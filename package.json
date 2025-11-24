@@ -1,0 +1,54 @@
+{
+  "name": "finleybook",
+  "version": "1.0.0",
+  "description": "AI-powered personal finance and tax management platform",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 4000",
+    "dev:3000": "next dev -p 3000",
+    "dev:3002": "next dev -p 3002",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "export": "next build && next export",
+    "firebase:deploy": "firebase deploy",
+    "firebase:rules": "firebase deploy --only firestore:rules,storage",
+    "deploy": "npm run build && firebase deploy"
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.7.17",
+    "@heroicons/react": "^2.0.18",
+    "@tailwindcss/forms": "^0.5.7",
+    "@vercel/analytics": "^1.1.1",
+    "autoprefixer": "^10.4.16",
+    "chart.js": "^4.4.0",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "firebase": "^10.14.1",
+    "firebase-admin": "^11.11.1",
+    "framer-motion": "^10.16.5",
+    "next": "^14.0.3",
+    "openai": "^4.20.1",
+    "postcss": "^8.4.32",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "react-hot-toast": "^2.4.1",
+    "recharts": "^2.8.0",
+    "tailwindcss": "^3.3.6",
+    "tesseract.js": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "eslint": "^8.54.0",
+    "eslint-config-next": "^14.0.3",
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
