@@ -163,6 +163,14 @@ export default function RecentTransactions() {
           </motion.h3>
           <div className="flex items-center space-x-2">
             <motion.button
+              onClick={loadTransactions}
+              className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              🔄 刷新
+            </motion.button>
+            <motion.button
               onClick={() => setShowAddModal(true)}
               className="flex items-center px-3 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               whileHover={{ scale: 1.05 }}
@@ -172,6 +180,14 @@ export default function RecentTransactions() {
               {t('transactions.addTransaction')}
             </motion.button>
           </div>
+        </div>
+
+        {/* Debug Info */}
+        <div className="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
+          <p>用户ID: {user?.uid}</p>
+          <p>交易数量: {transactions.length}</p>
+          <p>加载状态: {isLoading ? '加载中' : '已完成'}</p>
+          <p>最后刷新: {new Date().toLocaleTimeString()}</p>
         </div>
 
         <div className="mt-6">

@@ -90,7 +90,7 @@ export default function TransactionModal({ isOpen, onClose, onSuccess }: Transac
       console.log('[TransactionModal] Transaction added successfully with ID:', transactionId)
 
       setShowSuccess(true)
-      toast.success(t('transaction.successMessage'))
+      toast.success(t('transactions.addSuccess'))
 
       // Reset form and call success callback immediately
       setTimeout(() => {
