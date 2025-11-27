@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Check } from 'lucide-react'
 
@@ -65,9 +65,9 @@ export default function CountrySelector({
         <span className="text-lg">{selectedCountry.flag}</span>
         <span className="hidden sm:inline">{selectedCountry.name}</span>
         <span className="sm:hidden">{selectedCountry.code}</span>
-        <ChevronDown 
-          size={16} 
-          className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
+        <ChevronDown
+          size={16}
+          className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -76,11 +76,11 @@ export default function CountrySelector({
         {isOpen && (
           <>
             {/* Backdrop */}
-            <div 
-              className="fixed inset-0 z-40" 
+            <div
+              className="fixed inset-0 z-40"
               onClick={() => setIsOpen(false)}
             />
-            
+
             {/* Dropdown Panel */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: -10 }}
@@ -108,9 +108,8 @@ export default function CountrySelector({
                     <button
                       key={country.code}
                       onClick={() => handleCountrySelect(country)}
-                      className={`w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left group ${
-                        selectedCountry.code === country.code ? 'bg-indigo-50' : ''
-                      }`}
+                      className={`w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left group ${selectedCountry.code === country.code ? 'bg-indigo-50' : ''
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-xl">{country.flag}</span>
@@ -156,7 +155,8 @@ export function useCountry() {
   }
 
   // Load from localStorage on mount
-  useState(() => {
+  // Load from localStorage on mount
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('finleybook-country')
       if (saved) {
@@ -170,7 +170,7 @@ export function useCountry() {
         }
       }
     }
-  })
+  }, [])
 
   return {
     selectedCountry,
