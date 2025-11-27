@@ -52,7 +52,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (mounted) {
           setAuth(firebase.auth)
 
-          const { onAuthStateChanged } = await import('firebase/auth')
+          const { onAuthStateChanged, getRedirectResult } = await import('firebase/auth')
+          
+          // Handle redirect result first
+          try {
+            const result = await getRedirectResult(firebase.auth)
+            if (result) {
+              // User signed in via redirect
+              const isNewUser = (result as any)._tokenResponse?.isNewUser ||
+                result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+
+              if (isNewUser) {
+                await trackReferral(result.user.uid)
+              }
+            }
+          } catch (error: any) {
+            console.error('Redirect result error:', error)
+          }
+
           const unsubscribe = onAuthStateChanged(firebase.auth, (user) => {
             if (mounted) {
               clearTimeout(timeoutId)
@@ -152,16 +169,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setError(null)
-      const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth')
+      const { GoogleAuthProvider, signInWithRedirect, getRedirectResult } = await import('firebase/auth')
       const provider = new GoogleAuthProvider()
-      const result = await signInWithPopup(auth, provider)
-
-      const isNewUser = (result as any)._tokenResponse?.isNewUser ||
-        result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
-
-      if (isNewUser) {
-        await trackReferral(result.user.uid)
-      }
+      
+      // Use redirect instead of popup for better cross-origin support
+      await signInWithRedirect(auth, provider)
+      
     } catch (error: any) {
       console.error('Google sign in error:', error)
       setError(error.message)

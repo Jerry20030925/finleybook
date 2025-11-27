@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, CheckCircle2, TrendingUp, Zap, Shield, Star } from 'lucide-react'
+import { ArrowRight, CheckCircle2, TrendingUp, Zap, Shield, Star, ArrowUpRight, ArrowDownRight, Wallet } from 'lucide-react'
 import { useLanguage } from './LanguageProvider'
+import Logo from '@/components/Logo'
 
 interface HeroSectionProps {
   onStart: () => void
@@ -19,6 +20,11 @@ export default function HeroSection({ onStart }: HeroSectionProps) {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
+      {/* Logo - Top Left */}
+      <div className="absolute top-6 left-6 z-50">
+        <Logo size="lg" />
+      </div>
+
       {/* Background Gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-100/50 rounded-full blur-3xl opacity-60" />
@@ -132,7 +138,7 @@ export default function HeroSection({ onStart }: HeroSectionProps) {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
           className="relative flex justify-center lg:justify-end"
         >
-          <PhoneMockup />
+          <ProfessionalPhoneMockup />
 
           {/* Floating Emojis */}
           <motion.div
@@ -155,16 +161,55 @@ export default function HeroSection({ onStart }: HeroSectionProps) {
   )
 }
 
-// Enhanced Phone Mockup Component
-function PhoneMockup() {
+// Professional Phone Mockup with Live Feed Animation
+function ProfessionalPhoneMockup() {
+  const [balance, setBalance] = useState(1250.00)
+  const [transactions, setTransactions] = useState([
+    { id: 1, title: 'Opening Balance', amount: 1250.00, type: 'income', icon: '💰' }
+  ])
+
+  useEffect(() => {
+    const sequence = [
+      { title: 'Starbucks', amount: -5.50, type: 'expense', icon: '☕️', delay: 1000 },
+      { title: 'Freelance Work', amount: 450.00, type: 'income', icon: '💻', delay: 2500 },
+      { title: 'Grocery Store', amount: -85.20, type: 'expense', icon: '🛒', delay: 4000 },
+      { title: 'Netflix', amount: -15.99, type: 'expense', icon: '🎬', delay: 5500 },
+      { title: 'Salary', amount: 2500.00, type: 'income', icon: '💸', delay: 7000 },
+    ]
+
+    let timeouts: NodeJS.Timeout[] = []
+
+    sequence.forEach((item, index) => {
+      const timeout = setTimeout(() => {
+        setTransactions(prev => [
+          { id: Date.now(), ...item },
+          ...prev.slice(0, 3) // Keep only last 4
+        ])
+        setBalance(prev => prev + item.amount)
+      }, item.delay)
+      timeouts.push(timeout)
+    })
+
+    // Loop the animation
+    const loopTimeout = setTimeout(() => {
+      setTransactions([{ id: 1, title: 'Opening Balance', amount: 1250.00, type: 'income', icon: '💰' }])
+      setBalance(1250.00)
+    }, 9000) // Reset after sequence finishes
+
+    return () => {
+      timeouts.forEach(clearTimeout)
+      clearTimeout(loopTimeout)
+    }
+  }, [transactions.length === 1]) // Re-run when reset to initial state
+
   return (
     <div className="relative z-10">
       {/* Phone Frame */}
-      <div className="relative w-[320px] h-[640px] bg-gray-900 rounded-[3rem] border-[8px] border-gray-800 shadow-2xl mx-auto overflow-hidden">
+      <div className="relative w-[320px] h-[640px] bg-gray-900 rounded-[3rem] border-[8px] border-gray-800 shadow-2xl mx-auto overflow-hidden ring-1 ring-white/10">
         {/* Screen */}
-        <div className="absolute inset-0 bg-gray-900 rounded-[2.5rem] overflow-hidden">
+        <div className="absolute inset-0 bg-gray-950 rounded-[2.5rem] overflow-hidden flex flex-col">
           {/* Status Bar */}
-          <div className="h-12 flex items-center justify-between px-6 pt-2">
+          <div className="h-12 flex items-center justify-between px-6 pt-2 shrink-0 z-20">
             <div className="text-white text-xs font-medium">9:41</div>
             <div className="flex items-center gap-1.5">
               <div className="w-4 h-2.5 bg-white rounded-[1px]"></div>
@@ -175,69 +220,69 @@ function PhoneMockup() {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-gray-800 rounded-b-2xl z-20"></div>
 
           {/* App Content */}
-          <div className="p-6 h-full flex flex-col items-center justify-center relative">
+          <div className="flex-1 flex flex-col p-6 pt-12 relative">
 
-            {/* Main Circle - Savings */}
+            {/* Balance Card */}
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="relative w-56 h-56 mb-12"
+              layout
+              className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-6 mb-8 text-white shadow-lg shadow-indigo-500/20 relative overflow-hidden"
             >
-              {/* Green Gradient Circle */}
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full shadow-[0_0_40px_rgba(16,185,129,0.4)] flex items-center justify-center">
-                <div className="text-center text-white">
-                  <div className="text-4xl font-bold mb-1">$332.40</div>
-                  <div className="text-sm font-medium opacity-90">Saved This Month</div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16" />
+              <div className="relative z-10">
+                <div className="text-indigo-200 text-sm font-medium mb-1">Total Balance</div>
+                <div className="text-3xl font-bold tracking-tight">
+                  ${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+                <div className="mt-4 flex gap-3">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                    <ArrowUpRight className="w-4 h-4 text-emerald-300" />
+                  </div>
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                    <ArrowDownRight className="w-4 h-4 text-rose-300" />
+                  </div>
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-2 ml-auto">
+                    <Wallet className="w-4 h-4 text-white" />
+                  </div>
                 </div>
               </div>
-
-              {/* Floating Graph Icon */}
-              <motion.div
-                className="absolute -top-6 -right-2 bg-white rounded-xl p-3 shadow-lg"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <TrendingUp className="w-6 h-6 text-emerald-500" />
-              </motion.div>
             </motion.div>
 
-            {/* Transaction Card */}
-            <motion.div
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
-              className="w-full bg-gray-800/80 backdrop-blur-md rounded-2xl p-4 border border-gray-700/50 flex items-center gap-4"
-            >
-              <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-2xl">
-                🍔
+            {/* Live Transactions Feed */}
+            <div className="flex-1">
+              <div className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-4 px-1">Live Activity</div>
+              <div className="space-y-3">
+                <AnimatePresence mode="popLayout">
+                  {transactions.map((tx) => (
+                    <motion.div
+                      key={tx.id}
+                      layout
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      className="bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl p-3 flex items-center gap-3"
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${tx.type === 'income' ? 'bg-emerald-500/10' : 'bg-rose-500/10'
+                        }`}>
+                        {tx.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-white font-medium text-sm truncate">{tx.title}</div>
+                        <div className="text-gray-500 text-xs">Just now</div>
+                      </div>
+                      <div className={`font-bold text-sm ${tx.type === 'income' ? 'text-emerald-400' : 'text-rose-400'
+                        }`}>
+                        {tx.type === 'income' ? '+' : ''}{tx.amount.toFixed(2)}
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-bold">McDonald's</span>
-                  <span className="text-red-400 font-bold">-$12.49</span>
-                </div>
-                <div className="text-gray-400 text-xs mt-1">Fast Food • Today</div>
-              </div>
-            </motion.div>
+            </div>
 
           </div>
         </div>
       </div>
-
-      {/* Floating Notification - Outside Phone */}
-      <motion.div
-        initial={{ x: 50, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ delay: 1.2, duration: 0.5, type: "spring" }}
-        className="absolute top-1/3 -right-24 bg-white rounded-2xl p-4 shadow-xl border border-gray-100 max-w-[200px] z-30"
-      >
-        <div className="flex items-center gap-2 text-emerald-600 font-bold text-lg mb-1">
-          <TrendingUp size={20} />
-          <span>+$47.50</span>
-        </div>
-        <p className="text-xs text-gray-600 font-medium leading-tight">You saved by cooking at home!</p>
-      </motion.div>
     </div>
   )
 }
