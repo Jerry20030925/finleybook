@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import IdentityStep from './IdentityStep'
 import PainStep from './PainStep'
@@ -34,9 +34,11 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
     const [authError, setAuthError] = useState<string | null>(null)
 
     // Sync provider error to local state
-    if (providerError && !authError) {
-        setAuthError(providerError)
-    }
+    useEffect(() => {
+        if (providerError && !authError) {
+            setAuthError(providerError)
+        }
+    }, [providerError, authError])
 
     const nextStep = () => setStep(s => s + 1)
 

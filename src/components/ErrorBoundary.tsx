@@ -93,7 +93,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               刷新页面
             </motion.button>
 
-            {this.state.error && (
+            {process.env.NODE_ENV === 'development' && this.state.error && (
               <motion.details
                 className="mt-6 text-left"
                 initial={{ opacity: 0 }}
