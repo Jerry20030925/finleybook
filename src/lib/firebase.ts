@@ -20,15 +20,21 @@ const initializeFirebase = async () => {
     const { getFirestore } = await import('firebase/firestore');
     const { getStorage } = await import('firebase/storage');
 
+    // Hardcoded configuration to bypass environment variable issues
     const firebaseConfig = {
-      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyBQkaR0Bq9sIqFaLvlCUpQEVBWKu2AT5zc',
-      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'finleybook-6120d.firebaseapp.com',
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'finleybook-6120d',
-      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'finleybook-6120d.firebasestorage.app',
-      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '787309970302',
-      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:787309970302:web:c33272789af8ec7263292f',
-      measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || 'G-VSB2C4CK1M'
+      apiKey: 'AIzaSyBQkaR0Bq9sIqFaLvlCUpQEVBWKu2AT5zc',
+      authDomain: 'finleybook-6120d.firebaseapp.com',
+      projectId: 'finleybook-6120d',
+      storageBucket: 'finleybook-6120d.firebasestorage.app',
+      messagingSenderId: '787309970302',
+      appId: '1:787309970302:web:c33272789af8ec7263292f',
+      measurementId: 'G-VSB2C4CK1M'
     };
+
+    console.log('Initializing Firebase with config:', {
+      ...firebaseConfig,
+      apiKey: '***' + firebaseConfig.apiKey.slice(-4) // Mask API key
+    });
 
 
 
