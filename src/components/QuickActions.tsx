@@ -9,7 +9,8 @@ import {
   CameraIcon,
   MicrophoneIcon,
   CurrencyDollarIcon,
-  ClipboardDocumentListIcon
+  ClipboardDocumentListIcon,
+  GiftIcon
 } from '@heroicons/react/24/outline'
 import TransactionModal from './TransactionModal'
 import ReceiptUploadModal from './ReceiptUploadModal'
@@ -52,15 +53,19 @@ const actions = [
     action: 'view-transactions'
   },
   {
-    name: '预算分析',
-    description: '查看预算执行情况',
-    icon: CurrencyDollarIcon,
-    color: 'bg-indigo-600 hover:bg-indigo-700',
-    action: 'budget-analysis'
+    name: '邀请好友',
+    description: '送好友Pro会员',
+    icon: GiftIcon,
+    color: 'bg-pink-600 hover:bg-pink-700',
+    action: 'invite-friend'
   }
 ]
 
-export default function QuickActions() {
+interface QuickActionsProps {
+  onInvite?: () => void
+}
+
+export default function QuickActions({ onInvite }: QuickActionsProps) {
   const [activeModal, setActiveModal] = useState<string | null>(null)
   const router = useRouter()
 
@@ -83,6 +88,9 @@ export default function QuickActions() {
         break
       case 'budget-analysis':
         router.push('/budget')
+        break
+      case 'invite-friend':
+        if (onInvite) onInvite()
         break
       default:
         console.log('Action not implemented:', action)

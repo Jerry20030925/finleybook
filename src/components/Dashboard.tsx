@@ -30,6 +30,7 @@ import BudgetSetupModal from './Dashboard/BudgetSetupModal'
 
 import { Dialog } from '@headlessui/react'
 import ReferralGiftCard from './ReferralGiftCard'
+import InviteFriendModal from './Dashboard/InviteFriendModal'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -228,6 +229,16 @@ export default function Dashboard() {
           transition={{ delay: 0.4, duration: 0.5 }}
         >
           <QuickExpenseEntry onAddExpense={handleAddExpense} />
+        </motion.div>
+
+        {/* Quick Actions */}
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
+          <QuickActions onInvite={() => setShowInviteModal(true)} />
         </motion.div>
 
         {/* Main grid */}
@@ -444,6 +455,12 @@ export default function Dashboard() {
         currentBudget={monthlyBudget}
         currentWage={hourlyWage}
         onSave={saveUserSettings}
+      />
+
+      {/* Invite Friend Modal */}
+      <InviteFriendModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
       />
     </div>
   )
