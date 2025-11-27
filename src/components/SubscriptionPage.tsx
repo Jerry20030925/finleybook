@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { Check, Shield, Zap, Lock, TrendingUp, X, Sparkles } from 'lucide-react'
+import { useAuth } from './AuthProvider'
 
 interface SubscriptionPageProps {
     onClose?: () => void
@@ -11,6 +12,7 @@ interface SubscriptionPageProps {
 export default function SubscriptionPage({ onClose }: SubscriptionPageProps) {
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly')
     const [isProcessing, setIsProcessing] = useState(false)
+    const { user } = useAuth()
 
     const pricing = {
         monthly: {
@@ -73,17 +75,18 @@ export default function SubscriptionPage({ onClose }: SubscriptionPageProps) {
     ]
 
     const handleSubscribe = async () => {
+        if (!user) {
+            alert('Please login first to subscribe')
+            return
+        }
+
         setIsProcessing(true)
 
         try {
-            // Get user from auth context (you'll need to import useAuth)
-            // For now, using a placeholder
-            const userId = 'user-id-placeholder' // TODO: Get from useAuth()
-
-            // Stripe Price IDs (you'll need to create these in Stripe Dashboard)
+            // Actual Stripe Price IDs from environment variables
             const priceIds = {
-                monthly: 'price_monthly_placeholder', // TODO: Replace with actual Stripe Price ID
-                yearly: 'price_yearly_placeholder'    // TODO: Replace with actual Stripe Price ID
+                monthly: 'price_1QQVSzDBM183Xrjp3UQ5hgQB',
+                yearly: 'price_1QQVTgDBM183XrjSSKsR2Xqj'
             }
 
             const priceId = priceIds[billingCycle]
@@ -96,7 +99,7 @@ export default function SubscriptionPage({ onClose }: SubscriptionPageProps) {
                 },
                 body: JSON.stringify({
                     priceId,
-                    userId,
+                    userId: user.uid,
                 }),
             })
 
