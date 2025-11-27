@@ -15,7 +15,7 @@ const initializeFirebase = async () => {
   }
 
   try {
-    const { initializeApp, getApps, getApp } = await import('firebase/app');
+    const { initializeApp, getApps, getApp, deleteApp } = await import('firebase/app');
     const { getAuth } = await import('firebase/auth');
     const { getFirestore } = await import('firebase/firestore');
     const { getStorage } = await import('firebase/storage');
@@ -36,9 +36,25 @@ const initializeFirebase = async () => {
       apiKey: '***' + firebaseConfig.apiKey.slice(-4) // Mask API key
     });
 
+    if (getApps().length > 0) {
+      const currentApp = getApp();
+      const currentOptions = currentApp.options;
 
-
-    firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+      // Check if the current app has the correct API key
+      if (currentOptions.apiKey !== firebaseConfig.apiKey) {
+        console.warn('Firebase initialized with incorrect config. Deleting and re-initializing...', {
+          current: currentOptions.apiKey ? '***' + currentOptions.apiKey.slice(-4) : 'undefined',
+          expected: '***' + firebaseConfig.apiKey.slice(-4)
+        });
+        await deleteApp(currentApp);
+        firebaseApp = initializeApp(firebaseConfig);
+      } else {
+        console.log('Existing Firebase app has correct config.');
+        firebaseApp = currentApp;
+      }
+    } else {
+      firebaseApp = initializeApp(firebaseConfig);
+    }
     auth = getAuth(firebaseApp);
     db = getFirestore(firebaseApp);
     storage = getStorage(firebaseApp);
