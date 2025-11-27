@@ -40,10 +40,12 @@ export const getUserTransactions = async (userId: string, limitCount: number = 1
     )
 
     const snapshot = await getDocs(q)
-    console.log('[getUserTransactions] Found', snapshot.docs.length, 'transactions')
+    console.log('[getUserTransactions] Query executed successfully')
+    console.log('[getUserTransactions] Found', snapshot.docs.length, 'documents')
 
     const transactions = snapshot.docs.map(doc => {
       const data = doc.data()
+      console.log('[getUserTransactions] Processing document:', doc.id, data)
       return {
         id: doc.id,
         ...data,
@@ -58,6 +60,38 @@ export const getUserTransactions = async (userId: string, limitCount: number = 1
     console.error('[getUserTransactions] Error fetching transactions:', error)
     console.error('[getUserTransactions] Error code:', error.code)
     console.error('[getUserTransactions] Error message:', error.message)
+    
+    // If composite index error, try a simpler query
+    if (error.code === 'failed-precondition' && error.message.includes('index')) {
+      console.log('[getUserTransactions] Composite index required, trying simpler query...')
+      try {
+        const simpleQuery = query(
+          collection(db, 'transactions'),
+          where('userId', '==', userId),
+          limit(limitCount)
+        )
+        const simpleSnapshot = await getDocs(simpleQuery)
+        console.log('[getUserTransactions] Simple query found', simpleSnapshot.docs.length, 'transactions')
+        
+        const simpleTransactions = simpleSnapshot.docs.map(doc => {
+          const data = doc.data()
+          return {
+            id: doc.id,
+            ...data,
+            date: data.date?.toDate() || new Date(),
+            createdAt: data.createdAt?.toDate() || new Date()
+          }
+        }) as Transaction[]
+        
+        // Sort manually
+        simpleTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        return simpleTransactions.slice(0, limitCount)
+      } catch (simpleError) {
+        console.error('[getUserTransactions] Simple query also failed:', simpleError)
+        return []
+      }
+    }
+    
     return []
   }
 }
@@ -138,16 +172,32 @@ export const addTransaction = async (transaction: Omit<Transaction, 'id' | 'crea
       userId: transaction.userId,
       amount: transaction.amount,
       category: transaction.category,
-      type: transaction.type
+      type: transaction.type,
+      description: transaction.description,
+      date: transaction.date
     })
 
-    const docRef = await addDoc(collection(db, 'transactions'), {
+    const transactionData = {
       ...transaction,
       date: Timestamp.fromDate(new Date(transaction.date)),
       createdAt: Timestamp.now()
-    })
+    }
+
+    console.log('Prepared transaction data for Firestore:', transactionData)
+
+    const docRef = await addDoc(collection(db, 'transactions'), transactionData)
 
     console.log('Transaction added successfully with ID:', docRef.id)
+    
+    // Verify the transaction was actually saved
+    setTimeout(async () => {
+      try {
+        const verifyTransactions = await getUserTransactions(transaction.userId, 5)
+        console.log('Verification: Found', verifyTransactions.length, 'transactions after add')
+      } catch (error) {
+        console.error('Verification failed:', error)
+      }
+    }, 1000)
     return docRef.id
   } catch (error: any) {
     console.error('Error adding transaction:', error)

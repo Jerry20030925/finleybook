@@ -182,9 +182,21 @@ export default function Landing() {
 
         {/* Hero Section */}
         <div className="relative isolate px-6 pt-14 lg:px-8">
-          <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true">
+          <motion.div
+            animate={{
+              rotate: [0, 360],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+            aria-hidden="true"
+          >
             <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]" style={{ clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)' }} />
-          </div>
+          </motion.div>
 
           <div className="mx-auto max-w-7xl py-24 sm:py-32 lg:py-40">
             <motion.div
@@ -222,12 +234,15 @@ export default function Landing() {
                 className="mt-10 flex items-center justify-center gap-x-6"
                 variants={fadeInUp}
               >
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => openAuth('signup')}
-                  className="btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                  className="btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
                 >
-                  {t('hero.start')}
-                </button>
+                  <span className="relative z-10">{t('hero.start')}</span>
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                </motion.button>
                 <a href="#features" className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors">
                   {t('hero.learn_more')} <span aria-hidden="true">→</span>
                 </a>
@@ -241,7 +256,11 @@ export default function Landing() {
               transition={{ delay: 0.6, duration: 1, type: "spring" }}
               className="mt-16 flow-root sm:mt-24 relative z-10"
             >
-              <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4 backdrop-blur-sm">
+              <motion.div
+                animate={{ y: [0, -15, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4 backdrop-blur-sm"
+              >
                 <div className="rounded-md shadow-2xl ring-1 ring-gray-900/10 bg-white p-4 sm:p-8 overflow-hidden relative">
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-400 to-blue-500"></div>
                   <div className="flex flex-col sm:flex-row gap-8 items-center">
@@ -284,13 +303,25 @@ export default function Landing() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
 
-          <div className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]" aria-hidden="true">
+          <motion.div
+            animate={{
+              rotate: [360, 0],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
+            aria-hidden="true"
+          >
             <div className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]" style={{ clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)' }} />
-          </div>
+          </motion.div>
         </div>
 
         {/* Features Section */}
@@ -319,9 +350,14 @@ export default function Landing() {
                   return (
                     <motion.div
                       key={feature.key}
-                      className="flex flex-col bg-gray-50 rounded-2xl p-8 hover:bg-gray-100 transition-colors duration-300"
+                      className="flex flex-col bg-gray-50 rounded-2xl p-8 transition-all duration-300"
                       initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                       whileInView={{ opacity: 1, x: 0 }}
+                      whileHover={{
+                        y: -8,
+                        backgroundColor: "rgb(249, 250, 251)",
+                        boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+                      }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1, duration: 0.5 }}
                     >
@@ -376,11 +412,19 @@ export default function Landing() {
                           <button
                             key={tab}
                             onClick={() => setDemoTab(tab)}
-                            className={`text-xs px-2 py-1 rounded-md transition-colors ${demoTab === tab
-                              ? 'bg-primary-50 text-primary-600 font-medium'
+                            className={`relative text-xs px-3 py-1.5 rounded-md transition-colors ${demoTab === tab
+                              ? 'text-primary-600 font-medium'
                               : 'text-gray-400 hover:text-gray-600'
                               }`}
                           >
+                            {demoTab === tab && (
+                              <motion.div
+                                layoutId="activeTab"
+                                className="absolute inset-0 bg-primary-50 rounded-md"
+                                style={{ zIndex: -1 }}
+                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                              />
+                            )}
                             {tab.charAt(0).toUpperCase() + tab.slice(1)}
                           </button>
                         ))}
@@ -502,6 +546,7 @@ export default function Landing() {
                     whileInView={{ scale: 1, opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: stat.id * 0.1 }}
+                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
                   >
                     <dt className="text-sm font-semibold leading-6 text-gray-300">{stat.name}</dt>
                     <dd className="order-first text-3xl font-semibold tracking-tight text-white">

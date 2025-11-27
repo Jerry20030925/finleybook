@@ -91,8 +91,49 @@ export default function RecentTransactions() {
       },
       (error) => {
         console.error('[RecentTransactions] Real-time listener error:', error)
-        // Fall back to regular loading if real-time fails
-        loadTransactions()
+        console.error('[RecentTransactions] Error code:', error.code)
+        console.error('[RecentTransactions] Error message:', error.message)
+        
+        // If it's an index issue, try a simpler real-time query
+        if (error.code === 'failed-precondition' && error.message.includes('index')) {
+          console.log('[RecentTransactions] Setting up simple real-time listener without orderBy...')
+          const simpleQuery = query(
+            collection(db, 'transactions'),
+            where('userId', '==', user.uid),
+            limit(showAll ? 50 : 10)
+          )
+          
+          const simpleUnsubscribe = onSnapshot(simpleQuery,
+            (simpleSnapshot) => {
+              console.log('[RecentTransactions] Simple real-time update received, got', simpleSnapshot.docs.length, 'transactions')
+              const simpleTransactions = simpleSnapshot.docs.map(doc => {
+                const data = doc.data()
+                return {
+                  id: doc.id,
+                  ...data,
+                  date: data.date?.toDate() || new Date(),
+                  createdAt: data.createdAt?.toDate() || new Date()
+                }
+              }) as Transaction[]
+              
+              // Sort manually by date
+              simpleTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              console.log('[RecentTransactions] Simple real-time transactions (sorted):', simpleTransactions)
+              setTransactions(simpleTransactions)
+              setIsLoading(false)
+            },
+            (simpleError) => {
+              console.error('[RecentTransactions] Simple real-time listener also failed:', simpleError)
+              // Fall back to regular loading if all real-time methods fail
+              loadTransactions()
+            }
+          )
+          
+          return simpleUnsubscribe
+        } else {
+          // Fall back to regular loading if real-time fails
+          loadTransactions()
+        }
       }
     )
 
@@ -100,7 +141,7 @@ export default function RecentTransactions() {
       console.log('[RecentTransactions] Cleaning up real-time listener')
       unsubscribe()
     }
-  }, [user?.uid, showAll]) // Added showAll to dependencies
+  }, [user?.uid, showAll, loadTransactions]) // Added loadTransactions dependency
 
   const handleTransactionAdded = async () => {
     console.log('[RecentTransactions] Transaction added, refreshing list...')
@@ -185,9 +226,12 @@ export default function RecentTransactions() {
         {/* Debug Info */}
         <div className="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
           <p>用户ID: {user?.uid}</p>
+          <p>认证状态: {user ? '已登录' : '未登录'}</p>
           <p>交易数量: {transactions.length}</p>
           <p>加载状态: {isLoading ? '加载中' : '已完成'}</p>
           <p>最后刷新: {new Date().toLocaleTimeString()}</p>
+          <p>显示模式: {showAll ? '显示全部' : '显示10条'}</p>
+          {user?.email && <p>用户邮箱: {user.email}</p>}
         </div>
 
         <div className="mt-6">

@@ -4,7 +4,7 @@ import { auth } from '@/lib/firebase'
 
 export async function POST(req: NextRequest) {
   try {
-    const { planKey, successUrl, cancelUrl, userId, email } = await req.json()
+    const { planKey, successUrl, cancelUrl, userId, email, referralCode } = await req.json()
 
     // Enhanced logging for debugging
     console.log('Checkout session request:', {
@@ -118,17 +118,22 @@ export async function POST(req: NextRequest) {
             quantity: 1,
           },
         ],
+        discounts: referralCode ? [{
+          coupon: 'REF_FRIEND_1MO', // Ensure this coupon exists in Stripe Dashboard
+        }] : undefined,
         mode: 'subscription',
         success_url: successUrl,
         cancel_url: cancelUrl,
         metadata: {
           planKey,
           userId: userId,
+          referralCode: referralCode || '',
         },
         subscription_data: {
           metadata: {
             planKey,
             userId: userId,
+            referralCode: referralCode || '',
           },
         },
         automatic_tax: {

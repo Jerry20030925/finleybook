@@ -31,7 +31,7 @@ const translations: Record<string, {
 }> = {
   zh: {
     title: '服务条款',
-    lastUpdated: '最后更新时间：2024年11月25日',
+    lastUpdated: '最后更新时间：2025年11月25日',
     intro: '欢迎使用FinleyBook！这些服务条款（以下简称"条款"）规定了您使用我们平台服务的权利和义务。请您仔细阅读本条款，如果您不同意本条款的任何内容，请不要使用我们的服务。',
     sections: [
       {
