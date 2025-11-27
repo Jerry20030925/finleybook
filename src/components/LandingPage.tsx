@@ -199,7 +199,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
                     </div>
                 </div>
             </footer>
-        </div>
+        </motion.div>
     )
 }
 
