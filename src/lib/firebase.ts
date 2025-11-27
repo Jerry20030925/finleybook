@@ -23,7 +23,7 @@ const initializeFirebase = async () => {
     // Configuration from environment variables
     // Configuration hardcoded from Firebase Console with custom auth domain
     const firebaseConfig = {
-      apiKey: "AIzaSyBQkaR0Bq9sIqFaLvlCUpQEVBWKu2AT5zc",
+      apiKey: "AIzaSyBQkaROBq9sIqFaLvlCUpQEVBWKu2AT5zc",
       authDomain: "auth.finleybook.com",
       projectId: "finleybook-6120d",
       storageBucket: "finleybook-6120d.firebasestorage.app",
