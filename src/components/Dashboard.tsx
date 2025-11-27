@@ -50,21 +50,35 @@ export default function Dashboard() {
   }, [user])
 
   const loadUserSettings = () => {
-    // Load from localStorage (privacy-first approach)
-    const savedBudget = localStorage.getItem('monthlyBudget')
-    const savedWage = localStorage.getItem('hourlyWage')
-    const savedSpent = localStorage.getItem('currentMonthSpent')
+    // Only access localStorage on client side
+    if (typeof window === 'undefined') return
 
-    if (savedBudget) setMonthlyBudget(parseFloat(savedBudget))
-    if (savedWage) setHourlyWage(parseFloat(savedWage))
-    if (savedSpent) setSpent(parseFloat(savedSpent))
+    try {
+      const savedBudget = localStorage.getItem('monthlyBudget')
+      const savedWage = localStorage.getItem('hourlyWage')
+      const savedSpent = localStorage.getItem('currentMonthSpent')
+
+      if (savedBudget) setMonthlyBudget(parseFloat(savedBudget))
+      if (savedWage) setHourlyWage(parseFloat(savedWage))
+      if (savedSpent) setSpent(parseFloat(savedSpent))
+    } catch (error) {
+      console.error('Error loading user settings:', error)
+    }
   }
 
   const saveUserSettings = (budget: number, wage: number) => {
     setMonthlyBudget(budget)
     setHourlyWage(wage)
-    localStorage.setItem('monthlyBudget', budget.toString())
-    localStorage.setItem('hourlyWage', wage.toString())
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('monthlyBudget', budget.toString())
+        localStorage.setItem('hourlyWage', wage.toString())
+      } catch (error) {
+        console.error('Error saving user settings:', error)
+      }
+    }
+
     toast.success('Settings saved!')
   }
 
@@ -73,7 +87,14 @@ export default function Dashboard() {
       // Update local state immediately
       const newSpent = spent + amount
       setSpent(newSpent)
-      localStorage.setItem('currentMonthSpent', newSpent.toString())
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('currentMonthSpent', newSpent.toString())
+        } catch (error) {
+          console.error('Error saving to localStorage:', error)
+        }
+      }
 
       // Add to Firebase (optional backup)
       if (user) {
