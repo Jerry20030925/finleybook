@@ -18,7 +18,8 @@ export default function SubscriptionPage({ onClose }: SubscriptionPageProps) {
             total: 9.99,
             perDay: 0.33,
             savings: 0,
-            label: 'Monthly'
+            label: 'Monthly',
+            monthlyEquivalent: 9.99
         },
         yearly: {
             price: 79.99,
