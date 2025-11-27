@@ -21,15 +21,15 @@ const initializeFirebase = async () => {
     const { getStorage } = await import('firebase/storage');
 
     // Configuration from environment variables
-    // Configuration hardcoded to bypass potential Vercel Env Var errors
+    // Configuration hardcoded from Firebase Console screenshot
     const firebaseConfig = {
-      apiKey: 'AIzaSyBQkaR0Bq9sIqFaLvlCUpQEVBWKu2AT5zc',
-      authDomain: 'finleybook.com',
-      projectId: 'finleybook-6120d',
-      storageBucket: 'finleybook-6120d.firebasestorage.app',
-      messagingSenderId: '787309970302',
-      appId: '1:787309970302:web:c33272789af8ec7263292f',
-      measurementId: 'G-VSB2C4CK1M'
+      apiKey: "AIzaSyBQkaROBq9sIqFaLvlCUpQEVBWKu2AT5zc",
+      authDomain: "finleybook-6120d.firebaseapp.com",
+      projectId: "finleybook-6120d",
+      storageBucket: "finleybook-6120d.firebasestorage.app",
+      messagingSenderId: "787309970302",
+      appId: "1:787309970302:web:c33272789af8ec7263292f",
+      measurementId: "G-VSB2C4CK1M"
     };
 
     console.log('Initializing Firebase with config:', {
