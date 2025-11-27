@@ -128,6 +128,9 @@ const translations: Record<Language, Record<string, string>> = {
     'auth.signInError': 'Sign in failed, please check email and password',
     'auth.signUpError': 'Sign up failed, please try again later',
     'auth.googleSignInError': 'Google sign in failed',
+    'auth.enterEmailFirst': 'Please enter your email first',
+    'auth.passwordResetSent': 'Password reset email sent! Check your inbox.',
+    'auth.passwordResetError': 'Failed to send password reset email',
 
     // Form Validation
     'validation.emailRequired': 'Please enter email address',
@@ -458,6 +461,9 @@ const translations: Record<Language, Record<string, string>> = {
     'auth.signInError': '登录失败，请检查邮箱和密码',
     'auth.signUpError': '注册失败，请稍后重试',
     'auth.googleSignInError': 'Google登录失败',
+    'auth.enterEmailFirst': '请先输入您的邮箱',
+    'auth.passwordResetSent': '密码重置邮件已发送！请查看您的邮箱。',
+    'auth.passwordResetError': '发送密码重置邮件失败',
 
     // Form Validation
     'validation.emailRequired': '请输入邮箱地址',

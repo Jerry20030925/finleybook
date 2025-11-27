@@ -23,8 +23,9 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const { signIn, signUp, signInWithGoogle } = useAuth()
+  const { signIn, signUp, signInWithGoogle, sendPasswordReset } = useAuth()
   const { t } = useLanguage()
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
 
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {}
@@ -90,6 +91,25 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
     } catch (error: any) {
       console.error('Google auth error:', error)
       toast.error(t('auth.googleSignInError'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast.error(t('auth.enterEmailFirst'))
+      return
+    }
+    
+    setLoading(true)
+    try {
+      await sendPasswordReset(email)
+      toast.success(t('auth.passwordResetSent'))
+      setShowForgotPassword(false)
+    } catch (error: any) {
+      console.error('Password reset error:', error)
+      toast.error(t('auth.passwordResetError'))
     } finally {
       setLoading(false)
     }
@@ -309,6 +329,20 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
                           </motion.p>
                         )}
                       </div>
+                      
+                      {/* Forgot Password Link - only for signin mode */}
+                      {currentMode === 'signin' && (
+                        <div className="flex justify-end mt-2">
+                          <button
+                            type="button"
+                            onClick={handleForgotPassword}
+                            disabled={loading}
+                            className="text-sm text-violet-600 hover:text-violet-700 font-medium transition-colors disabled:opacity-50"
+                          >
+                            {t('auth.forgotPassword')}
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     {/* Confirm Password Field */}

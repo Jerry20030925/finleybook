@@ -251,3 +251,71 @@ export const createSampleData = async (userId: string) => {
     console.error('Error creating sample data:', error)
   }
 }
+
+// Goal interface
+export interface Goal {
+  id?: string
+  userId: string
+  title: string
+  description: string
+  targetAmount: number
+  currentAmount: number
+  deadline: string
+  category: 'savings' | 'investment' | 'purchase' | 'debt' | 'emergency'
+  isCompleted: boolean
+  createdAt: Date
+}
+
+// Goal CRUD operations
+export const addGoal = async (goal: Omit<Goal, 'id' | 'createdAt'>) => {
+  try {
+    const goalData = {
+      ...goal,
+      createdAt: Timestamp.now()
+    }
+    const docRef = await addDoc(collection(db, 'goals'), goalData)
+    return docRef.id
+  } catch (error) {
+    console.error('Error adding goal:', error)
+    throw error
+  }
+}
+
+export const getGoals = async (userId: string) => {
+  try {
+    const q = query(
+      collection(db, 'goals'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate() || new Date()
+    })) as Goal[]
+  } catch (error) {
+    console.error('Error fetching goals:', error)
+    return []
+  }
+}
+
+export const updateGoal = async (goalId: string, updates: Partial<Goal>) => {
+  try {
+    const docRef = doc(db, 'goals', goalId)
+    await updateDoc(docRef, updates)
+  } catch (error) {
+    console.error('Error updating goal:', error)
+    throw error
+  }
+}
+
+export const deleteGoal = async (goalId: string) => {
+  try {
+    const docRef = doc(db, 'goals', goalId)
+    await deleteDoc(docRef)
+  } catch (error) {
+    console.error('Error deleting goal:', error)
+    throw error
+  }
+}

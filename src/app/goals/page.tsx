@@ -6,29 +6,12 @@ import { PlusIcon, PencilIcon, TrashIcon, CheckCircleIcon } from '@heroicons/rea
 import Navigation from '@/components/Navigation'
 import { useAuth } from '@/components/AuthProvider'
 import toast from 'react-hot-toast'
-
-interface Goal {
-  id: string
-  title: string
-  description: string
-  targetAmount: number
-  currentAmount: number
-  deadline: string
-  category: 'savings' | 'investment' | 'purchase' | 'debt' | 'emergency'
-  isCompleted: boolean
-  createdAt: Date
-}
-
-const GOAL_CATEGORIES = {
-  savings: { label: '储蓄目标', color: 'bg-green-100 text-green-800', icon: '💰' },
-  investment: { label: '投资目标', color: 'bg-blue-100 text-blue-800', icon: '📈' },
-  purchase: { label: '购买目标', color: 'bg-purple-100 text-purple-800', icon: '🛒' },
-  debt: { label: '债务清偿', color: 'bg-red-100 text-red-800', icon: '💳' },
-  emergency: { label: '应急基金', color: 'bg-yellow-100 text-yellow-800', icon: '🛡️' }
-}
+import { useLanguage } from '@/components/LanguageProvider'
+import { Goal, addGoal, getGoals, updateGoal, deleteGoal } from '@/lib/dataService'
 
 export default function GoalsPage() {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const [goals, setGoals] = useState<Goal[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -40,10 +23,18 @@ export default function GoalsPage() {
     description: '',
     targetAmount: '',
     deadline: '',
-    category: 'savings' as keyof typeof GOAL_CATEGORIES
+    category: 'savings' as Goal['category']
   })
 
   const [progressAmount, setProgressAmount] = useState('')
+
+  const GOAL_CATEGORIES = {
+    savings: { label: t('goals.categories.savings'), color: 'bg-green-100 text-green-800', icon: '💰' },
+    investment: { label: t('goals.categories.investment'), color: 'bg-blue-100 text-blue-800', icon: '📈' },
+    purchase: { label: t('goals.categories.purchase'), color: 'bg-purple-100 text-purple-800', icon: '🛒' },
+    debt: { label: t('goals.categories.debt'), color: 'bg-red-100 text-red-800', icon: '💳' },
+    emergency: { label: t('goals.categories.emergency'), color: 'bg-yellow-100 text-yellow-800', icon: '🛡️' }
+  }
 
   useEffect(() => {
     if (user) {
@@ -52,49 +43,60 @@ export default function GoalsPage() {
   }, [user])
 
   const loadGoals = async () => {
+    if (!user) return
     try {
       setLoading(true)
-      // Create sample goals for demonstration
-      setGoals([])
+      const fetchedGoals = await getGoals(user.uid)
+      setGoals(fetchedGoals)
     } catch (error) {
       console.error('Error loading goals:', error)
-      toast.error('加载目标失败')
+      toast.error(t('goals.loadError'))
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!user) return
 
     if (!formData.title || !formData.targetAmount || !formData.deadline) {
-      toast.error('请填写必要信息')
+      toast.error(t('goals.fillRequired'))
       return
     }
 
-    const newGoal: Goal = {
-      id: editingGoal ? editingGoal.id : Date.now().toString(),
-      title: formData.title,
-      description: formData.description,
-      targetAmount: parseFloat(formData.targetAmount),
-      currentAmount: editingGoal ? editingGoal.currentAmount : 0,
-      deadline: formData.deadline,
-      category: formData.category,
-      isCompleted: editingGoal ? editingGoal.isCompleted : false,
-      createdAt: editingGoal ? editingGoal.createdAt : new Date()
-    }
+    try {
+      if (editingGoal && editingGoal.id) {
+        await updateGoal(editingGoal.id, {
+          title: formData.title,
+          description: formData.description,
+          targetAmount: parseFloat(formData.targetAmount),
+          deadline: formData.deadline,
+          category: formData.category
+        })
+        toast.success(t('goals.goalUpdated'))
+      } else {
+        await addGoal({
+          userId: user.uid,
+          title: formData.title,
+          description: formData.description,
+          targetAmount: parseFloat(formData.targetAmount),
+          currentAmount: 0,
+          deadline: formData.deadline,
+          category: formData.category,
+          isCompleted: false
+        })
+        toast.success(t('goals.goalAdded'))
+      }
 
-    if (editingGoal) {
-      setGoals(prev => prev.map(g => g.id === editingGoal.id ? newGoal : g))
-      toast.success('目标更新成功')
-    } else {
-      setGoals(prev => [...prev, newGoal])
-      toast.success('目标添加成功')
+      setFormData({ title: '', description: '', targetAmount: '', deadline: '', category: 'savings' })
+      setShowModal(false)
+      setEditingGoal(null)
+      loadGoals()
+    } catch (error) {
+      console.error('Error saving goal:', error)
+      toast.error(t('common.error'))
     }
-
-    setFormData({ title: '', description: '', targetAmount: '', deadline: '', category: 'savings' })
-    setShowModal(false)
-    setEditingGoal(null)
   }
 
   const handleEdit = (goal: Goal) => {
@@ -109,32 +111,47 @@ export default function GoalsPage() {
     setShowModal(true)
   }
 
-  const handleDelete = (id: string) => {
-    setGoals(prev => prev.filter(g => g.id !== id))
-    toast.success('目标删除成功')
+  const handleDelete = async (id: string) => {
+    if (!confirm(t('common.confirm') + '?')) return
+    try {
+      await deleteGoal(id)
+      toast.success(t('goals.goalDeleted'))
+      loadGoals()
+    } catch (error) {
+      console.error('Error deleting goal:', error)
+      toast.error(t('common.error'))
+    }
   }
 
-  const handleUpdateProgress = (goal: Goal) => {
+  const handleUpdateProgress = async (goal: Goal) => {
+    if (!goal.id) return
     const amount = parseFloat(progressAmount)
     if (isNaN(amount) || amount < 0) {
-      toast.error('请输入有效金额')
+      toast.error(t('goals.validAmount'))
       return
     }
 
-    const updatedGoal = {
-      ...goal,
-      currentAmount: Math.min(goal.currentAmount + amount, goal.targetAmount),
-      isCompleted: goal.currentAmount + amount >= goal.targetAmount
-    }
+    const newCurrentAmount = Math.min(goal.currentAmount + amount, goal.targetAmount)
+    const isCompleted = newCurrentAmount >= goal.targetAmount
 
-    setGoals(prev => prev.map(g => g.id === goal.id ? updatedGoal : g))
-    setShowProgressModal(null)
-    setProgressAmount('')
+    try {
+      await updateGoal(goal.id, {
+        currentAmount: newCurrentAmount,
+        isCompleted: isCompleted
+      })
 
-    if (updatedGoal.isCompleted) {
-      toast.success('🎉 恭喜！目标已完成！')
-    } else {
-      toast.success('进度更新成功')
+      setShowProgressModal(null)
+      setProgressAmount('')
+      loadGoals()
+
+      if (isCompleted) {
+        toast.success(t('goals.congratulations'))
+      } else {
+        toast.success(t('goals.progressUpdated'))
+      }
+    } catch (error) {
+      console.error('Error updating progress:', error)
+      toast.error(t('common.error'))
     }
   }
 
@@ -164,8 +181,8 @@ export default function GoalsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">目标管理</h1>
-          <p className="text-gray-600">设定并追踪您的财务目标</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('goals.title')}</h1>
+          <p className="text-gray-600">{t('goals.description')}</p>
         </motion.div>
 
         {/* Stats Cards */}
@@ -176,19 +193,19 @@ export default function GoalsPage() {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">总目标</h3>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">{t('goals.totalGoals')}</h3>
             <p className="text-2xl font-bold text-blue-600">{goals.length}</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">进行中</h3>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">{t('goals.inProgress')}</h3>
             <p className="text-2xl font-bold text-orange-600">{activeGoals.length}</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">已完成</h3>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">{t('goals.completed')}</h3>
             <p className="text-2xl font-bold text-green-600">{completedGoals.length}</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">完成率</h3>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">{t('goals.completionRate')}</h3>
             <p className="text-2xl font-bold text-purple-600">
               {goals.length > 0 ? Math.round((completedGoals.length / goals.length) * 100) : 0}%
             </p>
@@ -209,7 +226,7 @@ export default function GoalsPage() {
             whileTap={{ scale: 0.95 }}
           >
             <PlusIcon className="w-5 h-5 mr-2" />
-            添加目标
+            {t('goals.addGoal')}
           </motion.button>
         </motion.div>
 
@@ -220,85 +237,91 @@ export default function GoalsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          <h2 className="text-lg font-medium text-gray-900 mb-4">进行中的目标</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {activeGoals.map((goal, index) => {
-              const percentage = getProgressPercentage(goal.currentAmount, goal.targetAmount)
-              const daysLeft = getDaysUntilDeadline(goal.deadline)
-              const category = GOAL_CATEGORIES[goal.category]
+          <h2 className="text-lg font-medium text-gray-900 mb-4">{t('goals.activeGoals')}</h2>
+          {activeGoals.length === 0 ? (
+            <div className="text-center py-10 bg-white rounded-xl border border-gray-100">
+              <p className="text-gray-500">{t('transactions.noRecords')}</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {activeGoals.map((goal, index) => {
+                const percentage = getProgressPercentage(goal.currentAmount, goal.targetAmount)
+                const daysLeft = getDaysUntilDeadline(goal.deadline)
+                const category = GOAL_CATEGORIES[goal.category]
 
-              return (
-                <motion.div
-                  key={goal.id}
-                  className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.3 }}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-2xl">{category.icon}</span>
-                      <div>
-                        <h3 className="text-lg font-medium text-gray-900">{goal.title}</h3>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${category.color}`}>
-                          {category.label}
-                        </span>
+                return (
+                  <motion.div
+                    key={goal.id}
+                    className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.3 }}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-2xl">{category.icon}</span>
+                        <div>
+                          <h3 className="text-lg font-medium text-gray-900">{goal.title}</h3>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${category.color}`}>
+                            {category.label}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleEdit(goal)}
+                          className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                        >
+                          <PencilIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => goal.id && handleDelete(goal.id)}
+                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-                    <div className="flex space-x-2">
+
+                    {goal.description && (
+                      <p className="text-gray-600 text-sm mb-4">{goal.description}</p>
+                    )}
+
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>¥{goal.currentAmount.toLocaleString()}</span>
+                        <span>¥{goal.targetAmount.toLocaleString()}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <motion.div
+                          className="h-2 rounded-full bg-blue-500"
+                          style={{ width: `${percentage}%` }}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percentage}%` }}
+                          transition={{ delay: index * 0.1 + 0.5, duration: 0.8 }}
+                        />
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {percentage.toFixed(1)}% {t('goals.completedText')}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm text-gray-500">
+                        {daysLeft > 0 ? `${daysLeft} ${t('goals.daysLeft')}` : t('goals.expired')}
+                      </div>
                       <button
-                        onClick={() => handleEdit(goal)}
-                        className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                        onClick={() => setShowProgressModal(goal)}
+                        className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors"
                       >
-                        <PencilIcon className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(goal.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                      >
-                        <TrashIcon className="w-4 h-4" />
+                        {t('goals.updateProgress')}
                       </button>
                     </div>
-                  </div>
-
-                  {goal.description && (
-                    <p className="text-gray-600 text-sm mb-4">{goal.description}</p>
-                  )}
-
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
-                      <span>¥{goal.currentAmount.toLocaleString()}</span>
-                      <span>¥{goal.targetAmount.toLocaleString()}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <motion.div
-                        className="h-2 rounded-full bg-blue-500"
-                        style={{ width: `${percentage}%` }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
-                        transition={{ delay: index * 0.1 + 0.5, duration: 0.8 }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {percentage.toFixed(1)}% 完成
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-gray-500">
-                      {daysLeft > 0 ? `${daysLeft} 天后到期` : '已过期'}
-                    </div>
-                    <button
-                      onClick={() => setShowProgressModal(goal)}
-                      className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors"
-                    >
-                      更新进度
-                    </button>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+          )}
         </motion.div>
 
         {/* Completed Goals */}
@@ -308,7 +331,7 @@ export default function GoalsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.5 }}
           >
-            <h2 className="text-lg font-medium text-gray-900 mb-4">已完成的目标</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">{t('goals.completedGoals')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {completedGoals.map((goal, index) => {
                 const category = GOAL_CATEGORIES[goal.category]
@@ -334,7 +357,7 @@ export default function GoalsPage() {
                     </div>
 
                     <p className="text-green-600 font-medium">
-                      🎉 目标已完成！¥{goal.targetAmount.toLocaleString()}
+                      {t('goals.congratulations')} ¥{goal.targetAmount.toLocaleString()}
                     </p>
                   </motion.div>
                 )
@@ -353,39 +376,39 @@ export default function GoalsPage() {
               transition={{ duration: 0.2 }}
             >
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {editingGoal ? '编辑目标' : '添加目标'}
+                {editingGoal ? t('goals.editModal.title') : t('goals.addModal.title')}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    目标名称
+                    {t('goals.name')}
                   </label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500"
-                    placeholder="例如：紧急基金"
+                    placeholder={t('goals.namePlaceholder')}
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    描述（可选）
+                    {t('goals.descriptionLabel')}
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500"
                     rows={3}
-                    placeholder="目标的详细描述"
+                    placeholder={t('goals.descriptionPlaceholder')}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    目标金额
+                    {t('goals.targetAmount')}
                   </label>
                   <input
                     type="number"
@@ -401,7 +424,7 @@ export default function GoalsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    截止日期
+                    {t('goals.deadline')}
                   </label>
                   <input
                     type="date"
@@ -414,11 +437,11 @@ export default function GoalsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    分类
+                    {t('goals.category')}
                   </label>
                   <select
                     value={formData.category}
-                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as keyof typeof GOAL_CATEGORIES }))}
+                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as Goal['category'] }))}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
                   >
                     {Object.entries(GOAL_CATEGORIES).map(([key, category]) => (
@@ -439,13 +462,13 @@ export default function GoalsPage() {
                     }}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                   >
-                    取消
+                    {t('common.cancel')}
                   </button>
                   <button
                     type="submit"
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    {editingGoal ? '更新' : '添加'}
+                    {editingGoal ? t('goals.update') : t('goals.add')}
                   </button>
                 </div>
               </form>
@@ -463,11 +486,11 @@ export default function GoalsPage() {
               transition={{ duration: 0.2 }}
             >
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                更新进度 - {showProgressModal.title}
+                {t('goals.updateProgress')} - {showProgressModal.title}
               </h3>
               <div className="mb-4">
                 <p className="text-sm text-gray-600 mb-2">
-                  当前进度: ¥{showProgressModal.currentAmount.toLocaleString()} / ¥{showProgressModal.targetAmount.toLocaleString()}
+                  {t('goals.currentProgress')}: ¥{showProgressModal.currentAmount.toLocaleString()} / ¥{showProgressModal.targetAmount.toLocaleString()}
                 </p>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
@@ -479,7 +502,7 @@ export default function GoalsPage() {
 
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  增加金额
+                  {t('goals.addAmount')}
                 </label>
                 <input
                   type="number"
@@ -500,13 +523,13 @@ export default function GoalsPage() {
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                 >
-                  取消
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={() => handleUpdateProgress(showProgressModal)}
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  更新
+                  {t('goals.update')}
                 </button>
               </div>
             </motion.div>

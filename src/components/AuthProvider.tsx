@@ -12,6 +12,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
+  sendPasswordReset: (email: string) => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -193,10 +194,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-
+  const sendPasswordReset = async (email: string) => {
+    if (!auth) {
+      const errorMsg = error || 'Auth not initialized (Check console for details)'
+      console.error('SendPasswordReset blocked:', errorMsg)
+      throw new Error(errorMsg)
+    }
+    try {
+      setError(null)
+      const { sendPasswordResetEmail } = await import('firebase/auth')
+      await sendPasswordResetEmail(auth, email)
+    } catch (error: any) {
+      console.error('Password reset error:', error)
+      setError(error.message)
+      throw error
+    }
+  }
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, signIn, signUp, signInWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, signIn, signUp, signInWithGoogle, sendPasswordReset, logout }}>
       {children}
     </AuthContext.Provider>
   )
