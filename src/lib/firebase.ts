@@ -21,14 +21,15 @@ const initializeFirebase = async () => {
     const { getStorage } = await import('firebase/storage');
 
     // Configuration from environment variables
+    // Configuration from environment variables with fallbacks
     const firebaseConfig = {
-      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
-      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
-      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
-      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
-      measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID!
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyBQkaROBq9sIqFaLvlCUpQEVBWKu2AT5zc',
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'finleybook-6120d.firebaseapp.com',
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'finleybook-6120d',
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'finleybook-6120d.firebasestorage.app',
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '787309970302',
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:787309970302:web:c33272789af8ec7263292f',
+      measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
     };
 
     console.log('Initializing Firebase with config:', {
