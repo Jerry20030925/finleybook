@@ -9,6 +9,8 @@ import { useAuth } from '@/components/AuthProvider'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '../LanguageProvider'
 import toast from 'react-hot-toast'
+import Logo from '../Logo'
+
 import { Mail, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
 
 interface OnboardingWizardProps {
@@ -22,12 +24,13 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
         wastedAmount: 50
     })
     const [isSigningUp, setIsSigningUp] = useState(false)
-    const { user, signInWithGoogle, signUp, signIn, error: providerError } = useAuth()
+    const { user, signInWithGoogle, signUp, signIn, sendPasswordReset, error: providerError } = useAuth()
     const { t } = useLanguage()
     const router = useRouter()
 
     // Email Auth State
     const [showEmailForm, setShowEmailForm] = useState(false)
+    const [showResetForm, setShowResetForm] = useState(false)
     const [isLoginMode, setIsLoginMode] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -89,6 +92,29 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
         }
     }
 
+    const handlePasswordReset = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!email) {
+            toast.error(t('validation.emailRequired'))
+            return
+        }
+
+        setIsSigningUp(true)
+        try {
+            await sendPasswordReset(email)
+            toast.success('Password reset email sent! Check your inbox.')
+            setShowResetForm(false)
+            setIsLoginMode(true)
+        } catch (error: any) {
+            console.error('Reset failed', error)
+            setAuthError(error.message)
+        } finally {
+            setIsSigningUp(false)
+        }
+    }
+
+    // ... other handlers
+
     if (step === 3) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -98,14 +124,17 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                     className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center"
                 >
                     <div className="flex justify-center mb-6">
-                        <div className="relative">
-                            <span className="text-4xl font-black tracking-tighter">F.</span>
-                            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-teal-600 rounded-full border-2 border-white"></div>
-                        </div>
+                        <Logo size="xl" className="justify-center" />
                     </div>
 
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Last Step</h2>
-                    <p className="text-gray-600 mb-8">One second to open your "Flight Fund".</p>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                        {showResetForm ? 'Reset Password' : 'Last Step'}
+                    </h2>
+                    <p className="text-gray-600 mb-8">
+                        {showResetForm
+                            ? 'Enter your email to receive a reset link.'
+                            : 'One second to open your "Flight Fund".'}
+                    </p>
 
                     {authError && (
                         <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl flex flex-col gap-2 text-left">
@@ -115,16 +144,53 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                             </div>
                             <p className="text-xs opacity-90 break-all">{authError}</p>
                             <button
-                                onClick={() => window.location.reload()}
+                                onClick={() => setAuthError(null)}
                                 className="text-xs font-bold underline self-start hover:text-red-800"
                             >
-                                Reload Page
+                                Dismiss
                             </button>
                         </div>
                     )}
 
-                    {!showEmailForm ? (
+                    {showResetForm ? (
+                        <form onSubmit={handlePasswordReset} className="space-y-4 text-left">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">{t('auth.email')}</label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none text-gray-900 placeholder-gray-400"
+                                    placeholder="you@example.com"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isSigningUp}
+                                className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg shadow-indigo-200 mt-6"
+                            >
+                                {isSigningUp ? (
+                                    <Loader2 className="animate-spin" />
+                                ) : (
+                                    'Send Reset Link'
+                                )}
+                            </button>
+
+                            <div className="text-center">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowResetForm(false)}
+                                    className="text-gray-400 text-sm hover:text-gray-600 font-medium flex items-center justify-center gap-1 mx-auto"
+                                >
+                                    ← Back to Login
+                                </button>
+                            </div>
+                        </form>
+                    ) : !showEmailForm ? (
                         <div className="space-y-4">
+                            {/* ... Google and Email buttons ... */}
                             <button
                                 onClick={handleGoogleSignup}
                                 disabled={isSigningUp || !!authError}
@@ -145,7 +211,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                                                 <path fill="#EA4335" d="M12 4.66c1.6 0 3.05.55 4.18 1.6l3.14-3.14C17.45 1.27 14.97 0 12 0 7.7 0 3.99 2.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                                             </svg>
                                         </div>
-                                        {t('Continue with Google')}
+                                        {t('auth.googleSignIn')}
                                     </>
                                 )}
                             </button>
@@ -182,7 +248,18 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">{t('auth.password')}</label>
+                                <div className="flex justify-between items-center mb-1.5 ml-1">
+                                    <label className="block text-sm font-bold text-gray-700">{t('auth.password')}</label>
+                                    {isLoginMode && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowResetForm(true)}
+                                            className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                                        >
+                                            {t('auth.forgotPassword')}
+                                        </button>
+                                    )}
+                                </div>
                                 <input
                                     type="password"
                                     required
@@ -202,7 +279,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                                 {isSigningUp ? (
                                     <Loader2 className="animate-spin" />
                                 ) : (
-                                    isLoginMode ? 'Sign In' : 'Sign Up'
+                                    isLoginMode ? t('auth.signIn') : t('auth.signUp')
                                 )}
                             </button>
 
@@ -212,7 +289,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                                     onClick={() => setIsLoginMode(!isLoginMode)}
                                     className="text-indigo-600 hover:text-indigo-800 font-bold text-sm"
                                 >
-                                    {isLoginMode ? 'Create an account' : 'Already have an account?'}
+                                    {isLoginMode ? t('auth.createAccount') : t('auth.haveAccount')}
                                 </button>
                             </div>
 
@@ -222,14 +299,14 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                                     onClick={() => setShowEmailForm(false)}
                                     className="text-gray-400 text-sm hover:text-gray-600 font-medium flex items-center justify-center gap-1 mx-auto"
                                 >
-                                    ← Back
+                                    ← {t('common.back')}
                                 </button>
                             </div>
                         </form>
                     )}
 
                     <p className="text-xs text-gray-400 mt-8">
-                        By clicking, you agree to our Terms
+                        {t('onboarding.final.terms')}
                     </p>
                 </motion.div>
             </div>
