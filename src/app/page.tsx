@@ -20,6 +20,7 @@ export default function Home() {
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [totalSaved, setTotalSaved] = useState(125.00) // Demo initial value
   const [playCoin] = useSound('/sounds/coin.mp3', { volume: 0.5 })
+  const [initialStep, setInitialStep] = useState(0)
 
 
 
@@ -40,7 +41,7 @@ export default function Home() {
 
   if (loading) return <PageLoader />
 
-  const [initialStep, setInitialStep] = useState(0)
+
 
   // ...
 
