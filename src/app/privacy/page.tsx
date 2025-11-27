@@ -2,8 +2,11 @@
 
 'use client'
 
+import { useState } from 'react'
 import { useLanguage } from '@/components/LanguageProvider'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { ChevronRight, Home, FileText, Shield, ArrowUp } from 'lucide-react'
 
 interface Section {
   title: string
@@ -316,92 +319,221 @@ const translations: Record<string, {
 export default function Privacy() {
   const { language } = useLanguage()
   const t = translations[language]
+  const [activeSection, setActiveSection] = useState(0)
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // Scroll to section function
+  const scrollToSection = (index: number) => {
+    const element = document.getElementById(`section-${index}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+      setActiveSection(index)
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-sm p-8 md:p-12">
-          <header className="mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">{t.title}</h1>
-            <p className="text-lg text-gray-600 mb-4">
-              {t.lastUpdated}
-            </p>
-            <p className="text-gray-600 leading-relaxed">
-              {t.intro}
-            </p>
-          </header>
-
-          <div className="prose max-w-none">
-            {t.sections.map((section, index) => (
-              <section key={index} className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-6">{section.title}</h2>
-
-                {section.content && <p className="mb-4">{section.content}</p>}
-
-                {section.subsections && section.subsections.map((sub, subIndex) => (
-                  <div key={subIndex} className="mb-6">
-                    <h3 className="text-xl font-medium text-gray-900 mb-4">{sub.title}</h3>
-                    {sub.content && <p className="mb-4">{sub.content}</p>}
-                    {sub.items && (
-                      <ul className="list-disc pl-6 space-y-2">
-                        {sub.items.map((item, i) => (
-                          <li key={i}>{item}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-
-                {section.items && (
-                  <ul className="list-disc pl-6 space-y-2 mb-4">
-                    {section.items.map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                  </ul>
-                )}
-
-                {section.extraContent && <p className="mt-4 mb-4">{section.extraContent}</p>}
-
-                {section.extraItems && (
-                  <ul className="list-disc pl-6 space-y-2">
-                    {section.extraItems.map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                  </ul>
-                )}
-
-                {section.contactInfo && (
-                  <div className="bg-gray-50 rounded-lg p-6 mt-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      {Object.entries(section.contactInfo).map(([key, info]) => (
-                        <div key={key} className={key === 'address' ? 'md:col-span-2' : ''}>
-                          <h4 className="font-semibold text-gray-900 mb-2">{info.title}</h4>
-                          <p className="text-gray-600">{info.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </section>
-            ))}
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumb */}
+        <nav className="mb-8">
+          <div className="flex items-center space-x-2 text-sm text-gray-500">
+            <Link href="/" className="hover:text-indigo-600 transition-colors flex items-center gap-1">
+              <Home size={16} />
+              <span>{language === 'en' ? 'Home' : '首页'}</span>
+            </Link>
+            <ChevronRight size={16} />
+            <span className="text-gray-900 flex items-center gap-1">
+              <Shield size={16} />
+              {t.title}
+            </span>
           </div>
+        </nav>
 
-          <div className="mt-12 pt-8 border-t border-gray-200">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div className="text-sm text-gray-500">
-                {t.footer.copyright}
-              </div>
-              <div className="flex gap-4">
-                <Link href="/terms" className="text-sm text-blue-600 hover:text-blue-800">
-                  {t.footer.links.terms}
-                </Link>
-                <Link href="/" className="text-sm text-blue-600 hover:text-blue-800">
-                  {language === 'en' ? 'Home' : '首页'}
-                </Link>
-              </div>
+        <div className="grid lg:grid-cols-4 gap-8">
+          {/* Table of Contents - Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <FileText size={18} />
+                {language === 'en' ? 'Contents' : '目录'}
+              </h2>
+              <nav className="space-y-2">
+                {t.sections.map((section, index) => (
+                  <button
+                    key={index}
+                    onClick={() => scrollToSection(index)}
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                      activeSection === index
+                        ? 'bg-indigo-50 text-indigo-700 font-medium'
+                        : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {section.title}
+                  </button>
+                ))}
+              </nav>
             </div>
           </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-lg shadow-sm p-8 md:p-12"
+            >
+              <header className="mb-12">
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">{t.title}</h1>
+                <div className="flex items-center gap-4 text-lg text-gray-600 mb-6">
+                  <span>{t.lastUpdated}</span>
+                  <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                  <span className="text-indigo-600 font-medium">
+                    {language === 'en' ? 'Effective Now' : '现在生效'}
+                  </span>
+                </div>
+                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+                  <p className="text-gray-700 leading-relaxed">
+                    {t.intro}
+                  </p>
+                </div>
+              </header>
+
+              <div className="prose max-w-none">
+                {t.sections.map((section, index) => (
+                  <motion.section
+                    key={index}
+                    id={`section-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="mb-12 scroll-mt-8"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-8 h-8 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-sm font-bold">
+                        {index + 1}
+                      </div>
+                      <h2 className="text-2xl font-semibold text-gray-900">{section.title}</h2>
+                    </div>
+
+                    {section.content && (
+                      <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                        <p className="text-gray-700 leading-relaxed">{section.content}</p>
+                      </div>
+                    )}
+
+                    {section.subsections && section.subsections.map((sub, subIndex) => (
+                      <div key={subIndex} className="mb-8 pl-4 border-l-2 border-indigo-100">
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">{sub.title}</h3>
+                        {sub.content && (
+                          <div className="mb-4">
+                            <p className="text-gray-700 leading-relaxed">{sub.content}</p>
+                          </div>
+                        )}
+                        {sub.items && (
+                          <div className="bg-white border border-gray-200 rounded-lg p-4">
+                            <ul className="space-y-3">
+                              {sub.items.map((item, i) => (
+                                <li key={i} className="flex items-start gap-3">
+                                  <div className="w-2 h-2 bg-indigo-400 rounded-full mt-2 flex-shrink-0"></div>
+                                  <span className="text-gray-700">{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {section.items && (
+                      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                        <ul className="space-y-3">
+                          {section.items.map((item, i) => (
+                            <li key={i} className="flex items-start gap-3">
+                              <div className="w-2 h-2 bg-indigo-400 rounded-full mt-2 flex-shrink-0"></div>
+                              <span className="text-gray-700">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {section.extraContent && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-4">
+                        <p className="text-amber-800 font-medium">{section.extraContent}</p>
+                      </div>
+                    )}
+
+                    {section.extraItems && (
+                      <div className="bg-white border border-gray-200 rounded-lg p-6">
+                        <ul className="space-y-3">
+                          {section.extraItems.map((item, i) => (
+                            <li key={i} className="flex items-start gap-3">
+                              <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                              <span className="text-gray-700">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {section.contactInfo && (
+                      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-8 mt-8">
+                        <h4 className="text-lg font-semibold text-gray-900 mb-6 text-center">
+                          {language === 'en' ? 'Contact Information' : '联系方式'}
+                        </h4>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          {Object.entries(section.contactInfo).map(([key, info]) => (
+                            <div key={key} className={`${key === 'address' ? 'md:col-span-2' : ''} bg-white rounded-lg p-4 shadow-sm`}>
+                              <h5 className="font-semibold text-indigo-700 mb-2">{info.title}</h5>
+                              <p className="text-gray-700">{info.value}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </motion.section>
+                ))}
+          </div>
+
+              {/* Footer Navigation */}
+              <div className="mt-12 pt-8 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+                  <div className="text-sm text-gray-500">
+                    {t.footer.copyright}
+                  </div>
+                  <div className="flex gap-6">
+                    <Link 
+                      href="/terms" 
+                      className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors font-medium"
+                    >
+                      {t.footer.links.terms}
+                    </Link>
+                    <Link 
+                      href="/" 
+                      className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors font-medium"
+                    >
+                      {language === 'en' ? 'Home' : '首页'}
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
+
+        {/* Scroll to Top Button */}
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-colors z-50"
+          aria-label={language === 'en' ? 'Scroll to top' : '回到顶部'}
+        >
+          <ArrowUp size={20} />
+        </button>
       </div>
     </div>
   )

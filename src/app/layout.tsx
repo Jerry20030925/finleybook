@@ -10,6 +10,7 @@ import StructuredData from '@/components/StructuredData'
 import { Toaster } from 'react-hot-toast'
 import { LanguageProvider } from '@/components/LanguageProvider'
 import { CurrencyProvider } from '@/components/CurrencyProvider'
+import DebugAuth from '@/components/DebugAuth'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -98,6 +99,7 @@ export default function RootLayout({
                 <CurrencyProvider>
                   <SubscriptionProvider>
                     {children}
+                    <DebugAuth />
                     <Toaster position="top-right" />
                   </SubscriptionProvider>
                 </CurrencyProvider>

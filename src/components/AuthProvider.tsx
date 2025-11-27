@@ -48,10 +48,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!firebase.auth) {
           throw new Error('Firebase auth not available')
         }
-        
+
         if (mounted) {
           setAuth(firebase.auth)
-          
+
           const { onAuthStateChanged } = await import('firebase/auth')
           const unsubscribe = onAuthStateChanged(firebase.auth, (user) => {
             if (mounted) {
@@ -110,7 +110,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signIn = async (email: string, password: string) => {
-    if (!auth) throw new Error('Auth not initialized')
+    if (!auth) {
+      const errorMsg = error || 'Auth not initialized (Check console for details)'
+      console.error('SignIn blocked:', errorMsg)
+      throw new Error(errorMsg)
+    }
     try {
       setError(null)
       const { signInWithEmailAndPassword } = await import('firebase/auth')
@@ -123,7 +127,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string) => {
-    if (!auth) throw new Error('Auth not initialized')
+    if (!auth) {
+      const errorMsg = error || 'Auth not initialized (Check console for details)'
+      console.error('SignUp blocked:', errorMsg)
+      throw new Error(errorMsg)
+    }
     try {
       setError(null)
       const { createUserWithEmailAndPassword } = await import('firebase/auth')
@@ -137,13 +145,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithGoogle = async () => {
-    if (!auth) throw new Error('Auth not initialized')
+    if (!auth) {
+      const errorMsg = error || 'Auth not initialized (Check console for details)'
+      console.error('GoogleSignIn blocked:', errorMsg)
+      throw new Error(errorMsg)
+    }
     try {
       setError(null)
       const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth')
       const provider = new GoogleAuthProvider()
       const result = await signInWithPopup(auth, provider)
-      
+
       const isNewUser = (result as any)._tokenResponse?.isNewUser ||
         result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
 
@@ -158,7 +170,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = async () => {
-    if (!auth) throw new Error('Auth not initialized')
+    if (!auth) {
+      // If auth is null but we want to logout, just clear local state
+      setUser(null)
+      return
+    }
     try {
       setError(null)
       const { signOut } = await import('firebase/auth')

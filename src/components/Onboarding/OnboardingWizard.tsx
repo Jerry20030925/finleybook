@@ -18,7 +18,7 @@ export default function OnboardingWizard() {
         wastedAmount: 50
     })
     const [isSigningUp, setIsSigningUp] = useState(false)
-    const { user, signInWithGoogle, signUp, signIn } = useAuth()
+    const { user, signInWithGoogle, signUp, signIn, error: providerError } = useAuth()
     const { t } = useLanguage()
     const router = useRouter()
 
@@ -28,6 +28,11 @@ export default function OnboardingWizard() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [authError, setAuthError] = useState<string | null>(null)
+
+    // Sync provider error to local state
+    if (providerError && !authError) {
+        setAuthError(providerError)
+    }
 
     const nextStep = () => setStep(s => s + 1)
 
@@ -100,7 +105,7 @@ export default function OnboardingWizard() {
                         <div className="space-y-4">
                             <button
                                 onClick={handleGoogleSignup}
-                                disabled={isSigningUp}
+                                disabled={isSigningUp || !!authError}
                                 className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
                                 {isSigningUp ? (
