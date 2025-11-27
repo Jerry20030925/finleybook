@@ -21,10 +21,10 @@ const initializeFirebase = async () => {
     const { getStorage } = await import('firebase/storage');
 
     // Configuration from environment variables
-    // Configuration hardcoded from Firebase Console screenshot to ensure stability
+    // Configuration hardcoded from Firebase Console with custom auth domain
     const firebaseConfig = {
-      apiKey: "AIzaSyBQkaROBq9sIqFaLvlCUpQEVBWKu2AT5zc",
-      authDomain: "finleybook-6120d.firebaseapp.com",
+      apiKey: "AIzaSyBQkaR0Bq9sIqFaLvlCUpQEVBWKu2AT5zc",
+      authDomain: "auth.finleybook.com",
       projectId: "finleybook-6120d",
       storageBucket: "finleybook-6120d.firebasestorage.app",
       messagingSenderId: "787309970302",
