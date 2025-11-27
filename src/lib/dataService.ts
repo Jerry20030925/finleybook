@@ -60,7 +60,7 @@ export const getUserTransactions = async (userId: string, limitCount: number = 1
     console.error('[getUserTransactions] Error fetching transactions:', error)
     console.error('[getUserTransactions] Error code:', error.code)
     console.error('[getUserTransactions] Error message:', error.message)
-    
+
     // If composite index error, try a simpler query
     if (error.code === 'failed-precondition' && error.message.includes('index')) {
       console.log('[getUserTransactions] Composite index required, trying simpler query...')
@@ -72,7 +72,7 @@ export const getUserTransactions = async (userId: string, limitCount: number = 1
         )
         const simpleSnapshot = await getDocs(simpleQuery)
         console.log('[getUserTransactions] Simple query found', simpleSnapshot.docs.length, 'transactions')
-        
+
         const simpleTransactions = simpleSnapshot.docs.map(doc => {
           const data = doc.data()
           return {
@@ -82,7 +82,7 @@ export const getUserTransactions = async (userId: string, limitCount: number = 1
             createdAt: data.createdAt?.toDate() || new Date()
           }
         }) as Transaction[]
-        
+
         // Sort manually
         simpleTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         return simpleTransactions.slice(0, limitCount)
@@ -91,7 +91,7 @@ export const getUserTransactions = async (userId: string, limitCount: number = 1
         return []
       }
     }
-    
+
     return []
   }
 }
@@ -155,7 +155,7 @@ export const addTransaction = async (transaction: Omit<Transaction, 'id' | 'crea
     if (!transaction.userId) {
       throw new Error('User ID is required')
     }
-    if (!transaction.amount || transaction.amount <= 0) {
+    if (transaction.amount === undefined || transaction.amount === null || transaction.amount === 0) {
       throw new Error('Valid amount is required')
     }
     if (!transaction.category) {
@@ -188,7 +188,7 @@ export const addTransaction = async (transaction: Omit<Transaction, 'id' | 'crea
     const docRef = await addDoc(collection(db, 'transactions'), transactionData)
 
     console.log('Transaction added successfully with ID:', docRef.id)
-    
+
     // Verify the transaction was actually saved
     setTimeout(async () => {
       try {
@@ -219,7 +219,7 @@ export const addTransaction = async (transaction: Omit<Transaction, 'id' | 'crea
 export const DEFAULT_CATEGORIES = {
   income: [
     'category.salary',
-    'category.investment', 
+    'category.investment',
     'category.parttime',
     'category.otherIncome'
   ],
