@@ -20,9 +20,9 @@ const initializeFirebase = async () => {
     const { getFirestore } = await import('firebase/firestore');
     const { getStorage } = await import('firebase/storage');
 
-    // Hardcoded configuration to bypass environment variable issues
+    // Hardcoded configuration from Firebase Console
     const firebaseConfig = {
-      apiKey: 'AIzaSyBQkaR0Bq9sIqFaLvlCUpQEVBWKu2AT5zc',
+      apiKey: 'AIzaSyBQkaROBq9sIqFaLvlCUpQEVBWKu2AT5zc',
       authDomain: 'finleybook-6120d.firebaseapp.com',
       projectId: 'finleybook-6120d',
       storageBucket: 'finleybook-6120d.firebasestorage.app',
