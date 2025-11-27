@@ -2,18 +2,21 @@
 
 import { motion } from 'framer-motion'
 import { clsx } from 'clsx'
+import { useLanguage } from '../LanguageProvider'
 
 interface IdentityStepProps {
     onSelect: (identity: string) => void
 }
 
-const IDENTITIES = [
-    { id: 'survival', icon: '😩', title: '月光族生存模式', desc: '工资刚到账就没了' },
-    { id: 'shopaholic', icon: '🤔', title: '这就去买买买', desc: '控制不住剁手' },
-    { id: 'saver', icon: '🎯', title: '正在存钱买大件', desc: '为了梦想而奋斗' },
-]
-
 export default function IdentityStep({ onSelect }: IdentityStepProps) {
+    const { t } = useLanguage()
+
+    const IDENTITIES = [
+        { id: 'survival', icon: '😩', title: t('onboarding.identity.survival.title'), desc: t('onboarding.identity.survival.desc') },
+        { id: 'shopaholic', icon: '🤔', title: t('onboarding.identity.shopaholic.title'), desc: t('onboarding.identity.shopaholic.desc') },
+        { id: 'saver', icon: '🎯', title: t('onboarding.identity.saver.title'), desc: t('onboarding.identity.saver.desc') },
+    ]
+
     return (
         <div className="text-center">
             <motion.h2
@@ -21,7 +24,7 @@ export default function IdentityStep({ onSelect }: IdentityStepProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-2xl font-bold text-gray-900 mb-8"
             >
-                现在的你，最像哪一种状态？
+                {t('onboarding.identity.title')}
             </motion.h2>
 
             <div className="grid gap-4">

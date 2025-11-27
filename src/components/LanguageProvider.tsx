@@ -27,7 +27,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.terms': 'Terms',
     'nav.privacy': 'Privacy',
     'nav.signOut': 'Sign Out',
-    
+
     // Dashboard
     'dashboard.title': 'Financial Overview',
     'dashboard.date': '{date}',
@@ -39,7 +39,7 @@ const translations: Record<Language, Record<string, string>> = {
     'dashboard.monthlyTotalIncome': 'Monthly Total Income',
     'dashboard.monthlyTotalExpenses': 'Monthly Total Expenses',
     'dashboard.monthlySavingsRatio': 'Monthly Savings Ratio',
-    
+
     // Recent Transactions
     'transactions.recent': 'Recent Transactions',
     'transactions.addTransaction': 'Add Transaction',
@@ -47,7 +47,7 @@ const translations: Record<Language, Record<string, string>> = {
     'transactions.startAdding': 'Start adding your first transaction',
     'transactions.showMore': 'View more transactions',
     'transactions.showLess': 'Show recent 10',
-    
+
     // Transaction Modal
     'transaction.add': 'Add Transaction Record',
     'transaction.type': 'Transaction Type',
@@ -66,7 +66,7 @@ const translations: Record<Language, Record<string, string>> = {
     'transaction.success': 'Transaction Added Successfully!',
     'transaction.successMessage': 'Transaction record added successfully',
     'transaction.error': 'Failed to add transaction record',
-    
+
     // Payment Methods
     'payment.cash': 'Cash',
     'payment.bankCard': 'Bank Card',
@@ -74,13 +74,13 @@ const translations: Record<Language, Record<string, string>> = {
     'payment.wechat': 'WeChat Pay',
     'payment.creditCard': 'Credit Card',
     'payment.other': 'Other',
-    
+
     // Categories - Income
     'category.salary': 'Salary Income',
     'category.investment': 'Investment Returns',
     'category.parttime': 'Part-time Income',
     'category.otherIncome': 'Other Income',
-    
+
     // Categories - Expense
     'category.food': 'Food & Dining',
     'category.transport': 'Transportation',
@@ -90,7 +90,7 @@ const translations: Record<Language, Record<string, string>> = {
     'category.entertainment': 'Entertainment',
     'category.education': 'Education',
     'category.otherExpense': 'Other Expenses',
-    
+
     // Quick Actions
     'quickActions.title': 'Quick Actions',
     'quickActions.manual': 'Manual Entry',
@@ -98,7 +98,7 @@ const translations: Record<Language, Record<string, string>> = {
     'quickActions.voice': 'Voice Input',
     'quickActions.camera': 'Camera',
     'quickActions.viewAll': 'View All',
-    
+
     // Auth
     'auth.welcomeBack': 'Welcome Back',
     'auth.createAccount': 'Create Account',
@@ -123,7 +123,7 @@ const translations: Record<Language, Record<string, string>> = {
     'auth.signInError': 'Sign in failed, please check email and password',
     'auth.signUpError': 'Sign up failed, please try again later',
     'auth.googleSignInError': 'Google sign in failed',
-    
+
     // Form Validation
     'validation.emailRequired': 'Please enter email address',
     'validation.emailInvalid': 'Please enter a valid email address',
@@ -135,7 +135,7 @@ const translations: Record<Language, Record<string, string>> = {
     'validation.categoryRequired': 'Please select transaction category',
     'validation.descriptionRequired': 'Please enter transaction description',
     'validation.dateRequired': 'Please select transaction date',
-    
+
     // Landing Page
     'landing.title': 'Smart Financial Management with AI',
     'landing.subtitle': 'Take control of your finances with intelligent insights, automated tracking, and personalized recommendations',
@@ -145,7 +145,47 @@ const translations: Record<Language, Record<string, string>> = {
     'landing.features.insights': 'AI Insights',
     'landing.features.budgeting': 'Smart Budgeting',
     'landing.features.security': 'Bank-Level Security',
-    
+
+    // New Landing Page (Financial Navigator)
+    'landing.badge': 'New Generation Financial Tool',
+    'landing.hero.title.prefix': 'Don\'t just track, ',
+    'landing.hero.title.highlight': 'Navigate',
+    'landing.hero.desc': 'FinleyBook is not another complex ledger. It is your financial navigator, telling you how much you can spend today, not just how much you spent yesterday.',
+    'landing.cta.start': 'Start Wealth Checkup',
+    'landing.hero.sub': 'No bank connection needed · 30s setup',
+    'landing.feature.safe.title': 'Safe-to-Spend',
+    'landing.feature.safe.desc': 'Know exactly how much you can spend today. Green means safe, red means stop. No more anxiety.',
+    'landing.feature.drag.title': 'Drag-to-Track',
+    'landing.feature.drag.desc': 'Track expenses like a game. Drag icons to the ring, crunch, done.',
+    'landing.feature.time.title': 'Time Machine',
+    'landing.feature.time.desc': 'See your future wealth based on current habits. Will you be rich or broke in 5 years?',
+
+    // Onboarding
+    'onboarding.identity.title': 'Which state describes you best?',
+    'onboarding.identity.survival.title': 'Survival Mode',
+    'onboarding.identity.survival.desc': 'Living paycheck to paycheck',
+    'onboarding.identity.shopaholic.title': 'Shopaholic',
+    'onboarding.identity.shopaholic.desc': 'Can\'t stop spending',
+    'onboarding.identity.saver.title': 'Goal Saver',
+    'onboarding.identity.saver.desc': 'Saving for a dream',
+    'onboarding.pain.title': 'Be honest...',
+    'onboarding.pain.desc': 'How much money vanishes each month?',
+    'onboarding.pain.min': '$50 (Peanuts)',
+    'onboarding.pain.max': '$500+ (Help!)',
+    'onboarding.pain.annual': 'That\'s an annual loss of',
+    'onboarding.pain.next': 'Next',
+    'onboarding.dream.title': 'If we could recover this...',
+    'onboarding.dream.desc': 'By next year, you could have:',
+    'onboarding.dream.ipad': 'An iPad Air',
+    'onboarding.dream.flight': 'A Round-trip Flight',
+    'onboarding.dream.rent': '3 Months of Rent',
+    'onboarding.dream.value': 'Value approx. ${amount}',
+    'onboarding.dream.cta': 'Take me to find this money',
+    'onboarding.final.title': 'Last Step',
+    'onboarding.final.desc': 'One second to open your "Flight Fund".',
+    'onboarding.final.google': 'Start with Google',
+    'onboarding.final.terms': 'By clicking, you agree to our Terms',
+
     // Settings
     'settings.title': 'Settings',
     'settings.language': 'Language',
@@ -155,7 +195,7 @@ const translations: Record<Language, Record<string, string>> = {
     'settings.account': 'Account',
     'settings.support': 'Support',
     'settings.about': 'About',
-    
+
     // Language Settings
     'language.title': 'Language Settings',
     'language.description': 'Choose your preferred language for the interface',
@@ -164,7 +204,7 @@ const translations: Record<Language, Record<string, string>> = {
     'language.current': 'Current Language',
     'language.save': 'Save Changes',
     'language.saved': 'Language preference saved',
-    
+
     // Landing Page Legacy (for backward compatibility)
     'nav.login': 'Log In',
     'nav.register': 'Sign Up',
@@ -203,7 +243,7 @@ const translations: Record<Language, Record<string, string>> = {
     'countries.JP': 'Japan',
     'countries.CA': 'Canada',
     'countries.EU': 'Europe',
-    
+
     // Common
     'common.save': 'Save',
     'common.cancel': 'Cancel',
@@ -246,7 +286,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.terms': '服务条款',
     'nav.privacy': '隐私政策',
     'nav.signOut': '退出登录',
-    
+
     // Dashboard
     'dashboard.title': '财务概览',
     'dashboard.date': '{date}',
@@ -258,7 +298,7 @@ const translations: Record<Language, Record<string, string>> = {
     'dashboard.monthlyTotalIncome': '本月总收入',
     'dashboard.monthlyTotalExpenses': '本月总支出',
     'dashboard.monthlySavingsRatio': '本月储蓄占比',
-    
+
     // Recent Transactions
     'transactions.recent': '最近交易',
     'transactions.addTransaction': '添加交易',
@@ -266,7 +306,7 @@ const translations: Record<Language, Record<string, string>> = {
     'transactions.startAdding': '开始添加您的第一笔交易',
     'transactions.showMore': '查看更多交易',
     'transactions.showLess': '显示最近10条',
-    
+
     // Transaction Modal
     'transaction.add': '添加交易记录',
     'transaction.type': '交易类型',
@@ -285,7 +325,7 @@ const translations: Record<Language, Record<string, string>> = {
     'transaction.success': '交易添加成功！',
     'transaction.successMessage': '交易记录添加成功',
     'transaction.error': '添加交易记录失败',
-    
+
     // Payment Methods
     'payment.cash': '现金',
     'payment.bankCard': '银行卡',
@@ -293,13 +333,13 @@ const translations: Record<Language, Record<string, string>> = {
     'payment.wechat': '微信支付',
     'payment.creditCard': '信用卡',
     'payment.other': '其他',
-    
+
     // Categories - Income
     'category.salary': '工资收入',
     'category.investment': '投资收益',
     'category.parttime': '兼职收入',
     'category.otherIncome': '其他收入',
-    
+
     // Categories - Expense
     'category.food': '餐饮美食',
     'category.transport': '交通出行',
@@ -309,7 +349,7 @@ const translations: Record<Language, Record<string, string>> = {
     'category.entertainment': '文化娱乐',
     'category.education': '学习教育',
     'category.otherExpense': '其他支出',
-    
+
     // Quick Actions
     'quickActions.title': '快速操作',
     'quickActions.manual': '手动记账',
@@ -317,7 +357,7 @@ const translations: Record<Language, Record<string, string>> = {
     'quickActions.voice': '语音输入',
     'quickActions.camera': '拍照记账',
     'quickActions.viewAll': '查看全部',
-    
+
     // Auth
     'auth.welcomeBack': '欢迎回来',
     'auth.createAccount': '创建账户',
@@ -342,7 +382,7 @@ const translations: Record<Language, Record<string, string>> = {
     'auth.signInError': '登录失败，请检查邮箱和密码',
     'auth.signUpError': '注册失败，请稍后重试',
     'auth.googleSignInError': 'Google登录失败',
-    
+
     // Form Validation
     'validation.emailRequired': '请输入邮箱地址',
     'validation.emailInvalid': '请输入有效的邮箱地址',
@@ -354,7 +394,7 @@ const translations: Record<Language, Record<string, string>> = {
     'validation.categoryRequired': '请选择交易分类',
     'validation.descriptionRequired': '请输入交易描述',
     'validation.dateRequired': '请选择交易日期',
-    
+
     // Landing Page
     'landing.title': 'AI智能财务管理',
     'landing.subtitle': '通过智能洞察、自动追踪和个性化建议，掌控您的财务状况',
@@ -364,7 +404,47 @@ const translations: Record<Language, Record<string, string>> = {
     'landing.features.insights': 'AI洞察',
     'landing.features.budgeting': '智能预算',
     'landing.features.security': '银行级安全',
-    
+
+    // New Landing Page (Financial Navigator)
+    'landing.badge': '全新一代财务工具',
+    'landing.hero.title.prefix': '不要记账，要',
+    'landing.hero.title.highlight': '导航',
+    'landing.hero.desc': 'FinleyBook 不是另一个复杂的记账本。它是你的财务导航仪，告诉你今天能花多少，而不是昨天花了多少。',
+    'landing.cta.start': '开启财富体检',
+    'landing.hero.sub': '无需绑定银行卡 · 30秒上手',
+    'landing.feature.safe.title': '今日可花 (Safe-to-Spend)',
+    'landing.feature.safe.desc': '一眼看懂今天还能花多少钱。绿色安全，红色警示，告别超支焦虑。',
+    'landing.feature.drag.title': '极简拖拽记账',
+    'landing.feature.drag.desc': '像玩游戏一样记账。拖动图标到圆环，咔嚓一声，记账完成。',
+    'landing.feature.time.title': '时光机预测',
+    'landing.feature.time.desc': '看看现在的消费习惯，会让你在 5 年后成为富翁还是穷光蛋。',
+
+    // Onboarding
+    'onboarding.identity.title': '现在的你，最像哪一种状态？',
+    'onboarding.identity.survival.title': '月光族生存模式',
+    'onboarding.identity.survival.desc': '工资刚到账就没了',
+    'onboarding.identity.shopaholic.title': '这就去买买买',
+    'onboarding.identity.shopaholic.desc': '控制不住剁手',
+    'onboarding.identity.saver.title': '正在存钱买大件',
+    'onboarding.identity.saver.desc': '为了梦想而奋斗',
+    'onboarding.pain.title': '说实话...',
+    'onboarding.pain.desc': '你觉得每个月有多少钱是“不知道花哪去了”？',
+    'onboarding.pain.min': '$50 (小意思)',
+    'onboarding.pain.max': '$500+ (救命!)',
+    'onboarding.pain.annual': '这相当于你每年扔掉了',
+    'onboarding.pain.next': '下一步',
+    'onboarding.dream.title': '如果我们能帮你找回这笔钱...',
+    'onboarding.dream.desc': '明年这个时候，你可以拥有：',
+    'onboarding.dream.ipad': '一台 iPad Air',
+    'onboarding.dream.flight': '一张回国往返机票',
+    'onboarding.dream.rent': '三个月的房租',
+    'onboarding.dream.value': '价值约 ${amount}',
+    'onboarding.dream.cta': '带我去找回这笔钱',
+    'onboarding.final.title': '最后一步',
+    'onboarding.final.desc': '只需一秒，开启你的“机票基金”账户。',
+    'onboarding.final.google': '使用 Google 开启',
+    'onboarding.final.terms': '点击即代表同意我们的服务条款',
+
     // Settings
     'settings.title': '设置',
     'settings.language': '语言',
@@ -374,7 +454,7 @@ const translations: Record<Language, Record<string, string>> = {
     'settings.account': '账户',
     'settings.support': '支持',
     'settings.about': '关于',
-    
+
     // Language Settings
     'language.title': '语言设置',
     'language.description': '选择您首选的界面语言',
@@ -383,7 +463,7 @@ const translations: Record<Language, Record<string, string>> = {
     'language.current': '当前语言',
     'language.save': '保存更改',
     'language.saved': '语言偏好已保存',
-    
+
     // Landing Page Legacy (for backward compatibility)
     'nav.login': '登录',
     'nav.register': '免费注册',
@@ -422,7 +502,7 @@ const translations: Record<Language, Record<string, string>> = {
     'countries.JP': '日本',
     'countries.CA': '加拿大',
     'countries.EU': '欧洲',
-    
+
     // Common
     'common.save': '保存',
     'common.cancel': '取消',
@@ -482,14 +562,14 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   // Translation function with parameter support
   const t = (key: string, params?: Record<string, string | number>): string => {
     let translation = translations[language][key] || key
-    
+
     // Replace parameters if provided
     if (params) {
       Object.keys(params).forEach(param => {
         translation = translation.replace(`{${param}}`, String(params[param]))
       })
     }
-    
+
     return translation
   }
 

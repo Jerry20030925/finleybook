@@ -44,6 +44,11 @@ STRIPE_PRO_MONTHLY_PRICE_ID = your_monthly_price_id
 STRIPE_PRO_YEARLY_PRICE_ID = your_yearly_price_id
 ```
 
+#### Resend Configuration
+```
+RESEND_API_KEY = your_resend_api_key_here
+```
+
 #### Additional Configuration
 ```
 NODE_ENV = production

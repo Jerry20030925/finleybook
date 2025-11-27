@@ -5,80 +5,46 @@ import { useAuth } from '@/components/AuthProvider'
 import PageLoader from '@/components/PageLoader'
 import SafeRing from '@/components/Navigator/SafeRing'
 import EmojiTray from '@/components/Navigator/EmojiTray'
-import { getUserFinancialSummary, addTransaction } from '@/lib/dataService'
+import { addTransaction } from '@/lib/dataService'
 import useSound from 'use-sound'
 import toast, { Toaster } from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import OnboardingWizard from '@/components/Onboarding/OnboardingWizard'
+import LandingPage from '@/components/LandingPage'
+import ProfitOrb from '@/components/Dashboard/ProfitOrb'
+import OpportunityRadar from '@/components/Dashboard/OpportunityRadar'
+import WishlistDrawer from '@/components/Dashboard/WishlistDrawer'
 
 export default function Home() {
   const { user, loading } = useAuth()
-  const [dailyBudget, setDailyBudget] = useState(50) // Default budget
-  const [currentSpent, setCurrentSpent] = useState(0)
-  const [playCrunch] = useSound('/sounds/crunch.mp3', { volume: 0.5 }) // Placeholder path
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [totalSaved, setTotalSaved] = useState(125.00) // Demo initial value
   const [playCoin] = useSound('/sounds/coin.mp3', { volume: 0.5 })
 
-  useEffect(() => {
-    if (user) {
-      // Fetch today's spending
-      // For MVP, we'll just calculate from recent transactions or use a dummy value
-      // Real implementation would query Firestore for today's transactions
-      getUserFinancialSummary(user.uid).then(summary => {
-        // Approximate daily spent from monthly expenses / 30 for demo
-        // Ideally we query "transactions where date == today"
-        // Let's start with 0 for the "fresh day" feel
-        setCurrentSpent(15) // Demo starting value
-      })
-    }
-  }, [user])
 
-  const handleExpense = async (item: any) => {
-    if (!user) return
 
-    // Play sound
-    playCrunch()
-
-    // Optimistic UI update
-    const newSpent = currentSpent + item.defaultAmount
-    setCurrentSpent(newSpent)
-
-    // Show toast
+  const handleProfit = (amount: number) => {
+    playCoin()
+    setTotalSaved(prev => prev + amount)
     toast.custom((t) => (
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
-        className="bg-white px-6 py-4 rounded-full shadow-xl border border-gray-100 flex items-center gap-3"
+        className="bg-emerald-500 text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-2 font-bold"
       >
-        <span className="text-2xl">{item.emoji}</span>
-        <div>
-          <p className="font-bold text-gray-900">-${item.defaultAmount}</p>
-          <p className="text-xs text-gray-500">{item.label}</p>
-        </div>
+        <span>💰 +${amount}</span>
       </motion.div>
     ))
-
-    // Save to DB
-    try {
-      await addTransaction({
-        userId: user.uid,
-        amount: item.defaultAmount,
-        category: item.category,
-        description: `Quick add: ${item.label}`,
-        date: new Date(),
-        type: 'expense'
-      })
-    } catch (error) {
-      console.error('Failed to save transaction:', error)
-      toast.error('保存失败')
-      setCurrentSpent(currentSpent) // Revert on failure
-    }
   }
 
   if (loading) return <PageLoader />
 
   if (!user) {
-    return <OnboardingWizard />
+    if (showOnboarding) {
+      return <OnboardingWizard />
+    }
+    return <LandingPage onStart={() => setShowOnboarding(true)} />
   }
 
   return (
@@ -96,29 +62,28 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Ring */}
-      <main className="flex flex-col items-center justify-center pt-12">
-        <SafeRing dailyBudget={dailyBudget} currentSpent={currentSpent} />
+      {/* Main Content */}
+      <main className="flex flex-col items-center justify-start pt-8 pb-24 px-4 min-h-screen">
+        <ProfitOrb totalSaved={totalSaved} />
 
-        {/* Contextual Message */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center text-gray-500 max-w-xs mx-auto mt-4"
-        >
-          {dailyBudget - currentSpent > 20
-            ? "资金充足，喝杯奶茶没问题 🥤"
-            : "余额告急，控制一下双手 💸"}
-        </motion.p>
+        <div className="w-full max-w-md">
+          <h2 className="text-lg font-bold text-gray-900 mb-2 px-4">机会雷达 📡</h2>
+          <OpportunityRadar
+            onAccept={(opp) => handleProfit(opp.savedAmount)}
+            onReject={() => { }}
+          />
+        </div>
       </main>
 
-      {/* Drag Tray */}
-      <EmojiTray onDrop={handleExpense} />
+      {/* Wishlist Drawer */}
+      <WishlistDrawer onGiveUp={(item) => handleProfit(item.price)} />
 
       {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-indigo-200 rounded-full blur-3xl opacity-20" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-rose-200 rounded-full blur-3xl opacity-20" />
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none bg-gray-900">
+        <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-emerald-500 rounded-full blur-[100px] opacity-20" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-indigo-500 rounded-full blur-[100px] opacity-20" />
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
       </div>
     </div>
   )
