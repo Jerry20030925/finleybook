@@ -6,15 +6,19 @@ import { useLanguage } from './LanguageProvider'
 import LanguageSwitcher from './LanguageSwitcher'
 import CountrySelector, { useCountry } from './CountrySelector'
 import HeroSection from './HeroSection'
+import HowItWorksSection from './HowItWorksSection'
+import TestimonialsSection from './TestimonialsSection'
+import FAQSection from './FAQSection'
 import LoadingAnimation from './LoadingAnimation'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
 interface LandingPageProps {
     onStart: () => void
+    onLogin: () => void
 }
 
-export default function LandingPage({ onStart }: LandingPageProps) {
+export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
     const { t } = useLanguage()
     const { selectedCountry, updateCountry } = useCountry()
     const [isLoading, setIsLoading] = useState(true)
@@ -32,73 +36,34 @@ export default function LandingPage({ onStart }: LandingPageProps) {
     // Show loading animation
     if (isLoading) {
         return (
-            <div className="fixed inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50 z-50 flex items-center justify-center">
-                <div className="text-center">
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <LoadingAnimation type="financial" size="lg" />
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.5 }}
-                            className="mt-8 space-y-3"
-                        >
-                            <h2 className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-2">
-                                <Sparkles className="text-indigo-600" />
-                                Loading FinleyBook
-                            </h2>
-                            <motion.p
-                                animate={{ opacity: [0.5, 1, 0.5] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                                className="text-gray-600"
-                            >
-                                Preparing your financial journey...
-                            </motion.p>
-                            
-                            {/* Progress dots */}
-                            <div className="flex justify-center gap-2 mt-4">
-                                {[0, 1, 2].map((i) => (
-                                    <motion.div
-                                        key={i}
-                                        className="w-2 h-2 bg-indigo-600 rounded-full"
-                                        animate={{ 
-                                            scale: [1, 1.5, 1],
-                                            opacity: [0.5, 1, 0.5]
-                                        }}
-                                        transition={{ 
-                                            duration: 1, 
-                                            repeat: Infinity,
-                                            delay: i * 0.3
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                </div>
+            <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
+                <LoadingAnimation size="lg" />
             </div>
         )
     }
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: showContent ? 1 : 0 }}
             transition={{ duration: 0.5 }}
             className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50 relative overflow-hidden flex flex-col"
         >
             {/* Top Navigation */}
-            <motion.div 
+            <motion.div
                 initial={{ y: -50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
                 className="absolute top-6 right-6 z-50 flex items-center gap-4"
             >
-                <CountrySelector 
-                    selectedCountry={selectedCountry} 
+                <button
+                    onClick={onLogin}
+                    className="text-gray-600 font-semibold hover:text-indigo-600 transition-colors px-4 py-2"
+                >
+                    Login
+                </button>
+                <CountrySelector
+                    selectedCountry={selectedCountry}
                     onCountryChange={updateCountry}
                 />
                 <LanguageSwitcher />
@@ -117,7 +82,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
             >
                 {/* Background Pattern */}
                 <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-                
+
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
                     {/* Section Header */}
                     <div className="text-center mb-16">
@@ -176,6 +141,15 @@ export default function LandingPage({ onStart }: LandingPageProps) {
                 </div>
             </motion.section>
 
+            {/* How It Works Section */}
+            <HowItWorksSection />
+
+            {/* Testimonials Section */}
+            <TestimonialsSection />
+
+            {/* FAQ Section */}
+            <FAQSection />
+
             {/* Footer */}
             <footer className="bg-white border-t border-gray-200 py-8">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -190,8 +164,8 @@ export default function LandingPage({ onStart }: LandingPageProps) {
                             Terms of Use
                         </Link>
                         <div className="flex items-center gap-2 border-l border-gray-200 pl-6">
-                            <CountrySelector 
-                                selectedCountry={selectedCountry} 
+                            <CountrySelector
+                                selectedCountry={selectedCountry}
                                 onCountryChange={updateCountry}
                                 className="scale-90"
                             />
@@ -203,16 +177,16 @@ export default function LandingPage({ onStart }: LandingPageProps) {
     )
 }
 
-function EnhancedFeatureCard({ 
-    icon, 
-    title, 
-    desc, 
-    delay, 
-    color 
-}: { 
-    icon: React.ReactNode, 
-    title: string, 
-    desc: string, 
+function EnhancedFeatureCard({
+    icon,
+    title,
+    desc,
+    delay,
+    color
+}: {
+    icon: React.ReactNode,
+    title: string,
+    desc: string,
     delay: number,
     color: 'emerald' | 'amber' | 'indigo'
 }) {
@@ -240,8 +214,8 @@ function EnhancedFeatureCard({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay }}
-            whileHover={{ 
-                y: -10, 
+            whileHover={{
+                y: -10,
                 scale: 1.02,
                 transition: { duration: 0.2 }
             }}
@@ -255,12 +229,12 @@ function EnhancedFeatureCard({
                 absolute inset-0 bg-gradient-to-br ${colorClasses[color].bg} 
                 opacity-0 group-hover:opacity-30 transition-opacity duration-300
             `} />
-            
+
             {/* Content */}
             <div className="relative z-10">
                 <motion.div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 bg-white shadow-lg"
-                    whileHover={{ 
+                    whileHover={{
                         scale: 1.1,
                         rotate: [0, -5, 5, 0],
                         transition: { duration: 0.5 }
@@ -268,11 +242,11 @@ function EnhancedFeatureCard({
                 >
                     {icon}
                 </motion.div>
-                
+
                 <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-gray-800 transition-colors">
                     {title}
                 </h3>
-                
+
                 <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors">
                     {desc}
                 </p>

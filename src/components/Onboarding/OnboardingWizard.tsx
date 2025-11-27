@@ -11,8 +11,12 @@ import { useLanguage } from '../LanguageProvider'
 import toast from 'react-hot-toast'
 import { Mail, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
 
-export default function OnboardingWizard() {
-    const [step, setStep] = useState(0)
+interface OnboardingWizardProps {
+    initialStep?: number
+}
+
+export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardProps) {
+    const [step, setStep] = useState(initialStep)
     const [data, setData] = useState({
         identity: '',
         wastedAmount: 50

@@ -40,11 +40,26 @@ export default function Home() {
 
   if (loading) return <PageLoader />
 
+  const [initialStep, setInitialStep] = useState(0)
+
+  // ...
+
   if (!user) {
     if (showOnboarding) {
-      return <OnboardingWizard />
+      return <OnboardingWizard initialStep={initialStep} />
     }
-    return <LandingPage onStart={() => setShowOnboarding(true)} />
+    return (
+      <LandingPage
+        onStart={() => {
+          setInitialStep(0)
+          setShowOnboarding(true)
+        }}
+        onLogin={() => {
+          setInitialStep(3) // Jump to auth step
+          setShowOnboarding(true)
+        }}
+      />
+    )
   }
 
   return (
