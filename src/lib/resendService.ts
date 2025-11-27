@@ -15,13 +15,15 @@ export class ResendService {
 
   static async sendEmail(options: EmailOptions) {
     try {
-      const { data, error } = await resend.emails.send({
+      const payload: any = {
         from: options.from || this.defaultFrom,
         to: options.to,
         subject: options.subject,
         html: options.html,
         text: options.text,
-      });
+      };
+
+      const { data, error } = await resend.emails.send(payload);
 
       if (error) {
         console.error('Resend error:', error);
@@ -87,7 +89,7 @@ export class ResendService {
 
   static async sendPasswordResetEmail(email: string, resetToken: string) {
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://finleybook.com'}/reset-password?token=${resetToken}`;
-    
+
     const subject = 'Reset your FinleyBook password';
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

@@ -147,18 +147,29 @@ const translations: Record<Language, Record<string, string>> = {
     'landing.features.security': 'Bank-Level Security',
 
     // New Landing Page (Financial Navigator)
-    'landing.badge': 'New Generation Financial Tool',
-    'landing.hero.title.prefix': 'Don\'t just track, ',
-    'landing.hero.title.highlight': 'Navigate',
-    'landing.hero.desc': 'FinleyBook is not another complex ledger. It is your financial navigator, telling you how much you can spend today, not just how much you spent yesterday.',
+    'landing.badge': 'Money Management, Gamified',
+    'landing.hero.title.prefix': 'Your Money is a Game. ',
+    'landing.hero.title.highlight': 'Stop Losing.',
+    'landing.hero.desc': 'Forget boring spreadsheets. Simply drag, drop, and watch your savings grow. See exactly what you can spend today without going broke.',
     'landing.cta.start': 'Start Wealth Checkup',
     'landing.hero.sub': 'No bank connection needed · 30s setup',
     'landing.feature.safe.title': 'Safe-to-Spend',
-    'landing.feature.safe.desc': 'Know exactly how much you can spend today. Green means safe, red means stop. No more anxiety.',
+    'landing.feature.safe.desc': 'Know exactly how much you can spend today. Green means safe, red means stop.',
     'landing.feature.drag.title': 'Drag-to-Track',
     'landing.feature.drag.desc': 'Track expenses like a game. Drag icons to the ring, crunch, done.',
     'landing.feature.time.title': 'Time Machine',
-    'landing.feature.time.desc': 'See your future wealth based on current habits. Will you be rich or broke in 5 years?',
+    'landing.feature.time.desc': 'See your future wealth based on current habits. Will you be rich or broke?',
+
+    // Auth
+    'auth.email': 'Email',
+    'auth.password': 'Password',
+    'auth.continueEmail': 'Continue with Email',
+    'auth.signup': 'Sign Up',
+    'auth.login': 'Login',
+    'auth.haveAccount': 'Already have an account?',
+    'auth.noAccount': 'No account?',
+    'auth.or': 'OR',
+    'auth.forgotPassword': 'Forgot Password?',
 
     // Onboarding
     'onboarding.identity.title': 'Which state describes you best?',
@@ -406,21 +417,21 @@ const translations: Record<Language, Record<string, string>> = {
     'landing.features.security': '银行级安全',
 
     // New Landing Page (Financial Navigator)
-    'landing.badge': '全新一代财务工具',
-    'landing.hero.title.prefix': '不要记账，要',
-    'landing.hero.title.highlight': '导航',
-    'landing.hero.desc': 'FinleyBook 不是另一个复杂的记账本。它是你的财务导航仪，告诉你今天能花多少，而不是昨天花了多少。',
+    'landing.badge': '理财，游戏化',
+    'landing.hero.title.prefix': '金钱是一场游戏，',
+    'landing.hero.title.highlight': '别再输了。',
+    'landing.hero.desc': '忘掉枯燥的表格。只需拖拽，看着存款增长。一眼看清今天还能花多少钱，告别月光。',
     'landing.cta.start': '开启财富体检',
     'landing.hero.sub': '无需绑定银行卡 · 30秒上手',
     'landing.feature.safe.title': '今日可花 (Safe-to-Spend)',
-    'landing.feature.safe.desc': '一眼看懂今天还能花多少钱。绿色安全，红色警示，告别超支焦虑。',
+    'landing.feature.safe.desc': '一眼看懂今天还能花多少钱。绿色安全，红色警示。',
     'landing.feature.drag.title': '极简拖拽记账',
     'landing.feature.drag.desc': '像玩游戏一样记账。拖动图标到圆环，咔嚓一声，记账完成。',
     'landing.feature.time.title': '时光机预测',
     'landing.feature.time.desc': '看看现在的消费习惯，会让你在 5 年后成为富翁还是穷光蛋。',
 
     // Onboarding
-    'onboarding.identity.title': '现在的你，最像哪一种状态？',
+    'onboarding.identity.title': '目前的财务状态？',
     'onboarding.identity.survival.title': '月光族生存模式',
     'onboarding.identity.survival.desc': '工资刚到账就没了',
     'onboarding.identity.shopaholic.title': '这就去买买买',
