@@ -19,10 +19,14 @@ import { AIAnalyticsService } from '@/lib/services/aiAnalytics'
 import { AIInsight, RiskAlert } from '@/types'
 import toast from 'react-hot-toast'
 import NanoBanana from './NanoBanana'
-import { getUserTransactions, Transaction } from '@/lib/dataService'
+import { getUserTransactions, Transaction, addTransaction } from '@/lib/dataService'
 import { useLanguage } from './LanguageProvider'
 
-// ... existing imports
+// New Privacy-First components
+import BurnDownChart from './Dashboard/BurnDownChart'
+import QuickExpenseEntry from './Dashboard/QuickExpenseEntry'
+import WorthItCalculator from './Dashboard/WorthItCalculator'
+import BudgetSetupModal from './Dashboard/BudgetSetupModal'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -32,11 +36,66 @@ export default function Dashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Privacy-First state
+  const [monthlyBudget, setMonthlyBudget] = useState(1000)
+  const [spent, setSpent] = useState(0)
+  const [hourlyWage, setHourlyWage] = useState(25)
+  const [showBudgetModal, setShowBudgetModal] = useState(false)
+
   useEffect(() => {
     if (user) {
       loadDashboardData()
+      loadUserSettings()
     }
   }, [user])
+
+  const loadUserSettings = () => {
+    // Load from localStorage (privacy-first approach)
+    const savedBudget = localStorage.getItem('monthlyBudget')
+    const savedWage = localStorage.getItem('hourlyWage')
+    const savedSpent = localStorage.getItem('currentMonthSpent')
+
+    if (savedBudget) setMonthlyBudget(parseFloat(savedBudget))
+    if (savedWage) setHourlyWage(parseFloat(savedWage))
+    if (savedSpent) setSpent(parseFloat(savedSpent))
+  }
+
+  const saveUserSettings = (budget: number, wage: number) => {
+    setMonthlyBudget(budget)
+    setHourlyWage(wage)
+    localStorage.setItem('monthlyBudget', budget.toString())
+    localStorage.setItem('hourlyWage', wage.toString())
+    toast.success('Settings saved!')
+  }
+
+  const handleAddExpense = async (amount: number, category: string, emoji: string) => {
+    try {
+      // Update local state immediately
+      const newSpent = spent + amount
+      setSpent(newSpent)
+      localStorage.setItem('currentMonthSpent', newSpent.toString())
+
+      // Add to Firebase (optional backup)
+      if (user) {
+        await addTransaction({
+          userId: user.uid,
+          amount: -amount, // Negative for expense
+          category,
+          description: `${emoji} Quick add`,
+          date: new Date(),
+          type: 'expense'
+        })
+      }
+
+      toast.success(`Added $${amount} ${emoji}`)
+
+      // Reload transactions
+      loadDashboardData()
+    } catch (error) {
+      console.error('Error adding expense:', error)
+      toast.error('Failed to add expense')
+    }
+  }
 
   const loadDashboardData = async () => {
     if (!user) return
@@ -103,28 +162,42 @@ export default function Dashboard() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
           >
-            {language === 'en' ? 'Your financial overview and latest insights' : '这是您的财务概览和最新洞察'}
+            {language === 'en' ? 'Your Privacy-First Wealth Dashboard' : '您的隐私优先财富仪表板'}
           </motion.p>
         </motion.div>
 
-        {/* Quick Actions */}
+        {/* Burn-Down Chart - Hero Section */}
         <motion.div
-          className="mb-4 md:mb-6 lg:mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <QuickActions />
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+            <BurnDownChart
+              monthlyBudget={monthlyBudget}
+              spent={spent}
+              onSetBudget={() => setShowBudgetModal(true)}
+            />
+          </div>
         </motion.div>
 
-
+        {/* Quick Expense Entry */}
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          <QuickExpenseEntry onAddExpense={handleAddExpense} />
+        </motion.div>
 
         {/* Main grid */}
         <motion.div
           className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
         >
           {/* Left column - Main content */}
           <motion.div
@@ -319,6 +392,21 @@ export default function Dashboard() {
           </motion.div>
         </motion.div>
       </motion.main>
+
+      {/* Worth It? Calculator - Floating Button */}
+      <WorthItCalculator
+        hourlyWage={hourlyWage}
+        onSetWage={() => setShowBudgetModal(true)}
+      />
+
+      {/* Budget Setup Modal */}
+      <BudgetSetupModal
+        isOpen={showBudgetModal}
+        onClose={() => setShowBudgetModal(false)}
+        currentBudget={monthlyBudget}
+        currentWage={hourlyWage}
+        onSave={saveUserSettings}
+      />
     </div>
   )
 }

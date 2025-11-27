@@ -142,7 +142,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                                                 <path fill="#EA4335" d="M12 4.66c1.6 0 3.05.55 4.18 1.6l3.14-3.14C17.45 1.27 14.97 0 12 0 7.7 0 3.99 2.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                                             </svg>
                                         </div>
-                                        {t('onboarding.cta.google')}
+                                        {t('Continue with Google')}
                                     </>
                                 )}
                             </button>
