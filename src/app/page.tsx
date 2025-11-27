@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import PageLoader from '@/components/PageLoader'
 import SafeRing from '@/components/Navigator/SafeRing'
