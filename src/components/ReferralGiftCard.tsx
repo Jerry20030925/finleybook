@@ -13,7 +13,7 @@ export default function ReferralGiftCard() {
 
     // Generate referral link
     const referralCode = user?.uid?.slice(0, 8) || 'DEMO'
-    const referralLink = `https://finleybook.vercel.app?ref=${referralCode}`
+    const referralLink = `https://finleybook.com?ref=${referralCode}`
 
     // Pre-written messages
     const messages = {
