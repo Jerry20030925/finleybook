@@ -1,99 +1,42 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { ResendService } from '@/lib/resendService';
+import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
+import WeeklyReportEmail from '@/emails/WeeklyReport';
 
-export async function POST(request: NextRequest) {
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { type, email, ...data } = body;
+    // 假设这是从数据库取出的用户数据
+    // In a real application, you would parse the request body or fetch data from DB
+    const userData = {
+      userName: "Alex",
+      email: "alex@example.com", // This should be dynamic
+      savedAmount: "85.50",
+      topCategory: "Gaming",
+      nextBillName: "Spotify",
+      nextBillAmount: "11.99"
+    };
 
-    if (!email) {
-      return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
-      );
-    }
+    // Allow overriding email for testing
+    const body = await request.json().catch(() => ({}));
+    const recipientEmail = body.email || userData.email;
 
-    let result;
-
-    switch (type) {
-      case 'welcome':
-        result = await ResendService.sendWelcomeEmail(email, data.name);
-        break;
-      
-      case 'password-reset':
-        if (!data.resetToken) {
-          return NextResponse.json(
-            { error: 'Reset token is required' },
-            { status: 400 }
-          );
-        }
-        result = await ResendService.sendPasswordResetEmail(email, data.resetToken);
-        break;
-      
-      case 'notification':
-        if (!data.notification) {
-          return NextResponse.json(
-            { error: 'Notification data is required' },
-            { status: 400 }
-          );
-        }
-        result = await ResendService.sendNotificationEmail(email, data.notification);
-        break;
-      
-      case 'custom':
-        if (!data.subject || (!data.html && !data.text)) {
-          return NextResponse.json(
-            { error: 'Subject and content (html or text) are required' },
-            { status: 400 }
-          );
-        }
-        result = await ResendService.sendEmail({
-          to: email,
-          subject: data.subject,
-          html: data.html,
-          text: data.text,
-          from: data.from,
-        });
-        break;
-      
-      default:
-        return NextResponse.json(
-          { error: 'Invalid email type' },
-          { status: 400 }
-        );
-    }
-
-    return NextResponse.json({ 
-      success: true, 
-      messageId: result?.id,
-      message: 'Email sent successfully'
+    const data = await resend.emails.send({
+      from: 'FinleyBook <hello@finleybook.com>', // 必须是你验证过的域名
+      to: [recipientEmail],
+      subject: `Weekly Report: You saved $${userData.savedAmount}!`,
+      // 核心：把组件作为 react 属性传入
+      react: WeeklyReportEmail({
+        userName: userData.userName,
+        savedAmount: userData.savedAmount,
+        topCategory: userData.topCategory,
+        nextBillName: userData.nextBillName,
+        nextBillAmount: userData.nextBillAmount,
+      }),
     });
 
-  } catch (error: any) {
-    console.error('Email API error:', error);
-    
-    return NextResponse.json(
-      { 
-        error: 'Failed to send email',
-        details: error.message 
-      },
-      { status: 500 }
-    );
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json({ error });
   }
-}
-
-// GET endpoint for testing
-export async function GET() {
-  return NextResponse.json({
-    message: 'Email API is working',
-    supportedTypes: ['welcome', 'password-reset', 'notification', 'custom'],
-    usage: {
-      method: 'POST',
-      body: {
-        type: 'string (required)',
-        email: 'string (required)',
-        // Additional fields based on type
-      }
-    }
-  });
 }
