@@ -97,13 +97,26 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                     animate={{ opacity: 1, scale: 1 }}
                     className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center"
                 >
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('onboarding.final.title')}</h2>
+                    <div className="flex justify-center mb-8">
+                        <img src="/static/logo-f.png" alt="Finley Logo" className="w-16 h-16 object-contain" />
+                    </div>
+
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('onboarding.final.title')}</h2>
                     <p className="text-gray-600 mb-8">{t('onboarding.final.desc')}</p>
 
                     {authError && (
-                        <div className="mb-6 p-3 bg-red-50 text-red-600 text-sm rounded-lg flex items-center gap-2 text-left">
-                            <AlertCircle size={16} />
-                            {authError}
+                        <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl flex flex-col gap-2 text-left">
+                            <div className="flex items-center gap-2 font-medium">
+                                <AlertCircle size={16} />
+                                <span>Authentication Error</span>
+                            </div>
+                            <p className="text-xs opacity-90 break-all">{authError}</p>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="text-xs font-bold underline self-start hover:text-red-800"
+                            >
+                                Reload Page
+                            </button>
                         </div>
                     )}
 
