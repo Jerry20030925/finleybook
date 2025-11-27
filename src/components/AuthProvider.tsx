@@ -52,23 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (mounted) {
           setAuth(firebase.auth)
 
-          const { onAuthStateChanged, getRedirectResult } = await import('firebase/auth')
-          
-          // Handle redirect result first
-          try {
-            const result = await getRedirectResult(firebase.auth)
-            if (result) {
-              // User signed in via redirect
-              const isNewUser = (result as any)._tokenResponse?.isNewUser ||
-                result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+          const { onAuthStateChanged } = await import('firebase/auth')
 
-              if (isNewUser) {
-                await trackReferral(result.user.uid)
-              }
-            }
-          } catch (error: any) {
-            console.error('Redirect result error:', error)
-          }
+          // No need for getRedirectResult since we use popup flow now
 
           const unsubscribe = onAuthStateChanged(firebase.auth, (user) => {
             if (mounted) {
@@ -169,12 +155,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setError(null)
-      const { GoogleAuthProvider, signInWithRedirect, getRedirectResult } = await import('firebase/auth')
+      const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth')
       const provider = new GoogleAuthProvider()
-      
-      // Use redirect instead of popup for better cross-origin support
-      await signInWithRedirect(auth, provider)
-      
+
+      // Use popup for better UX and to avoid redirect loops
+      const result = await signInWithPopup(auth, provider)
+
+      // Check for new user
+      const isNewUser = (result as any)._tokenResponse?.isNewUser ||
+        result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+
+      if (isNewUser) {
+        await trackReferral(result.user.uid)
+      }
+
     } catch (error: any) {
       console.error('Google sign in error:', error)
       setError(error.message)
