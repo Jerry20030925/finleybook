@@ -11,8 +11,8 @@ export default function LanguageSwitcher() {
   const [isOpen, setIsOpen] = useState(false)
 
   const languages = [
-    { code: 'en' as const, name: t('language.english'), flag: '🇺🇸' },
-    { code: 'zh' as const, name: t('language.chinese'), flag: '🇨🇳' }
+    { code: 'en' as const, name: t('language.english') },
+    { code: 'zh' as const, name: t('language.chinese') }
   ]
 
   const currentLanguage = languages.find(lang => lang.code === language)
@@ -34,8 +34,7 @@ export default function LanguageSwitcher() {
         whileTap={{ scale: 0.98 }}
       >
         <GlobeAltIcon className="w-4 h-4" />
-        <span className="hidden sm:inline">{currentLanguage?.flag} {currentLanguage?.name}</span>
-        <span className="sm:hidden">{currentLanguage?.flag}</span>
+        <span>{currentLanguage?.name}</span>
         <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </motion.button>
 
@@ -74,7 +73,6 @@ export default function LanguageSwitcher() {
                     }`}
                     whileHover={{ backgroundColor: language === lang.code ? '#f0fdfa' : '#f9fafb' }}
                   >
-                    <span className="mr-3 text-lg">{lang.flag}</span>
                     <span className="flex-1">{lang.name}</span>
                     {language === lang.code && (
                       <motion.div

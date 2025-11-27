@@ -7,6 +7,8 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { UserCircleIcon } from '@heroicons/react/24/outline'
 
+import SubscriptionStatus from '@/components/SubscriptionStatus'
+
 export default function ProfilePage() {
     const { user, loading } = useAuth()
     const { language } = useLanguage()
@@ -43,7 +45,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+                <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
                     <div className="px-4 py-5 sm:px-6 flex items-center gap-4">
                         {user.photoURL ? (
                             <img src={user.photoURL} alt="" className="h-16 w-16 rounded-full" />
@@ -94,6 +96,20 @@ export default function ProfilePage() {
                         >
                             {language === 'en' ? 'Edit Profile & Settings' : '编辑资料与设置'} <span aria-hidden="true">&rarr;</span>
                         </Link>
+                    </div>
+                </div>
+
+                <div className="bg-white shadow sm:rounded-lg overflow-hidden">
+                    <div className="px-4 py-5 sm:px-6">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">
+                            {language === 'en' ? 'Subscription' : '订阅管理'}
+                        </h3>
+                        <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                            {language === 'en' ? 'Manage your subscription plan' : '管理您的订阅方案'}
+                        </p>
+                    </div>
+                    <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+                        <SubscriptionStatus />
                     </div>
                 </div>
             </div>

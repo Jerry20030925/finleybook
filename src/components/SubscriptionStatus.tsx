@@ -25,17 +25,17 @@ export default function SubscriptionStatus() {
       >
         <motion.div
           className="absolute top-0 right-0 w-32 h-32 bg-white bg-opacity-10 rounded-full -translate-y-16 translate-x-16"
-          animate={{ 
+          animate={{
             scale: [1, 1.1, 1],
-            rotate: [0, 180, 360] 
+            rotate: [0, 180, 360]
           }}
-          transition={{ 
-            duration: 20, 
-            repeat: Infinity, 
-            ease: "linear" 
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
           }}
         />
-        
+
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
@@ -55,28 +55,34 @@ export default function SubscriptionStatus() {
               ))}
             </div>
           </div>
-          
+
           <p className="text-blue-100 mb-4">
             {currentPlan.name} - 享受全部高级功能
           </p>
-          
+
           {subscription.currentPeriodEnd && (
-            <div className="text-sm text-blue-100">
+            <div className="text-sm text-blue-100 mb-4">
               续费时间: {subscription.currentPeriodEnd.toLocaleDateString('zh-CN')}
             </div>
           )}
-          
-          <motion.div
-            className="mt-4 pt-4 border-t border-white border-opacity-20"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
+
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-white border-opacity-20">
             <div className="flex items-center text-sm text-blue-100">
               <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
-              无限记账 • AI 分析 • 优先支持
+              无限记账 • AI 分析
             </div>
-          </motion.div>
+            <button
+              onClick={() => {
+                if (confirm('Are you sure you want to cancel your subscription?')) {
+                  // In a real app, call API to cancel
+                  alert('Subscription cancellation request sent.');
+                }
+              }}
+              className="text-xs text-blue-100 hover:text-white underline opacity-80 hover:opacity-100 transition-opacity"
+            >
+              取消订阅
+            </button>
+          </div>
         </div>
       </motion.div>
     )
@@ -92,39 +98,39 @@ export default function SubscriptionStatus() {
       >
         <motion.div
           className="absolute top-0 right-0 w-20 h-20 bg-blue-200 bg-opacity-30 rounded-full -translate-y-10 translate-x-10"
-          animate={{ 
+          animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.6, 0.3]
           }}
-          transition={{ 
-            duration: 3, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut"
           }}
         />
-        
+
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">免费版</h3>
             <motion.div
               className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
-              animate={{ 
+              animate={{
                 scale: [1, 1.05, 1],
               }}
-              transition={{ 
-                duration: 2, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
               }}
             >
               当前方案
             </motion.div>
           </div>
-          
+
           <p className="text-gray-600 mb-4">
             基础功能可满足日常记账需求
           </p>
-          
+
           <div className="space-y-2 mb-4">
             <div className="flex items-center text-sm text-gray-700">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2" />
@@ -139,7 +145,7 @@ export default function SubscriptionStatus() {
               数据导出：每月 2 次
             </div>
           </div>
-          
+
           <motion.button
             onClick={() => setShowUpgrade(true)}
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
@@ -149,7 +155,7 @@ export default function SubscriptionStatus() {
             <ArrowUpIcon className="w-5 h-5 mr-2" />
             升级到 Pro 版
           </motion.button>
-          
+
           <motion.p
             className="text-xs text-gray-500 mt-2 text-center"
             initial={{ opacity: 0 }}
@@ -176,9 +182,9 @@ export default function SubscriptionStatus() {
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <SubscriptionPlans 
+            <SubscriptionPlans
               currentPlan={subscription.planKey}
-              onClose={() => setShowUpgrade(false)} 
+              onClose={() => setShowUpgrade(false)}
             />
           </motion.div>
         </motion.div>

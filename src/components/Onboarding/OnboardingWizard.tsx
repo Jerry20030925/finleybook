@@ -97,12 +97,15 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                     animate={{ opacity: 1, scale: 1 }}
                     className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center"
                 >
-                    <div className="flex justify-center mb-8">
-                        <img src="/static/logo-f.png" alt="Finley Logo" className="w-16 h-16 object-contain" />
+                    <div className="flex justify-center mb-6">
+                        <div className="relative">
+                            <span className="text-4xl font-black tracking-tighter">F.</span>
+                            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-teal-600 rounded-full border-2 border-white"></div>
+                        </div>
                     </div>
 
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('onboarding.final.title')}</h2>
-                    <p className="text-gray-600 mb-8">{t('onboarding.final.desc')}</p>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Last Step</h2>
+                    <p className="text-gray-600 mb-8">One second to open your "Flight Fund".</p>
 
                     {authError && (
                         <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl flex flex-col gap-2 text-left">
@@ -125,7 +128,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                             <button
                                 onClick={handleGoogleSignup}
                                 disabled={isSigningUp || !!authError}
-                                className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-indigo-200"
                             >
                                 {isSigningUp ? (
                                     <>
@@ -147,18 +150,18 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                                 )}
                             </button>
 
-                            <div className="relative">
+                            <div className="relative py-2">
                                 <div className="absolute inset-0 flex items-center">
                                     <div className="w-full border-t border-gray-200"></div>
                                 </div>
                                 <div className="relative flex justify-center text-sm">
-                                    <span className="px-2 bg-white text-gray-500">{t('auth.or')}</span>
+                                    <span className="px-4 bg-white text-gray-500 font-medium">{t('auth.or')}</span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={() => setShowEmailForm(true)}
-                                className="w-full bg-white border-2 border-gray-200 text-gray-700 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                                className="w-full bg-white border-2 border-gray-100 text-gray-700 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 hover:border-gray-200 transition-all flex items-center justify-center gap-2"
                             >
                                 <Mail className="w-5 h-5" />
                                 {t('auth.continueEmail')}
@@ -167,25 +170,25 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                     ) : (
                         <form onSubmit={handleEmailAuth} className="space-y-4 text-left">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.email')}</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">{t('auth.email')}</label>
                                 <input
                                     type="email"
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                                    className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none text-gray-900 placeholder-gray-400"
                                     placeholder="you@example.com"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.password')}</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">{t('auth.password')}</label>
                                 <input
                                     type="password"
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                                    className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none text-gray-900 placeholder-gray-400"
                                     placeholder="••••••••"
                                     minLength={6}
                                 />
@@ -194,36 +197,38 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                             <button
                                 type="submit"
                                 disabled={isSigningUp}
-                                className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                                className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg shadow-indigo-200 mt-6"
                             >
                                 {isSigningUp ? (
                                     <Loader2 className="animate-spin" />
                                 ) : (
-                                    isLoginMode ? t('auth.login') : t('auth.signup')
+                                    isLoginMode ? 'Sign In' : 'Sign Up'
                                 )}
                             </button>
 
-                            <div className="text-center mt-4">
+                            <div className="text-center mt-6">
                                 <button
                                     type="button"
                                     onClick={() => setIsLoginMode(!isLoginMode)}
-                                    className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                                    className="text-indigo-600 hover:text-indigo-800 font-bold text-sm"
                                 >
-                                    {isLoginMode ? t('auth.noAccount') : t('auth.haveAccount')}
+                                    {isLoginMode ? 'Create an account' : 'Already have an account?'}
                                 </button>
                             </div>
 
-                            <button
-                                type="button"
-                                onClick={() => setShowEmailForm(false)}
-                                className="w-full text-gray-400 text-sm hover:text-gray-600 mt-2"
-                            >
-                                ← Back
-                            </button>
+                            <div className="text-center">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEmailForm(false)}
+                                    className="text-gray-400 text-sm hover:text-gray-600 font-medium flex items-center justify-center gap-1 mx-auto"
+                                >
+                                    ← Back
+                                </button>
+                            </div>
                         </form>
                     )}
 
-                    <p className="text-xs text-gray-400 mt-6">
+                    <p className="text-xs text-gray-400 mt-8">
                         By clicking, you agree to our Terms
                     </p>
                 </motion.div>

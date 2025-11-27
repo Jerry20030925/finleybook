@@ -278,7 +278,7 @@ export default function BudgetPage() {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
                     required
                   >
                     <option value="">选择分类</option>
@@ -296,7 +296,7 @@ export default function BudgetPage() {
                     type="number"
                     value={formData.amount}
                     onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500"
                     placeholder="0.00"
                     step="0.01"
                     min="0"
@@ -311,7 +311,7 @@ export default function BudgetPage() {
                   <select
                     value={formData.period}
                     onChange={(e) => setFormData(prev => ({ ...prev, period: e.target.value as 'monthly' | 'yearly' }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
                   >
                     <option value="monthly">月度</option>
                     <option value="yearly">年度</option>

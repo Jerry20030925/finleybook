@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { Gift, Copy, Check, Mail, MessageCircle, Share2 } from 'lucide-react'
+import { Gift, Copy, Check, Mail, MessageCircle, Share2, Ticket } from 'lucide-react'
 import { useAuth } from './AuthProvider'
 import toast from 'react-hot-toast'
 
@@ -52,71 +52,70 @@ export default function ReferralGiftCard() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto p-6">
+        <div className="max-w-md mx-auto p-4">
             {/* Header */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center mb-8"
+                className="text-center mb-6"
             >
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-2xl font-bold text-gray-900 mb-1">
                     Gift 30 Days of Pro
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-sm text-gray-600">
                     Help your friends stop losing money. For every friend who joins, you get 1 free month.
                 </p>
             </motion.div>
 
-            {/* Gift Card */}
+            {/* Black Gold Gift Card */}
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                className="relative mb-8"
+                transition={{ delay: 0.1 }}
+                className="relative mb-6 filter drop-shadow-xl"
             >
-                {/* Card with ticket-style cutouts */}
-                <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl p-8 overflow-hidden">
-                    {/* Decorative elements */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl" />
+                {/* Card Container */}
+                <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 rounded-xl overflow-hidden text-white">
+                    {/* Golden Glow Effects */}
+                    <div className="absolute top-[-50%] left-[-50%] w-full h-full bg-yellow-500/20 blur-3xl rounded-full pointer-events-none" />
+                    <div className="absolute bottom-[-50%] right-[-50%] w-full h-full bg-yellow-600/20 blur-3xl rounded-full pointer-events-none" />
 
-                    {/* Left cutout */}
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-12 bg-gray-50 rounded-r-full -ml-3" />
+                    {/* Ticket Cutouts & Dashed Line */}
+                    <div className="absolute top-1/2 left-0 w-4 h-8 bg-white rounded-r-full -translate-y-1/2 -ml-2 z-10" />
+                    <div className="absolute top-1/2 right-0 w-4 h-8 bg-white rounded-l-full -translate-y-1/2 -mr-2 z-10" />
+                    <div className="absolute top-1/2 left-4 right-4 border-t-2 border-dashed border-gray-700/50" />
 
-                    {/* Right cutout */}
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-12 bg-gray-50 rounded-l-full -mr-3" />
-
-                    {/* Dashed line */}
-                    <div className="absolute left-0 right-0 top-1/2 border-t-2 border-dashed border-gray-700" />
-
-                    {/* Content */}
-                    <div className="relative z-10">
-                        {/* Top section */}
-                        <div className="flex items-start justify-between mb-6">
+                    {/* Top Section */}
+                    <div className="p-6 pb-4 relative z-10">
+                        <div className="flex justify-between items-start">
                             <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Gift className="text-yellow-400" size={24} />
-                                    <span className="text-yellow-400 font-bold text-sm">GIFT CARD</span>
+                                <div className="flex items-center space-x-2 mb-1">
+                                    <Ticket className="w-4 h-4 text-yellow-500" />
+                                    <span className="text-xs font-bold text-yellow-500 tracking-wider">GIFT CARD</span>
                                 </div>
-                                <h2 className="text-white text-2xl font-bold">FinleyBook Pro</h2>
-                                <p className="text-gray-400 text-sm mt-1">30-Day Access Pass</p>
+                                <h2 className="text-xl font-bold tracking-tight">FinleyBook Pro</h2>
+                                <p className="text-gray-400 text-xs mt-0.5">30-Day Access Pass</p>
                             </div>
                             <div className="text-right">
-                                <div className="text-yellow-400 text-3xl font-bold">$9.99</div>
-                                <div className="text-gray-500 text-xs">Value</div>
+                                <div className="text-2xl font-bold text-yellow-500">$9.99</div>
+                                <div className="text-gray-500 text-[10px] uppercase tracking-wide">Value</div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Bottom section */}
-                        <div className="pt-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <div className="text-gray-400 text-xs mb-1">Your Gifts Remaining</div>
-                                    <div className="text-white text-xl font-bold">{giftsRemaining}</div>
+                    {/* Bottom Section */}
+                    <div className="p-6 pt-4 relative z-10">
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <p className="text-gray-400 text-[10px] uppercase tracking-wide mb-1">You have</p>
+                                <div className="text-lg font-bold text-white flex items-center">
+                                    {giftsRemaining} Gifts Remaining
                                 </div>
-                                <div className="text-right">
-                                    <div className="text-gray-400 text-xs mb-1">Referral Code</div>
-                                    <div className="text-white font-mono text-sm">{referralCode}</div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-gray-400 text-[10px] uppercase tracking-wide mb-1">Code</p>
+                                <div className="font-mono text-sm text-yellow-500/90 bg-yellow-500/10 px-2 py-1 rounded border border-yellow-500/20">
+                                    {referralCode}
                                 </div>
                             </div>
                         </div>
@@ -124,103 +123,48 @@ export default function ReferralGiftCard() {
                 </div>
             </motion.div>
 
-            {/* Share Buttons */}
+            {/* Share Button */}
+            <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                onClick={() => handleShare('generic')}
+                className="w-full bg-gray-900 hover:bg-black text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl mb-6 active:scale-95"
+            >
+                <Share2 size={18} />
+                Send Gift to Friends
+            </motion.button>
+
+            {/* 3-Step Logic */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="space-y-3 mb-8"
+                className="bg-gray-50 rounded-xl p-5 border border-gray-100"
             >
-                <button
-                    onClick={() => handleShare('generic')}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
-                >
-                    <Share2 size={20} />
-                    Send Gift to Friends
-                </button>
+                <div className="flex justify-between items-start text-center relative">
+                    {/* Connecting Line */}
+                    <div className="absolute top-4 left-10 right-10 h-0.5 bg-gray-200 -z-10" />
 
-                <div className="grid grid-cols-2 gap-3">
-                    <button
-                        onClick={() => handleShare('email')}
-                        className="bg-white border-2 border-gray-200 hover:border-indigo-300 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
-                    >
-                        <Mail size={18} />
-                        Email
-                    </button>
-                    <button
-                        onClick={() => handleShare('sms')}
-                        className="bg-white border-2 border-gray-200 hover:border-indigo-300 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
-                    >
-                        <MessageCircle size={18} />
-                        Message
-                    </button>
-                </div>
-            </motion.div>
-
-            {/* Copy Link */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="bg-gray-50 rounded-xl p-4 mb-8"
-            >
-                <div className="flex items-center gap-3">
-                    <input
-                        type="text"
-                        value={referralLink}
-                        readOnly
-                        className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm font-mono"
-                    />
-                    <button
-                        onClick={handleCopy}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
-                    >
-                        {copied ? <Check size={18} /> : <Copy size={18} />}
-                        {copied ? 'Copied!' : 'Copy'}
-                    </button>
-                </div>
-            </motion.div>
-
-            {/* How it Works */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="bg-white rounded-xl p-6 border-2 border-gray-100"
-            >
-                <h3 className="font-bold text-gray-900 mb-4">How it Works</h3>
-                <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center">
-                        <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <span className="text-indigo-600 font-bold">1</span>
+                    <div className="flex flex-col items-center flex-1">
+                        <div className="w-8 h-8 bg-white border-2 border-gray-900 rounded-full flex items-center justify-center mb-2 z-10">
+                            <span className="text-sm font-bold text-gray-900">1</span>
                         </div>
-                        <p className="text-xs text-gray-600">Share your gift link</p>
+                        <p className="text-[10px] font-medium text-gray-600 leading-tight">Share Gift</p>
                     </div>
-                    <div className="text-center">
-                        <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <span className="text-indigo-600 font-bold">2</span>
+                    <div className="flex flex-col items-center flex-1">
+                        <div className="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center mb-2 z-10 shadow-md">
+                            <span className="text-sm font-bold">2</span>
                         </div>
-                        <p className="text-xs text-gray-600">Friend gets 30 days free</p>
+                        <p className="text-[10px] font-medium text-gray-600 leading-tight">Friend Joins</p>
                     </div>
-                    <div className="text-center">
-                        <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <span className="text-indigo-600 font-bold">3</span>
+                    <div className="flex flex-col items-center flex-1">
+                        <div className="w-8 h-8 bg-yellow-400 text-gray-900 rounded-full flex items-center justify-center mb-2 z-10 shadow-md">
+                            <span className="text-sm font-bold">3</span>
                         </div>
-                        <p className="text-xs text-gray-600">You earn 1 free month</p>
+                        <p className="text-[10px] font-medium text-gray-600 leading-tight">Get Free Month</p>
                     </div>
                 </div>
-            </motion.div>
-
-            {/* Stats (Optional) */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="mt-6 text-center"
-            >
-                <p className="text-sm text-gray-500">
-                    You've helped <span className="font-bold text-indigo-600">0 friends</span> save money
-                </p>
             </motion.div>
         </div>
     )

@@ -113,7 +113,7 @@ export default function TransactionsPage() {
                 placeholder="搜索交易记录..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
               />
             </div>
 
@@ -122,7 +122,7 @@ export default function TransactionsPage() {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value as 'all' | 'income' | 'expense')}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
               >
                 <option value="all">全部类型</option>
                 <option value="income">收入</option>
@@ -132,7 +132,7 @@ export default function TransactionsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'date' | 'amount')}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
               >
                 <option value="date">按日期排序</option>
                 <option value="amount">按金额排序</option>

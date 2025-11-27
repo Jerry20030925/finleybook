@@ -364,7 +364,7 @@ export default function GoalsPage() {
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500"
                     placeholder="例如：紧急基金"
                     required
                   />
@@ -377,7 +377,7 @@ export default function GoalsPage() {
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500"
                     rows={3}
                     placeholder="目标的详细描述"
                   />
@@ -391,7 +391,7 @@ export default function GoalsPage() {
                     type="number"
                     value={formData.targetAmount}
                     onChange={(e) => setFormData(prev => ({ ...prev, targetAmount: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500"
                     placeholder="0.00"
                     step="0.01"
                     min="0"
@@ -407,7 +407,7 @@ export default function GoalsPage() {
                     type="date"
                     value={formData.deadline}
                     onChange={(e) => setFormData(prev => ({ ...prev, deadline: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
                     required
                   />
                 </div>
@@ -419,7 +419,7 @@ export default function GoalsPage() {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as keyof typeof GOAL_CATEGORIES }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
                   >
                     {Object.entries(GOAL_CATEGORIES).map(([key, category]) => (
                       <option key={key} value={key}>
@@ -485,7 +485,7 @@ export default function GoalsPage() {
                   type="number"
                   value={progressAmount}
                   onChange={(e) => setProgressAmount(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500"
                   placeholder="0.00"
                   step="0.01"
                   min="0"

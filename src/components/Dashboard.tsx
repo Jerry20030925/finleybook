@@ -28,6 +28,9 @@ import QuickExpenseEntry from './Dashboard/QuickExpenseEntry'
 import WorthItCalculator from './Dashboard/WorthItCalculator'
 import BudgetSetupModal from './Dashboard/BudgetSetupModal'
 
+import { Dialog } from '@headlessui/react'
+import ReferralGiftCard from './ReferralGiftCard'
+
 export default function Dashboard() {
   const { user } = useAuth()
   const { language } = useLanguage()
@@ -41,6 +44,20 @@ export default function Dashboard() {
   const [spent, setSpent] = useState(0)
   const [hourlyWage, setHourlyWage] = useState(25)
   const [showBudgetModal, setShowBudgetModal] = useState(false)
+  const [showInviteModal, setShowInviteModal] = useState(false)
+
+  useEffect(() => {
+    // Check if user has seen the invite modal
+    const hasSeenInvite = localStorage.getItem('hasSeenInviteModal_v1')
+    if (!hasSeenInvite && !loading) {
+      // Small delay to let the dashboard load first
+      const timer = setTimeout(() => {
+        setShowInviteModal(true)
+        localStorage.setItem('hasSeenInviteModal_v1', 'true')
+      }, 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [loading])
 
   useEffect(() => {
     if (user) {

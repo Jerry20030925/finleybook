@@ -20,15 +20,15 @@ const initializeFirebase = async () => {
     const { getFirestore } = await import('firebase/firestore');
     const { getStorage } = await import('firebase/storage');
 
-    // Hardcoded configuration from Firebase Console
+    // Configuration from environment variables
     const firebaseConfig = {
-      apiKey: 'AIzaSyBQkaROBq9sIqFaLvlCUpQEVBWKu2AT5zc',
-      authDomain: 'finleybook-6120d.firebaseapp.com',
-      projectId: 'finleybook-6120d',
-      storageBucket: 'finleybook-6120d.firebasestorage.app',
-      messagingSenderId: '787309970302',
-      appId: '1:787309970302:web:c33272789af8ec7263292f',
-      measurementId: 'G-VSB2C4CK1M'
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
+      measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID!
     };
 
     console.log('Initializing Firebase with config:', {

@@ -10,6 +10,7 @@ import StructuredData from '@/components/StructuredData'
 import { Toaster } from 'react-hot-toast'
 import { LanguageProvider } from '@/components/LanguageProvider'
 import { CurrencyProvider } from '@/components/CurrencyProvider'
+import SmartNotificationManager from '@/components/SmartNotificationManager'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -95,6 +96,7 @@ export default function RootLayout({
           <LanguageProvider>
             <AuthProvider>
               <NotificationProvider>
+                <SmartNotificationManager />
                 <CurrencyProvider>
                   <SubscriptionProvider>
                     {children}
