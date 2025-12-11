@@ -19,9 +19,12 @@ import Navigation from '@/components/Navigation'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'FinleyBook - AI Wealth Tracker & Cashback Glitch Finder',
+  title: {
+    default: 'FinleyBook - AI Wealth Tracker & Cashback Glitch Finder',
+    template: '%s | FinleyBook',
+  },
   description: 'The #1 AI Money App. Track net worth, find 90% off price glitches, and earn double cashback on daily shopping. Join the AI wealth revolution today.',
-  keywords: 'Cashback App, Price Glitch Finder, AI Finance Tracker, Wealth Management, Bank Bounties, Money Saving App, FinleyBook, 现金回扣, 省钱神器, 澳洲理财',
+  keywords: ['AI Finance', 'Cashback App', 'Price Glitch Finder', 'Wealth Management', 'Bank Bounties', 'Money Saving App', 'FinleyBook', 'Personal Finance Dashboard', '现金回扣', '省钱神器', '澳洲理财'],
   authors: [{ name: 'FinleyBook Team' }],
   creator: 'FinleyBook',
   publisher: 'FinleyBook',
@@ -32,6 +35,12 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL('https://finleybook.com'),
+  alternates: {
+    canonical: '/',
+  },
+  verification: {
+    google: 'verification_token', // Placeholder for user to update
+  },
   openGraph: {
     type: 'website',
     locale: 'en_AU',

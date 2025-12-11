@@ -70,6 +70,19 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         }
         return organizationData
 
+      case 'breadcrumbs':
+        if (!data) return null
+        const breadcrumbData = {
+          '@type': 'BreadcrumbList',
+          itemListElement: data.map((item: any, index: number) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: item.name,
+            item: item.url ? `${baseUrl}${item.url}` : undefined
+          }))
+        }
+        return breadcrumbData
+
       case 'software':
         const softwareData = {
           '@type': 'SoftwareApplication',
@@ -80,22 +93,12 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           applicationSubCategory: 'ShoppingApplication',
           operatingSystem: 'Windows, macOS, Android, iOS',
           screenshot: `${baseUrl}/og-image.png`,
-          offers: [
-            {
-              '@type': 'Offer',
-              price: '0',
-              priceCurrency: 'USD',
-              availability: 'https://schema.org/InStock',
-              name: 'Free Starter Plan'
-            },
-            {
-              '@type': 'Offer',
-              price: '9.99',
-              priceCurrency: 'USD',
-              availability: 'https://schema.org/InStock',
-              name: 'Pro Plan (Monthly)'
-            }
-          ],
+          offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock'
+          },
           aggregateRating: {
             '@type': 'AggregateRating',
             ratingValue: 4.9,

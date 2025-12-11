@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/dashboard/', '/settings/', '/admin/', '/profile/', '/debug/'],
+      disallow: ['/dashboard/', '/settings/', '/admin/', '/profile/', '/wallet/', '/debug/'],
     },
     sitemap: 'https://finleybook.com/sitemap.xml',
   }

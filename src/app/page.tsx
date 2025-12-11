@@ -10,6 +10,14 @@ export const metadata = {
   },
 }
 
+import StructuredData from '@/components/StructuredData'
+
 export default function Home() {
-  return <HomePage />
+  return (
+    <>
+      <StructuredData type="software" />
+      <StructuredData type="organization" />
+      <HomePage />
+    </>
+  )
 }

@@ -12,9 +12,15 @@ interface BreadcrumbsProps {
     items: BreadcrumbItem[]
 }
 
+import StructuredData from './StructuredData'
+
 export default function Breadcrumbs({ items }: BreadcrumbsProps) {
     return (
         <nav className="flex" aria-label="Breadcrumb">
+            <StructuredData
+                type="breadcrumbs"
+                data={items}
+            />
             <ol role="list" className="flex items-center space-x-2">
                 <li>
                     <div>
