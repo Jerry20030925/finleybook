@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowRight, ShieldCheck, Zap, TrendingUp, CheckCircle2, Sparkles } from 'lucide-react'
+import { ArrowRight, ShieldCheck, Zap, TrendingUp, CheckCircle2, Sparkles, Coins } from 'lucide-react'
 import { useLanguage } from './LanguageProvider'
 import LanguageSwitcher from './LanguageSwitcher'
 import CountrySelector, { useCountry } from './CountrySelector'
@@ -10,8 +10,10 @@ import HowItWorksSection from './HowItWorksSection'
 import TestimonialsSection from './TestimonialsSection'
 import FAQSection from './FAQSection'
 import LoadingAnimation from './LoadingAnimation'
+import EarningsCalculator from './EarningsCalculator'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import Footer from './Footer'
 
 interface LandingPageProps {
     onStart: () => void
@@ -21,31 +23,12 @@ interface LandingPageProps {
 export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
     const { t } = useLanguage()
     const { selectedCountry, updateCountry } = useCountry()
-    const [isLoading, setIsLoading] = useState(true)
-    const [showContent, setShowContent] = useState(false)
-
-    useEffect(() => {
-        // Simulate loading time
-        const timer = setTimeout(() => {
-            setIsLoading(false)
-            setTimeout(() => setShowContent(true), 300)
-        }, 2000)
-        return () => clearTimeout(timer)
-    }, [])
-
-    // Show loading animation
-    if (isLoading) {
-        return (
-            <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
-                <LoadingAnimation size="lg" />
-            </div>
-        )
-    }
+    // Removed artificial loading state for SEO optimization
 
     return (
         <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: showContent ? 1 : 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50 relative overflow-hidden flex flex-col"
         >
@@ -54,23 +37,30 @@ export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
                 initial={{ y: -50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="absolute top-6 right-6 z-50 flex items-center gap-4"
+                className="absolute top-4 right-4 md:top-6 md:right-6 z-50 flex items-center gap-2 md:gap-4"
             >
                 <button
                     onClick={onLogin}
-                    className="text-gray-600 font-semibold hover:text-indigo-600 transition-colors px-4 py-2"
+                    className="text-gray-600 font-semibold hover:text-indigo-600 transition-colors px-2 py-1 md:px-4 md:py-2 text-sm md:text-base"
                 >
-                    Login
+                    {t('auth.login')}
                 </button>
-                <CountrySelector
-                    selectedCountry={selectedCountry}
-                    onCountryChange={updateCountry}
-                />
-                <LanguageSwitcher />
+                <div className="scale-90 md:scale-100 origin-right flex items-center gap-2">
+                    <CountrySelector
+                        selectedCountry={selectedCountry}
+                        onCountryChange={updateCountry}
+                    />
+                    <LanguageSwitcher />
+                </div>
             </motion.div>
 
             {/* Hero Section */}
             <HeroSection onStart={onStart} />
+
+            {/* Earnings Calculator Widget */}
+            <section className="relative z-20 mt-0 mb-20">
+                <EarningsCalculator />
+            </section>
 
             {/* Enhanced Features Section */}
             <motion.section
@@ -78,6 +68,7 @@ export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
+                id="features"
                 className="py-24 bg-white relative"
             >
                 {/* Background Pattern */}
@@ -93,7 +84,7 @@ export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
                             className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 px-4 py-2 rounded-full text-sm font-semibold mb-6"
                         >
                             <Sparkles size={16} />
-                            {t('landing.features.badge') || 'Why Choose FinleyBook'}
+                            {t('landing.features.badge')}
                         </motion.div>
                         <motion.h2
                             initial={{ opacity: 0, y: 20 }}
@@ -102,7 +93,7 @@ export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
                             transition={{ delay: 0.1 }}
                             className="text-4xl font-bold text-gray-900 mb-4"
                         >
-                            {t('landing.features.title') || 'Built for Modern Financial Management'}
+                            {t('landing.features.title')}
                         </motion.h2>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
@@ -111,7 +102,7 @@ export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
                             transition={{ delay: 0.2 }}
                             className="text-xl text-gray-600 max-w-3xl mx-auto"
                         >
-                            {t('landing.features.desc') || 'Experience the future of personal finance with our innovative tools and AI-powered insights.'}
+                            {t('landing.features.desc')}
                         </motion.p>
                     </div>
 
@@ -124,7 +115,7 @@ export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
                             color="emerald"
                         />
                         <EnhancedFeatureCard
-                            icon={<Zap className="w-8 h-8 text-amber-500" />}
+                            icon={<Coins className="w-8 h-8 text-amber-500" />}
                             title={t('landing.feature.drag.title')}
                             desc={t('landing.feature.drag.desc')}
                             delay={0.5}
@@ -151,28 +142,8 @@ export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
             <FAQSection />
 
             {/* Footer */}
-            <footer className="bg-white border-t border-gray-200 py-8">
-                <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-gray-400 text-sm">
-                        Copyright © 2025 FinleyBook Inc. All rights reserved.
-                    </p>
-                    <div className="flex items-center gap-6 text-sm text-gray-500">
-                        <Link href="/privacy" className="hover:text-gray-900 transition-colors">
-                            Privacy Policy
-                        </Link>
-                        <Link href="/terms" className="hover:text-gray-900 transition-colors">
-                            Terms of Use
-                        </Link>
-                        <div className="flex items-center gap-2 border-l border-gray-200 pl-6">
-                            <CountrySelector
-                                selectedCountry={selectedCountry}
-                                onCountryChange={updateCountry}
-                                className="scale-90"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            {/* Footer */}
+            <Footer selectedCountry={selectedCountry} onCountryChange={updateCountry} />
         </motion.div>
     )
 }
@@ -216,9 +187,12 @@ function EnhancedFeatureCard({
             transition={{ duration: 0.6, delay }}
             whileHover={{
                 y: -10,
+                rotateX: 5,
+                rotateY: 5,
                 scale: 1.02,
                 transition: { duration: 0.2 }
             }}
+            style={{ perspective: 1000 }}
             className={`
                 relative bg-white p-8 rounded-3xl border-2 ${colorClasses[color].border}
                 hover:shadow-2xl ${colorClasses[color].glow} transition-all duration-300 cursor-default group overflow-hidden
@@ -256,27 +230,6 @@ function EnhancedFeatureCard({
             <div className="absolute top-4 right-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Sparkles size={24} />
             </div>
-        </motion.div>
-    )
-}
-
-function FeatureCard({ icon, title, desc, delay }: { icon: React.ReactNode, title: string, desc: string, delay: number }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay }}
-            whileHover={{ y: -10 }}
-            className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:shadow-xl transition-all cursor-default group"
-        >
-            <div className="bg-gray-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                {icon}
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
-            <p className="text-gray-600 leading-relaxed">
-                {desc}
-            </p>
         </motion.div>
     )
 }

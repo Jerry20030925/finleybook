@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Minus } from 'lucide-react'
+import StructuredData from './StructuredData'
 
 export default function FAQSection() {
     const faqs = [
@@ -25,7 +26,8 @@ export default function FAQSection() {
     ]
 
     return (
-        <section className="py-24 bg-gray-50">
+        <section id="faq" className="py-24 bg-gray-50">
+            <StructuredData type="faq" data={faqs} />
             <div className="max-w-3xl mx-auto px-6">
                 <div className="text-center mb-16">
                     <motion.h2

@@ -18,7 +18,7 @@ const mockAlerts: RiskAlert[] = [
     relatedEntityId: 'invoice_123',
     relatedEntityType: 'invoice',
     isResolved: false,
-    createdAt: new Date()
+    createdAt: new Date('2024-01-01')
   },
   {
     id: '2',
@@ -28,7 +28,7 @@ const mockAlerts: RiskAlert[] = [
     title: '税务申报截止日期临近',
     description: '距离季度税务申报截止还有7天，请及时准备相关材料',
     isResolved: false,
-    createdAt: new Date()
+    createdAt: new Date('2024-01-01')
   }
 ]
 
@@ -85,29 +85,27 @@ export default function RiskAlerts({ alerts }: RiskAlertsProps) {
       {displayAlerts.map((alert) => {
         const Icon = getSeverityIcon(alert.severity)
         const colorClass = getSeverityColor(alert.severity)
-        
+
         return (
           <div key={alert.id} className={`rounded-lg border p-4 ${colorClass}`}>
             <div className="flex items-start justify-between">
               <div className="flex items-start space-x-3">
-                <div className={`flex-shrink-0 ${
-                  alert.severity === 'high' || alert.severity === 'critical' 
-                    ? 'text-danger-600' 
-                    : alert.severity === 'medium'
+                <div className={`flex-shrink-0 ${alert.severity === 'high' || alert.severity === 'critical'
+                  ? 'text-danger-600'
+                  : alert.severity === 'medium'
                     ? 'text-warning-600'
                     : 'text-blue-600'
-                }`}>
+                  }`}>
                   <Icon className="h-6 w-6" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
                     <h3 className="text-sm font-medium text-gray-900">{alert.title}</h3>
-                    <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                      alert.severity === 'critical' ? 'bg-danger-100 text-danger-800' :
+                    <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${alert.severity === 'critical' ? 'bg-danger-100 text-danger-800' :
                       alert.severity === 'high' ? 'bg-danger-100 text-danger-800' :
-                      alert.severity === 'medium' ? 'bg-warning-100 text-warning-800' :
-                      'bg-blue-100 text-blue-800'
-                    }`}>
+                        alert.severity === 'medium' ? 'bg-warning-100 text-warning-800' :
+                          'bg-blue-100 text-blue-800'
+                      }`}>
                       {getSeverityText(alert.severity)}
                     </span>
                   </div>

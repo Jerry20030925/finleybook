@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LockClosedIcon, StarIcon, SparklesIcon } from '@heroicons/react/24/outline'
 import { useSubscription } from './SubscriptionProvider'
-import SubscriptionPlans from './SubscriptionPlans'
+import SubscriptionPage from './SubscriptionPage'
 
 interface FeatureGateProps {
   feature: string
@@ -14,12 +14,12 @@ interface FeatureGateProps {
   fallback?: React.ReactNode
 }
 
-export default function FeatureGate({ 
-  feature, 
-  title, 
-  description, 
-  children, 
-  fallback 
+export default function FeatureGate({
+  feature,
+  title,
+  description,
+  children,
+  fallback
 }: FeatureGateProps) {
   const { canUseFeature, isProMember } = useSubscription()
   const [showUpgrade, setShowUpgrade] = useState(false)
@@ -37,14 +37,14 @@ export default function FeatureGate({
     >
       <motion.div
         className="absolute -top-2 -right-2"
-        animate={{ 
+        animate={{
           rotate: [0, -10, 10, -10, 0],
           scale: [1, 1.1, 1, 1.1, 1]
         }}
-        transition={{ 
-          duration: 2, 
-          repeat: Infinity, 
-          repeatType: 'reverse' 
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          repeatType: 'reverse'
         }}
       >
         <div className="bg-yellow-400 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold flex items-center">
@@ -77,7 +77,7 @@ export default function FeatureGate({
           </div>
         </motion.button>
 
-        <motion.p 
+        <motion.p
           className="text-sm text-gray-500"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -92,7 +92,7 @@ export default function FeatureGate({
   return (
     <>
       {fallback || <UpgradePrompt />}
-      
+
       <AnimatePresence>
         {showUpgrade && (
           <motion.div
@@ -109,7 +109,7 @@ export default function FeatureGate({
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <SubscriptionPlans onClose={() => setShowUpgrade(false)} />
+              <SubscriptionPage onClose={() => setShowUpgrade(false)} />
             </motion.div>
           </motion.div>
         )}
@@ -139,35 +139,32 @@ export function UsageLimit({ limitType, title, current, limit }: UsageLimitProps
 
   return (
     <motion.div
-      className={`p-4 rounded-lg border-2 ${
-        isOverLimit 
-          ? 'bg-red-50 border-red-200' 
-          : isNearLimit 
-          ? 'bg-yellow-50 border-yellow-200' 
+      className={`p-4 rounded-lg border-2 ${isOverLimit
+        ? 'bg-red-50 border-red-200'
+        : isNearLimit
+          ? 'bg-yellow-50 border-yellow-200'
           : 'bg-gray-50 border-gray-200'
-      }`}
+        }`}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-sm font-medium text-gray-900">{title}</h4>
-        <span className={`text-sm font-bold ${
-          isOverLimit ? 'text-red-600' : isNearLimit ? 'text-yellow-600' : 'text-gray-600'
-        }`}>
+        <span className={`text-sm font-bold ${isOverLimit ? 'text-red-600' : isNearLimit ? 'text-yellow-600' : 'text-gray-600'
+          }`}>
           {current}/{limit}
         </span>
       </div>
 
       <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
         <motion.div
-          className={`h-2 rounded-full ${
-            isOverLimit 
-              ? 'bg-red-500' 
-              : isNearLimit 
-              ? 'bg-yellow-500' 
+          className={`h-2 rounded-full ${isOverLimit
+            ? 'bg-red-500'
+            : isNearLimit
+              ? 'bg-yellow-500'
               : 'bg-blue-500'
-          }`}
+            }`}
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(percentage, 100)}%` }}
           transition={{ duration: 0.8, ease: 'easeOut' }}

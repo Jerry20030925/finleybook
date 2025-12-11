@@ -24,6 +24,10 @@ export interface Transaction {
   location?: string;
   createdAt: Date;
   updatedAt: Date;
+  emotionalTag?: 'happy' | 'stress' | 'impulse' | 'sad' | 'neutral';
+  savings_link?: string;
+  projectedCashback?: number;
+  netCost?: number;
 }
 
 export interface TransactionCategory {

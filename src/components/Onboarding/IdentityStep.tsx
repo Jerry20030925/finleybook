@@ -12,9 +12,9 @@ export default function IdentityStep({ onSelect }: IdentityStepProps) {
     const { t } = useLanguage()
 
     const IDENTITIES = [
-        { id: 'survival', icon: '😩', title: t('onboarding.identity.survival.title'), desc: t('onboarding.identity.survival.desc') },
-        { id: 'shopaholic', icon: '🤔', title: t('onboarding.identity.shopaholic.title'), desc: t('onboarding.identity.shopaholic.desc') },
-        { id: 'saver', icon: '🎯', title: t('onboarding.identity.saver.title'), desc: t('onboarding.identity.saver.desc') },
+        { id: 'survival', icon: '🌱', title: t('onboarding.identity.survival.title'), desc: t('onboarding.identity.survival.desc') },
+        { id: 'shopaholic', icon: '🛍️', title: t('onboarding.identity.shopaholic.title'), desc: t('onboarding.identity.shopaholic.desc') },
+        { id: 'saver', icon: '🚀', title: t('onboarding.identity.saver.title'), desc: t('onboarding.identity.saver.desc') },
     ]
 
     return (

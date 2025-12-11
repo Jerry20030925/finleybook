@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { headers } from 'next/headers'
-import { db } from '@/lib/firebase'
-import { doc, updateDoc } from 'firebase/firestore'
+import { adminDb } from '@/lib/firebase-admin'
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -32,6 +31,11 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  if (!adminDb) {
+    console.error('Firebase Admin not initialized');
+    return NextResponse.json({ error: 'Server Error' }, { status: 500 });
+  }
+
   try {
     switch (event.type) {
       case 'checkout.session.completed':
@@ -40,8 +44,7 @@ export async function POST(req: NextRequest) {
 
         if (session.metadata?.userId) {
           try {
-            const userRef = doc(db, 'users', session.metadata.userId)
-            await updateDoc(userRef, {
+            await adminDb.collection('users').doc(session.metadata.userId).update({
               subscription: {
                 status: 'active',
                 planKey: session.metadata.planKey,
@@ -56,19 +59,23 @@ export async function POST(req: NextRequest) {
         }
         break
 
+      case 'customer.subscription.created':
       case 'customer.subscription.updated':
-        const updatedSubscription = event.data.object as any
-        console.log('Subscription updated:', updatedSubscription.id)
+        const subscription = event.data.object as any
+        console.log(`Subscription ${event.type}:`, subscription.id)
 
-        if (updatedSubscription.metadata?.userId) {
+        if (subscription.metadata?.userId) {
           try {
-            const userRef = doc(db, 'users', updatedSubscription.metadata.userId)
-            await updateDoc(userRef, {
-              'subscription.status': updatedSubscription.status,
-              'subscription.currentPeriodStart': new Date(updatedSubscription.current_period_start * 1000),
-              'subscription.currentPeriodEnd': new Date(updatedSubscription.current_period_end * 1000),
+            await adminDb.collection('users').doc(subscription.metadata.userId).update({
+              'subscription.status': subscription.status,
+              'subscription.planKey': 'PRO_MONTHLY', // Default to monthly for now, or derive from price ID
+              'subscription.stripeCustomerId': subscription.customer,
+              'subscription.stripeSubscriptionId': subscription.id,
+              'subscription.currentPeriodStart': new Date(subscription.current_period_start * 1000),
+              'subscription.currentPeriodEnd': new Date(subscription.current_period_end * 1000),
               'subscription.updatedAt': new Date(),
             })
+            console.log(`Updated subscription for user ${subscription.metadata.userId}`)
           } catch (error) {
             console.error('Error updating subscription status:', error)
           }
@@ -81,8 +88,7 @@ export async function POST(req: NextRequest) {
 
         if (deletedSubscription.metadata?.userId) {
           try {
-            const userRef = doc(db, 'users', deletedSubscription.metadata.userId)
-            await updateDoc(userRef, {
+            await adminDb.collection('users').doc(deletedSubscription.metadata.userId).update({
               subscription: {
                 status: 'canceled',
                 planKey: 'FREE',
@@ -108,6 +114,40 @@ export async function POST(req: NextRequest) {
 
       default:
         console.log('Unhandled event type:', event.type)
+        break
+
+      case 'account.updated':
+        const account = event.data.object as any
+        console.log('Account updated:', account.id)
+
+        // Find user by stripeAccountId
+        try {
+          if (!adminDb) {
+            console.error('Admin DB not initialized');
+            break;
+          }
+          const usersRef = adminDb.collection('users')
+          const snapshot = await usersRef.where('stripeAccountId', '==', account.id).limit(1).get()
+
+          if (!snapshot.empty) {
+            const userDoc = snapshot.docs[0]
+            await userDoc.ref.update({
+              stripeAccountStatus: {
+                chargesEnabled: account.charges_enabled,
+                payoutsEnabled: account.payouts_enabled,
+                detailsSubmitted: account.details_submitted,
+                requirements: account.requirements,
+                updatedAt: new Date()
+              }
+            })
+            console.log(`Updated Stripe status for user ${userDoc.id}`)
+          } else {
+            console.log(`No user found for Stripe Account ID: ${account.id}`)
+          }
+        } catch (error) {
+          console.error('Error handling account.updated:', error)
+        }
+        break
     }
 
     return NextResponse.json({ received: true })

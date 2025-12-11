@@ -1,467 +1,354 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useAuth } from './AuthProvider'
 import PageLoader from './PageLoader'
-import Navigation from './Navigation'
 import FinancialOverview from './FinancialOverview'
 import RecentTransactions from './RecentTransactions'
-import BudgetWidget from './BudgetWidget'
-import GoalsWidget from './GoalsWidget'
-import InsightsWidget from './InsightsWidget'
-
-import QuickActions from './QuickActions'
-import SubscriptionStatus from './SubscriptionStatus'
-import FeatureGate, { UsageLimit } from './FeatureGate'
-import { AIAnalyticsService } from '@/lib/services/aiAnalytics'
-
-import { AIInsight, RiskAlert } from '@/types'
-import toast from 'react-hot-toast'
 import NanoBanana from './NanoBanana'
-import { getUserTransactions, Transaction, addTransaction } from '@/lib/dataService'
+import SmartSuggestions from './Dashboard/SmartSuggestions'
+import QuickActions from './QuickActions'
+import FinancialGarden from './Dashboard/FinancialGarden'
+import CashbackCard from './Dashboard/CashbackCard'
+import VisionBoard from './VisionBoard'
+import { getUserTransactions, Transaction, addTransaction, getGoals, Goal } from '@/lib/dataService'
+import { collection, query, where, orderBy, limit, onSnapshot, addDoc, doc } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 import { useLanguage } from './LanguageProvider'
-
-// New Privacy-First components
-import BurnDownChart from './Dashboard/BurnDownChart'
-import QuickExpenseEntry from './Dashboard/QuickExpenseEntry'
-import WorthItCalculator from './Dashboard/WorthItCalculator'
-import BudgetSetupModal from './Dashboard/BudgetSetupModal'
-
-import { Dialog } from '@headlessui/react'
-import ReferralGiftCard from './ReferralGiftCard'
+import { getUserDisplayName } from '@/lib/userUtils'
+import toast from 'react-hot-toast'
 import InviteFriendModal from './Dashboard/InviteFriendModal'
+import GettingStartedGuide from './Dashboard/GettingStartedGuide'
+import TransactionModal from './TransactionModal'
+import ReceiptUploadModal from './ReceiptUploadModal'
+import CsvImportModal from './CsvImportModal'
+import { useRouter } from 'next/navigation'
+import StreakCounter from './Dashboard/StreakCounter'
 
 export default function Dashboard() {
-  const { user } = useAuth()
-  const { language } = useLanguage()
-  const [insights, setInsights] = useState<AIInsight[]>([])
+  const { user, loading: authLoading } = useAuth()
+  const { t } = useLanguage()
+  const router = useRouter()
 
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
+  const [primaryGoal, setPrimaryGoal] = useState<Goal | null>(null)
+  const [monthlyBudget, setMonthlyBudget] = useState(0)
+  const [isNewUser, setIsNewUser] = useState(false)
+  const [userProfile, setUserProfile] = useState<any>(null)
 
-  // Privacy-First state
-  const [monthlyBudget, setMonthlyBudget] = useState(1000)
-  const [spent, setSpent] = useState(0)
-  const [hourlyWage, setHourlyWage] = useState(25)
-  const [showBudgetModal, setShowBudgetModal] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const [activeModal, setActiveModal] = useState<string | null>(null)
 
-  useEffect(() => {
-    // Check if user has seen the invite modal
-    const hasSeenInvite = localStorage.getItem('hasSeenInviteModal_v1')
-    if (!hasSeenInvite && !loading) {
-      // Small delay to let the dashboard load first
-      const timer = setTimeout(() => {
-        setShowInviteModal(true)
-        localStorage.setItem('hasSeenInviteModal_v1', 'true')
-      }, 1500)
-      return () => clearTimeout(timer)
-    }
-  }, [loading])
+  // Real streak from userProfile
+  const currentStreak = userProfile?.streak || 0
+  const lastLogin = userProfile?.lastLogin?.toDate() || new Date() // Fallback to now if missing to prevent crash
 
+  // Calculate if streak is "active" (logged in today or yesterday) for UI purposes
+  // Actually, we can just use the streak value. If it's > 0, it's effectively active.
+  // The only edge case is if they haven't logged in today (flame might look different?)
+  // For now, let's pass a calculated "isActive" boolean based on lastLogin
+  const isStreakActive = (() => {
+    if (!userProfile?.lastLogin) return true // New user assumption or just logged in
+    const now = new Date()
+    const last = userProfile.lastLogin.toDate()
+    const diff = now.getTime() - last.getTime()
+    const hours = diff / (1000 * 60 * 60)
+    return hours < 48 // lenient check for UI visual
+  })()
+
+  // Hydration fix
+  const [isMounted, setIsMounted] = useState(false)
   useEffect(() => {
-    if (user) {
-      loadDashboardData()
-      loadUserSettings()
+    setIsMounted(true)
+  }, [])
+
+  // Hydration safe user check
+  useEffect(() => {
+    if (user?.metadata.creationTime) {
+      const created = new Date(user.metadata.creationTime).getTime()
+      const now = new Date().getTime()
+      setIsNewUser((now - created) < 7 * 24 * 60 * 60 * 1000)
     }
   }, [user])
 
-  const loadUserSettings = () => {
-    // Only access localStorage on client side
-    if (typeof window === 'undefined') return
-
-    try {
-      const savedBudget = localStorage.getItem('monthlyBudget')
-      const savedWage = localStorage.getItem('hourlyWage')
-      const savedSpent = localStorage.getItem('currentMonthSpent')
-
-      if (savedBudget) setMonthlyBudget(parseFloat(savedBudget))
-      if (savedWage) setHourlyWage(parseFloat(savedWage))
-      if (savedSpent) setSpent(parseFloat(savedSpent))
-    } catch (error) {
-      console.error('Error loading user settings:', error)
-    }
-  }
-
-  const saveUserSettings = (budget: number, wage: number) => {
-    setMonthlyBudget(budget)
-    setHourlyWage(wage)
-
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('monthlyBudget', budget.toString())
-        localStorage.setItem('hourlyWage', wage.toString())
-      } catch (error) {
-        console.error('Error saving user settings:', error)
-      }
-    }
-
-    toast.success('Settings saved!')
-  }
-
-  const handleAddExpense = async (amount: number, category: string, emoji: string) => {
-    try {
-      // Update local state immediately
-      const newSpent = spent + amount
-      setSpent(newSpent)
-
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.setItem('currentMonthSpent', newSpent.toString())
-        } catch (error) {
-          console.error('Error saving to localStorage:', error)
-        }
-      }
-
-      // Add to Firebase (optional backup)
-      if (user) {
-        await addTransaction({
-          userId: user.uid,
-          amount: -amount, // Negative for expense
-          category,
-          description: `${emoji} Quick add`,
-          date: new Date(),
-          type: 'expense'
-        })
-      }
-
-      toast.success(`Added $${amount} ${emoji}`)
-
-      // Reload transactions
-      loadDashboardData()
-    } catch (error) {
-      console.error('Error adding expense:', error)
-      toast.error('Failed to add expense')
-    }
-  }
-
-  const loadDashboardData = async () => {
+  const fetchTransactions = useCallback(async () => {
     if (!user) return
-
-    setLoading(true)
     try {
-      // Fetch transactions first for the charts
-      const txs = await getUserTransactions(user.uid, 100)
+      const txs = await getUserTransactions(user.uid)
       setTransactions(txs)
-
-      // Use Promise.allSettled to allow partial success
-      const results = await Promise.allSettled([
-        AIAnalyticsService.getInstance().generatePersonalizedInsights(user.uid)
-      ])
-
-      // Handle AI Insights
-      if (results[0].status === 'fulfilled') {
-        setInsights(results[0].value)
-      } else {
-        console.error('Failed to load AI insights:', results[0].reason)
-      }
-
-
-
     } catch (error) {
-      console.error('Unexpected error loading dashboard data:', error)
-    } finally {
+      console.error("Failed to fetch transactions:", error)
+    }
+  }, [user])
+
+  // Data Fetching Effect
+  useEffect(() => {
+    let unsubscribeProfile: () => void
+    let unsubscribeGoals: () => void
+
+    const fetchData = async () => {
+      if (!user) return
+
+      try {
+        setLoading(true)
+        // 1. Fetch Transactions
+        await fetchTransactions()
+
+        // 2. Fetch User Profile
+        const userRef = doc(db, 'users', user.uid)
+        unsubscribeProfile = onSnapshot(userRef, (doc) => {
+          if (doc.exists()) {
+            setUserProfile(doc.data())
+          }
+        })
+
+        // 3. Fetch Goals (Realtime)
+        const goalsQuery = query(collection(db, 'goals'), where('userId', '==', user.uid))
+        unsubscribeGoals = onSnapshot(goalsQuery, (snapshot) => {
+          const goals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Goal))
+          if (goals.length > 0) {
+            setPrimaryGoal(goals[0])
+          }
+        })
+
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error)
+        toast.error(t('common.errorLoading'))
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (!authLoading && user) {
+      fetchData()
+    } else if (!authLoading && !user) {
       setLoading(false)
     }
-  }
 
-  if (loading) {
-    return <PageLoader />
-  }
+    return () => {
+      if (unsubscribeProfile) unsubscribeProfile()
+      if (unsubscribeGoals) unsubscribeGoals()
+    }
+  }, [user, authLoading, t, fetchTransactions])
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/')
+    }
+  }, [authLoading, user, router])
+
+  const isGuest = user?.isAnonymous
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
+    <>
+      {(!isMounted || loading) ? (
+        <PageLoader />
+      ) : (
+        <div className="min-h-screen bg-gray-50">
+          {/* GUEST BANNER */}
+          {isGuest && (
+            <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white p-3 shadow-md relative z-50">
+              <div className="max-w-7xl mx-auto px-4 flex justify-between items-center text-sm font-medium">
+                <div className="flex items-center gap-2">
+                  <span>👻 You are in <strong>Guest Mode</strong>. Data is saved locally but will be lost if you clear cookies.</span>
+                </div>
+                <button
+                  onClick={() => {
+                    // Trigger logout to force real signup flow for now,
+                    // or better: open a "Link Account" modal. 
+                    // For MVP: Redirect to home to signup? No, that clears state.
+                    // We'll trigger the Onboarding or Auth logic.
+                    // Simplest for MVP: Logout and Signup.
+                    // "Sign up to save"
+                    setShowInviteModal(false) // Reuse logic? No.
+                    // Let's just alert for now or implement Link logic later.
+                    // Actually, let's look for a Link logic. 
+                    // For now, simple warning.
+                    alert("To save forever, please logout and Sign Up!")
+                  }}
+                  className="bg-white text-orange-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-orange-50 transition-colors"
+                >
+                  Sign Up to Save
+                </button>
+              </div>
+            </div>
+          )}
 
-      <motion.main
-        className="max-w-7xl mx-auto py-4 md:py-6 px-4 sm:px-6 lg:px-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Page header */}
-        <motion.div
-          className="mb-4 md:mb-6 lg:mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
-        >
-          <motion.h1
-            className="text-xl md:text-2xl font-bold text-gray-900"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+          <motion.main
+            className="max-w-7xl mx-auto py-4 md:py-8 px-4 sm:px-6 lg:px-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            {language === 'en' ? `Welcome back, ${user?.email?.split('@')[0]}` : `欢迎回来，${user?.email?.split('@')[0]}`}
-          </motion.h1>
-          <motion.p
-            className="mt-1 text-gray-600"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
-            {language === 'en' ? 'Your Privacy-First Wealth Dashboard' : '您的隐私优先财富仪表板'}
-          </motion.p>
-        </motion.div>
-
-        {/* Burn-Down Chart - Hero Section */}
-        <motion.div
-          className="mb-6"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-            <BurnDownChart
-              monthlyBudget={monthlyBudget}
-              spent={spent}
-              onSetBudget={() => setShowBudgetModal(true)}
-            />
-          </div>
-        </motion.div>
-
-        {/* Quick Expense Entry */}
-        <motion.div
-          className="mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          <QuickExpenseEntry onAddExpense={handleAddExpense} />
-        </motion.div>
-
-        {/* Quick Actions */}
-        <motion.div
-          className="mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-        >
-          <QuickActions onInvite={() => setShowInviteModal(true)} />
-        </motion.div>
-
-        {/* Main grid */}
-        <motion.div
-          className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
-          {/* Left column - Main content */}
-          <motion.div
-            className="lg:col-span-2 space-y-4 md:space-y-6 lg:space-y-8"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-          >
-            {/* Nano Banana Charts */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.5 }}
-            >
-              <NanoBanana transactions={transactions} />
-            </motion.div>
-
-            {/* Financial Overview */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <FinancialOverview />
-            </motion.div>
-
-            {/* Recent Transactions */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.5 }}
-            >
-              <RecentTransactions />
-            </motion.div>
-
-            {/* AI Insights */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
-            >
-              <FeatureGate
-                feature="ai_insights"
-                title={language === 'en' ? 'AI Financial Analysis' : 'AI 财务分析'}
-                description={language === 'en' ? 'Upgrade to Pro for personalized AI financial advice and deep insights' : '升级到 Pro 版本，获得个性化的 AI 财务建议和深度分析洞察'}
+            {/* Header */}
+            <div className="flex justify-between items-end mb-8">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
               >
-                <InsightsWidget insights={insights} />
-              </FeatureGate>
-            </motion.div>
-          </motion.div>
+                <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+                  {t('dashboard.welcomeBack', { name: getUserDisplayName(user) })}
+                </h1>
+                <p className="text-gray-500 font-medium">
+                  {t('dashboard.wealthCommandCenter')}
+                </p>
+              </motion.div>
 
-          {/* Right column - Sidebar */}
-          <motion.div
-            className="space-y-4 md:space-y-6 lg:space-y-8"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-          >
-            {/* Subscription Status */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <StreakCounter streak={currentStreak} isActive={isStreakActive} />
+              </motion.div>
+            </div>
+
+            {/* Getting Started Guide */}
+            <GettingStartedGuide
+              hasTransactions={transactions.length > 0}
+              hasBudget={monthlyBudget > 0}
+              hasCashback={transactions.some(t => t.type === 'cashback')}
+              hasProfile={!!user?.displayName || !!userProfile?.displayName}
+              onAddTransaction={() => setActiveModal('transaction')}
+              onImportCsv={() => setActiveModal('csv')}
+              isNewUser={isNewUser}
+            />
+
+            {/* 1. HERO: Financial Overview (Top Anchor) */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.65, duration: 0.5 }}
+              transition={{ delay: 0.1 }}
+              className="mb-8"
             >
-              <SubscriptionStatus />
+              <FinancialOverview transactions={transactions} />
             </motion.div>
 
-            {/* Usage Limits */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.68, duration: 0.5 }}
-              className="space-y-3"
-            >
-              <UsageLimit
-                limitType="transactions"
-                title={language === 'en' ? 'Monthly Transactions' : '本月交易记录'}
-                current={23}
-                limit={50}
-              />
-              <UsageLimit
-                limitType="budgets"
-                title={language === 'en' ? 'Budget Categories' : '预算分类'}
-                current={3}
-                limit={5}
-              />
-            </motion.div>
+            {/* Main Grid Layout (66% Left / 33% Right) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Left Column (66% -> col-span-8) - DATA HEAVY */}
+              <div className="lg:col-span-8 space-y-8">
 
-            {/* Budget Widget */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.5 }}
-            >
-              <BudgetWidget />
-            </motion.div>
-
-            {/* Goals Widget */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
-            >
-              <GoalsWidget />
-            </motion.div>
-
-            {/* Financial Health Score */}
-            <motion.div
-              className="card"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.5 }}
-              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            >
-              <h3 className="text-lg font-medium text-gray-900 mb-4">{language === 'en' ? 'Financial Health Score' : '财务健康评分'}</h3>
-              <div className="text-center">
+                {/* 2. Charts (NanoBanana) */}
                 <motion.div
-                  className="relative inline-block"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 1.2, type: 'spring', damping: 15 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
                 >
-                  <svg className="w-32 h-32 mx-auto" viewBox="0 0 120 120">
-                    <circle
-                      cx="60"
-                      cy="60"
-                      r="50"
-                      fill="none"
-                      stroke="#e5e7eb"
-                      strokeWidth="8"
-                    />
-                    <motion.circle
-                      cx="60"
-                      cy="60"
-                      r="50"
-                      fill="none"
-                      stroke="#3b82f6"
-                      strokeWidth="8"
-                      strokeLinecap="round"
-                      strokeDasharray={`${2 * Math.PI * 50}`}
-                      initial={{ strokeDashoffset: 2 * Math.PI * 50 }}
-                      animate={{ strokeDashoffset: 2 * Math.PI * 50 }}
-                      transition={{ delay: 1.5, duration: 2, ease: "easeOut" }}
-                      style={{ transformOrigin: '50% 50%', transform: 'rotate(-90deg)' }}
-                    />
-                  </svg>
-                  <motion.div
-                    className="absolute inset-0 flex items-center justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.8 }}
-                  >
-                    <span className="text-4xl font-bold text-gray-400">--</span>
-                  </motion.div>
+                  <NanoBanana transactions={transactions} />
                 </motion.div>
+
+                {/* 3. Recent Transactions */}
                 <motion.div
-                  className="text-sm text-gray-600 mt-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 2.0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
                 >
-                  {language === 'en' ? 'No score data available' : '暂无评分数据'}
+                  <RecentTransactions />
                 </motion.div>
               </div>
-            </motion.div>
 
-            {/* Monthly Summary */}
-            <motion.div
-              className="card"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.0, duration: 0.5 }}
-            >
-              <h3 className="text-lg font-medium text-gray-900 mb-4">{language === 'en' ? 'Monthly Summary' : '本月概览'}</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{language === 'en' ? 'Total Income' : '总收入'}</span>
-                  <span className="text-sm font-medium text-success-600">¥0</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">{language === 'en' ? 'Total Expenses' : '总支出'}</span>
-                  <span className="text-sm font-medium text-danger-600">¥0</span>
-                </div>
-                <div className="border-t pt-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-gray-900">{language === 'en' ? 'Net Cash Flow' : '净现金流'}</span>
-                    <span className="text-sm font-medium text-gray-900">¥0</span>
-                  </div>
-                </div>
+              {/* Right Column (33% -> col-span-4) - ACTION & INSIGHTS */}
+              <div className="lg:col-span-4 space-y-6">
+
+                {/* 1. Cashback Center (Visual Anchor - Dark Mode) */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <CashbackCard
+                    pendingAmount={transactions.filter(t => t.type === 'cashback' && t.status === 'pending').reduce((acc, t) => acc + t.amount, 0)}
+                    potentialAmount={50.00}
+                    lifeTimeEarned={transactions.filter(t => t.type === 'cashback').reduce((acc, t) => acc + t.amount, 0)}
+                  />
+                </motion.div>
+
+                {/* 2. Finley AI (Insights First) */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="min-h-[180px]"
+                >
+                  <SmartSuggestions transactions={transactions} monthlyBudget={monthlyBudget} />
+                </motion.div>
+
+                {/* 3. Financial Garden (Retention) */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="min-h-[240px]"
+                >
+                  <Link href="/wealth">
+                    <FinancialGarden />
+                  </Link>
+                </motion.div>
+
+                {/* 4. Compact Vision Board (Progress Tracker) */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.45 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Link href="/goals">
+                    <VisionBoard primaryGoal={primaryGoal} compact={true} />
+                  </Link>
+                </motion.div>
+
+                {/* 5. Quick Actions */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <QuickActions onInvite={() => setShowInviteModal(true)} onDataRefresh={fetchTransactions} />
+                </motion.div>
               </div>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </motion.main>
+            </div>
 
-      {/* Worth It? Calculator - Floating Button */}
-      <WorthItCalculator
-        hourlyWage={hourlyWage}
-        onSetWage={() => setShowBudgetModal(true)}
-      />
+          </motion.main >
 
-      {/* Budget Setup Modal */}
-      <BudgetSetupModal
-        isOpen={showBudgetModal}
-        onClose={() => setShowBudgetModal(false)}
-        currentBudget={monthlyBudget}
-        currentWage={hourlyWage}
-        onSave={saveUserSettings}
-      />
+          <InviteFriendModal
+            isOpen={showInviteModal}
+            onClose={() => setShowInviteModal(false)}
+          />
 
-      {/* Invite Friend Modal */}
-      <InviteFriendModal
-        isOpen={showInviteModal}
-        onClose={() => setShowInviteModal(false)}
-      />
-    </div>
+          <TransactionModal
+            isOpen={activeModal === 'transaction'}
+            onClose={() => setActiveModal(null)}
+            onSuccess={() => {
+              setActiveModal(null)
+              fetchTransactions()
+            }}
+          />
+
+          {
+            activeModal === 'receipt' && (
+              <ReceiptUploadModal
+                onClose={() => setActiveModal(null)}
+              />
+            )
+          }
+
+          <CsvImportModal
+            isOpen={activeModal === 'csv'}
+            onClose={() => setActiveModal(null)}
+            onSuccess={() => {
+              setActiveModal(null)
+              fetchTransactions()
+            }}
+          />
+        </div>
+      )}
+    </>
   )
 }

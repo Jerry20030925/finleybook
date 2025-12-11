@@ -9,7 +9,9 @@ import {
   where,
   orderBy,
   limit,
-  Timestamp
+  Timestamp,
+  getDoc,
+  writeBatch
 } from 'firebase/firestore'
 import { db } from './firebase'
 import { useAuth } from '@/components/AuthProvider'
@@ -22,9 +24,25 @@ export interface Transaction {
   category: string
   description: string
   date: Date
-  type: 'income' | 'expense'
+  type: 'income' | 'expense' | 'cashback'
   paymentMethod?: string
+  merchantName?: string
   createdAt: Date
+  emotionalTag?: 'happy' | 'stress' | 'impulse' | 'sad' | 'neutral'
+  savings_link?: string
+  projectedCashback?: number
+  netCost?: number
+  accountId?: string // Link to BankAccount
+  status?: 'pending' | 'completed' | 'failed'
+}
+
+export interface Account {
+  id: string
+  userId: string
+  name: string
+  mask: string
+  type: string
+  balance: number
 }
 
 // Simple data fetching functions
@@ -262,8 +280,12 @@ export interface Goal {
   currentAmount: number
   deadline: string
   category: 'savings' | 'investment' | 'purchase' | 'debt' | 'emergency'
+  image_url?: string
+  icon?: string
   isCompleted: boolean
   createdAt: Date
+  participants?: string[] // Shared: List of User IDs
+  ownerId?: string // Shared: Creator ID
 }
 
 // Goal CRUD operations
@@ -271,6 +293,8 @@ export const addGoal = async (goal: Omit<Goal, 'id' | 'createdAt'>) => {
   try {
     const goalData = {
       ...goal,
+      ownerId: goal.userId,
+      participants: [goal.userId],
       createdAt: Timestamp.now()
     }
     const docRef = await addDoc(collection(db, 'goals'), goalData)
@@ -283,17 +307,58 @@ export const addGoal = async (goal: Omit<Goal, 'id' | 'createdAt'>) => {
 
 export const getGoals = async (userId: string) => {
   try {
-    const q = query(
-      collection(db, 'goals'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    )
-    const snapshot = await getDocs(q)
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date()
-    })) as Goal[]
+    // 1. Fetch by participants (New Schema)
+    let snap1 = { docs: [] } as any;
+    try {
+      const q1 = query(
+        collection(db, 'goals'),
+        where('participants', 'array-contains', userId),
+        orderBy('createdAt', 'desc')
+      );
+      snap1 = await getDocs(q1);
+    } catch (e: any) {
+      console.warn('Complex participants query failed (likely index), falling back to simple query', e);
+      // Fallback: Fetch all by participants and sort in memory
+      const q1Simple = query(
+        collection(db, 'goals'),
+        where('participants', 'array-contains', userId)
+      );
+      snap1 = await getDocs(q1Simple);
+    }
+
+    // 2. Fetch by ownerId/userId (Legacy Schema & Backup)
+    let snap2 = { docs: [] } as any;
+    try {
+      const q2 = query(
+        collection(db, 'goals'),
+        where('userId', '==', userId),
+        orderBy('createdAt', 'desc')
+      );
+      snap2 = await getDocs(q2);
+    } catch (e: any) {
+      console.warn('Complex legacy query failed (likely index), falling back to simple query', e);
+      // Fallback: Fetch all by userId and sort in memory
+      const q2Simple = query(
+        collection(db, 'goals'),
+        where('userId', '==', userId)
+      );
+      snap2 = await getDocs(q2Simple);
+    }
+
+    const goalsMap = new Map<string, Goal>()
+
+    const processDoc = (doc: any) => {
+      goalsMap.set(doc.id, {
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date()
+      } as Goal)
+    }
+
+    snap1.docs.forEach(processDoc)
+    snap2.docs.forEach(processDoc)
+
+    return Array.from(goalsMap.values()).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   } catch (error) {
     console.error('Error fetching goals:', error)
     return []
@@ -312,10 +377,120 @@ export const updateGoal = async (goalId: string, updates: Partial<Goal>) => {
 
 export const deleteGoal = async (goalId: string) => {
   try {
-    const docRef = doc(db, 'goals', goalId)
-    await deleteDoc(docRef)
+    await deleteDoc(doc(db, 'goals', goalId))
   } catch (error) {
     console.error('Error deleting goal:', error)
     throw error
   }
 }
+
+export const getUserWalletBalance = async (userId: string) => {
+  try {
+    const userDoc = await getDocs(query(collection(db, 'users'), where('uid', '==', userId)))
+    if (!userDoc.empty) {
+      const userData = userDoc.docs[0].data()
+      return userData.wallet_snapshot || userData.wallet || { available: 0, pending: 0, lifetime: 0 }
+    }
+    // Fallback if querying by document ID directly
+    const docRef = doc(db, 'users', userId)
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) {
+      const userData = docSnap.data()
+      return userData.wallet_snapshot || userData.wallet || { available: 0, pending: 0, lifetime: 0 }
+    }
+    return { available: 0, pending: 0, lifetime: 0 }
+  } catch (error) {
+    console.error('Error fetching wallet balance:', error)
+    return { available: 0, pending: 0, lifetime: 0 }
+  }
+}
+export const addTransactionsBatch = async (transactions: Omit<Transaction, 'id' | 'createdAt'>[]) => {
+  try {
+    const batch = writeBatch(db)
+    const collectionRef = collection(db, 'transactions')
+    const addedIds: string[] = []
+
+    transactions.forEach(transaction => {
+      const docRef = doc(collectionRef)
+      batch.set(docRef, {
+        ...transaction,
+        date: Timestamp.fromDate(new Date(transaction.date)),
+        createdAt: Timestamp.now()
+      })
+      addedIds.push(docRef.id)
+    })
+
+    await batch.commit()
+    console.log(`Successfully batch added ${transactions.length} transactions`)
+    return addedIds
+  } catch (error) {
+    console.error('Error batch adding transactions:', error)
+    throw error
+  }
+}
+
+// --- Cashback & Affiliate Schemas ---
+
+export interface CashbackTransaction {
+  id?: string
+  skimlinksTransactionId: string // from webhook
+  userId: string // from xcust
+  merchantId: string
+  merchantName: string
+  orderAmount: number // The user's purchase amount
+  commissionAmount: number // The breakdown of what we earn vs user
+  userCashbackAmount: number // Calculated amount for the user
+  status: 'pending' | 'confirmed' | 'paid' | 'declined'
+  clickDate: Date
+  transactionDate: Date
+  lastUpdated: Date
+  metadata?: any // Raw webhook data for debugging
+}
+
+export interface AffiliateMerchant {
+  id: string // Skimlinks Merchant ID
+  name: string
+  domains: string[] // e.g., ["amazon.com", "amazon.co.uk"]
+  baseCommissionRate: number // e.g., 0.05 (5%)
+  averageCommissionRate?: number
+  logoUrl?: string
+  categories?: string[]
+  lastSynced: Date
+}
+
+export const getCashbackTransactions = async (userId: string) => {
+  try {
+    const q = query(
+      collection(db, 'cashback_transactions'),
+      where('userId', '==', userId),
+      orderBy('transactionDate', 'desc')
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      clickDate: doc.data().clickDate?.toDate(),
+      transactionDate: doc.data().transactionDate?.toDate(),
+      lastUpdated: doc.data().lastUpdated?.toDate()
+    })) as CashbackTransaction[]
+  } catch (error) {
+    console.error('Error fetching cashback transactions:', error)
+    return []
+  }
+}
+
+export const addCashbackTransaction = async (transaction: Omit<CashbackTransaction, 'id'>) => {
+  try {
+    const docRef = await addDoc(collection(db, 'cashback_transactions'), {
+      ...transaction,
+      clickDate: Timestamp.fromDate(transaction.clickDate),
+      transactionDate: Timestamp.fromDate(transaction.transactionDate),
+      lastUpdated: Timestamp.now()
+    })
+    return docRef.id
+  } catch (error) {
+    console.error('Error adding cashback transaction:', error)
+    throw error
+  }
+}
+

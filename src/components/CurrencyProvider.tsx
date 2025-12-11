@@ -35,7 +35,7 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined)
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-    const [country, setCountryState] = useState<Country>(COUNTRIES[0]) // Default to China
+    const [country, setCountryState] = useState<Country>(COUNTRIES[2]) // Default to Australia
     const { user } = useAuth()
     const [isInitialized, setIsInitialized] = useState(false)
 
@@ -98,7 +98,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     }
 
     const formatAmount = (amount: number) => {
-        return new Intl.NumberFormat(undefined, {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: country.currency,
         }).format(amount)

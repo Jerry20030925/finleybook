@@ -1,25 +1,12 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "headers": [
+  "crons": [
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options", 
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        }
-      ]
+      "path": "/api/cron/monthly-report",
+      "schedule": "0 9 1 * *"
+    },
+    {
+      "path": "/api/cron/reengagement",
+      "schedule": "0 10 * * 1"
     }
   ]
 }

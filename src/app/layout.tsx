@@ -1,6 +1,7 @@
 
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import { AuthProvider } from '@/components/AuthProvider'
 import { NotificationProvider } from '@/components/NotificationProvider'
@@ -11,50 +12,47 @@ import { Toaster } from 'react-hot-toast'
 import { LanguageProvider } from '@/components/LanguageProvider'
 import { CurrencyProvider } from '@/components/CurrencyProvider'
 import SmartNotificationManager from '@/components/SmartNotificationManager'
+import AIChatInput from '@/components/AIChatInput'
+import NoSSR from '@/components/NoSSR'
+import Navigation from '@/components/Navigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'FinleyBook - AI-Driven Personal Finance',
-  description: 'Smart financial management, making finance simple. AI-driven personal finance platform.',
-  keywords: '个人理财, 财务管理, 预算规划, 投资跟踪, 记账软件, AI理财, 财务分析, 税务管理, 理财工具, 财务规划',
+  title: 'FinleyBook - AI Wealth Tracker & Cashback Glitch Finder',
+  description: 'The #1 AI Money App. Track net worth, find 90% off price glitches, and earn double cashback on daily shopping. Join the AI wealth revolution today.',
+  keywords: 'Cashback App, Price Glitch Finder, AI Finance Tracker, Wealth Management, Bank Bounties, Money Saving App, FinleyBook, 现金回扣, 省钱神器, 澳洲理财',
   authors: [{ name: 'FinleyBook Team' }],
   creator: 'FinleyBook',
   publisher: 'FinleyBook',
+  category: 'finance',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   metadataBase: new URL('https://finleybook.com'),
-  alternates: {
-    canonical: '/',
-    languages: {
-      'zh-CN': '/',
-      'en-US': '/en',
-    },
-  },
   openGraph: {
     type: 'website',
-    locale: 'zh_CN',
+    locale: 'en_AU',
     url: 'https://finleybook.com',
-    title: 'FinleyBook - 智能个人财务管理平台',
-    description: 'AI驱动的个人理财和财务管理解决方案，让您轻松掌控财务生活',
+    title: 'FinleyBook - Earn Cashback & Track Wealth with AI',
+    description: 'Stop overpaying. FinleyBook finds hidden price glitches, bank bounties, and cashback rewards automatically. The smartest way to build wealth in 2025.',
     siteName: 'FinleyBook',
     images: [
       {
-        url: 'https://finleybook.com/og-image.jpg',
+        url: 'https://finleybook.com/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'FinleyBook 智能财务管理平台',
+        alt: 'FinleyBook AI Wealth & Cashback',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FinleyBook - 智能个人财务管理平台',
-    description: 'AI驱动的个人理财和财务管理解决方案',
-    images: ['https://finleybook.com/twitter-image.jpg'],
+    title: 'FinleyBook - AI Wealth & Cashback App',
+    description: 'Find Price Glitches. Earn Cashback. Track Net Worth. The all-in-one AI finance superapp.',
+    images: ['https://finleybook.com/og-image.png'],
     creator: '@finleybook',
   },
   icons: {
@@ -72,11 +70,7 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  verification: {
-    google: 'google-site-verification-code',
-    yandex: 'yandex-verification-code',
-    yahoo: 'yahoo-site-verification-code',
-  },
+
 }
 
 export default function RootLayout({
@@ -85,8 +79,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* @ts-ignore */}
+        <meta name="impact-site-verification" value="2b7d56d3-1c4d-459c-8fb2-9774dcc971e3" />
         <StructuredData type="website" />
         <StructuredData type="organization" />
         <StructuredData type="software" />
@@ -99,14 +95,23 @@ export default function RootLayout({
                 <SmartNotificationManager />
                 <CurrencyProvider>
                   <SubscriptionProvider>
-                    {children}
-                    <Toaster position="top-right" />
+                    <NoSSR>
+                      <AIChatInput />
+                      <Navigation />
+                      {children}
+                      <Toaster position="top-right" />
+                    </NoSSR>
                   </SubscriptionProvider>
                 </CurrencyProvider>
               </NotificationProvider>
             </AuthProvider>
           </LanguageProvider>
         </ErrorBoundary>
+        <Script
+          id="skimlinks-script"
+          strategy="lazyOnload"
+          src="https://s.skimresources.com/js/295600X1782999.skimlinks.js"
+        />
       </body>
     </html>
   )

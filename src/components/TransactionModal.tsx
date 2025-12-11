@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { XMarkIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline'
 import { useAuth } from './AuthProvider'
 import { useLanguage } from './LanguageProvider'
+import { useCurrency } from './CurrencyProvider'
 import { addTransaction, DEFAULT_CATEGORIES } from '@/lib/dataService'
 import toast from 'react-hot-toast'
 
@@ -18,14 +19,16 @@ interface TransactionModalProps {
 export default function TransactionModal({ isOpen, onClose, onSuccess }: TransactionModalProps) {
   const { user } = useAuth()
   const { t } = useLanguage()
-  
+  const { country } = useCurrency()
+
   const [formData, setFormData] = useState({
     type: 'expense' as 'income' | 'expense',
     amount: '',
     category: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
-    paymentMethod: 'Cash' // We'll use English as default and translate display
+    paymentMethod: 'Cash', // We'll use English as default and translate display
+    emotionalTag: 'neutral' as 'happy' | 'stress' | 'impulse' | 'sad' | 'neutral'
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
@@ -84,7 +87,8 @@ export default function TransactionModal({ isOpen, onClose, onSuccess }: Transac
         category: formData.category,
         description: formData.description,
         date: new Date(formData.date),
-        paymentMethod: formData.paymentMethod
+        paymentMethod: formData.paymentMethod,
+        emotionalTag: formData.emotionalTag
       })
 
       console.log('[TransactionModal] Transaction added successfully with ID:', transactionId)
@@ -101,7 +105,8 @@ export default function TransactionModal({ isOpen, onClose, onSuccess }: Transac
           category: '',
           description: '',
           date: new Date().toISOString().split('T')[0],
-          paymentMethod: 'Cash'
+          paymentMethod: 'Cash',
+          emotionalTag: 'neutral'
         })
         setShowSuccess(false)
         onSuccess()
@@ -248,7 +253,7 @@ export default function TransactionModal({ isOpen, onClose, onSuccess }: Transac
                               {t('transaction.amount')}
                             </label>
                             <div className="mt-1 relative">
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">¥</span>
+                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{country.symbol}</span>
                               <motion.input
                                 type="number"
                                 id="amount"
@@ -347,6 +352,36 @@ export default function TransactionModal({ isOpen, onClose, onSuccess }: Transac
                               <option value={t('payment.creditCard')}>{t('payment.creditCard')}</option>
                               <option value={t('payment.other')}>{t('payment.other')}</option>
                             </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              {t('transaction.emotionalContext')}
+                            </label>
+                            <div className="grid grid-cols-5 gap-2">
+                              {['happy', 'stress', 'impulse', 'sad', 'neutral'].map((tag) => (
+                                <button
+                                  key={tag}
+                                  type="button"
+                                  onClick={() => setFormData(prev => ({ ...prev, emotionalTag: tag as any }))}
+                                  className={`p-2 rounded-lg text-2xl flex flex-col items-center gap-1 transition-all ${formData.emotionalTag === tag
+                                    ? 'bg-indigo-100 border-2 border-indigo-500 scale-110'
+                                    : 'bg-gray-50 border border-gray-200 hover:bg-gray-100 opacity-70 hover:opacity-100'
+                                    }`}
+                                  title={tag}
+                                >
+                                  <span>
+                                    {tag === 'happy' ? '🥰' :
+                                      tag === 'stress' ? '😫' :
+                                        tag === 'impulse' ? '💸' :
+                                          tag === 'sad' ? '😢' : '😐'}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                            <p className="text-center text-xs text-gray-500 mt-2 font-medium capitalize">
+                              {formData.emotionalTag ? `Mood: ${formData.emotionalTag}` : 'How did you feel?'}
+                            </p>
                           </div>
 
                           <motion.div

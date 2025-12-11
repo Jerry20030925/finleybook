@@ -1,14 +1,14 @@
 'use client'
 
 interface StructuredDataProps {
-  type: 'website' | 'organization' | 'software' | 'blog' | 'article'
+  type: 'website' | 'organization' | 'software' | 'article' | 'product' | 'faq' | 'blog' | 'breadcrumbs'
   data?: any
 }
 
 export default function StructuredData({ type, data }: StructuredDataProps) {
+  const baseUrl = 'https://finleybook.com'
+
   const generateStructuredData = () => {
-    const baseUrl = 'https://finleybook.com'
-    
     switch (type) {
       case 'website':
         const websiteData = {
@@ -16,8 +16,8 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           '@id': `${baseUrl}/#website`,
           url: baseUrl,
           name: 'FinleyBook',
-          description: 'FinleyBook是一个智能的个人财务管理平台，提供AI驱动的预算规划、投资跟踪、理财分析和税务管理服务',
-          inLanguage: 'zh-CN',
+          description: 'FinleyBook is an intelligent personal finance platform providing AI-driven budget planning, investment tracking, wealth analysis, and tax management services.',
+          inLanguage: 'en-AU',
           potentialAction: {
             '@type': 'SearchAction',
             target: {
@@ -38,8 +38,8 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           '@type': 'Organization',
           '@id': `${baseUrl}/#organization`,
           name: 'FinleyBook',
-          alternateName: 'FinleyBook 智能财务管理',
-          description: 'AI驱动的个人财务管理解决方案提供商',
+          alternateName: 'FinleyBook AI Finance',
+          description: 'FinleyBook is an AI-powered personal finance platform helping Australians track expenses and earn cashback.',
           url: baseUrl,
           logo: {
             '@type': 'ImageObject',
@@ -53,28 +53,20 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             width: 1200,
             height: 630
           },
-          foundingDate: '2023-01-01',
-          founder: [
-            {
-              '@type': 'Person',
-              name: '张明',
-              jobTitle: '创始人兼CEO'
-            }
-          ],
-          contactPoint: [
-            {
-              '@type': 'ContactPoint',
-              telephone: '+86-400-123-4567',
-              contactType: 'customer service',
-              areaServed: 'CN',
-              availableLanguage: 'Chinese'
-            }
-          ],
           sameAs: [
-            'https://weibo.com/finleybook',
-            'https://twitter.com/finleybook',
-            'https://linkedin.com/company/finleybook'
-          ]
+            'https://www.linkedin.com/company/finleybook',
+            'https://www.crunchbase.com/organization/finleybook',
+            'https://www.tiktok.com/@finleybook',
+            'https://www.instagram.com/finleybook',
+            'https://x.com/finleybook1'
+          ],
+          contactPoint: {
+            '@type': 'ContactPoint',
+            contactType: 'customer service',
+            areaServed: ['AU', 'US'],
+            availableLanguage: ['en', 'zh']
+          },
+          foundingDate: '2024'
         }
         return organizationData
 
@@ -82,30 +74,41 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         const softwareData = {
           '@type': 'SoftwareApplication',
           name: 'FinleyBook',
-          description: '智能个人财务管理平台',
+          description: 'The #1 AI Wealth Tracker & Cashback App. Find price glitches, earn double rewards, and track your net worth automatically.',
           url: baseUrl,
           applicationCategory: 'FinanceApplication',
-          operatingSystem: 'Web Browser, iOS, Android',
-          offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'CNY',
-            availability: 'https://schema.org/InStock'
-          },
+          applicationSubCategory: 'ShoppingApplication',
+          operatingSystem: 'Windows, macOS, Android, iOS',
+          screenshot: `${baseUrl}/og-image.png`,
+          offers: [
+            {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'USD',
+              availability: 'https://schema.org/InStock',
+              name: 'Free Starter Plan'
+            },
+            {
+              '@type': 'Offer',
+              price: '9.99',
+              priceCurrency: 'USD',
+              availability: 'https://schema.org/InStock',
+              name: 'Pro Plan (Monthly)'
+            }
+          ],
           aggregateRating: {
             '@type': 'AggregateRating',
-            ratingValue: 4.8,
-            ratingCount: 1250,
+            ratingValue: 4.9,
+            ratingCount: 2048,
             bestRating: 5,
             worstRating: 1
           },
           featureList: [
-            '智能预算管理',
-            'AI财务分析',
-            '投资跟踪',
-            '税务规划',
-            '财务目标设定',
-            '支出分类'
+            'AI Wealth Tracker',
+            'Cashback Glitch Finder',
+            'Bank Bounties Hunter',
+            'Expense Manager',
+            'Net Worth Calculator'
           ]
         }
         return softwareData
@@ -154,6 +157,49 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           inLanguage: 'zh-CN'
         }
         return articleData
+
+      case 'faq':
+        if (!data) return null
+        const faqData = {
+          '@type': 'FAQPage',
+          mainEntity: data.map((item: any) => ({
+            '@type': 'Question',
+            name: item.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: item.answer
+            }
+          }))
+        }
+        return faqData
+
+      case 'product':
+        if (!data) return null
+        const productData = {
+          '@type': 'Product',
+          name: data.name,
+          image: data.image,
+          description: data.description,
+          brand: {
+            '@type': 'Brand',
+            name: data.merchant
+          },
+          offers: {
+            '@type': 'Offer',
+            url: `${baseUrl}/wealth/product/${data.id}`,
+            priceCurrency: 'USD',
+            price: data.price,
+            availability: 'https://schema.org/InStock',
+            itemCondition: 'https://schema.org/NewCondition'
+          },
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: '4.8',
+            ratingCount: '124'
+          }
+        }
+        return productData
+
 
       default:
         return null

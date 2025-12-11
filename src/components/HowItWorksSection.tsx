@@ -7,26 +7,26 @@ export default function HowItWorksSection() {
     const steps = [
         {
             icon: <Wallet className="w-8 h-8 text-white" />,
-            title: "Connect or Track",
-            desc: "Link your accounts securely or manually track cash expenses in seconds.",
+            title: "Join for Free",
+            desc: "Create your account in 30 seconds. No credit card required.",
             color: "bg-blue-500"
         },
         {
             icon: <PieChart className="w-8 h-8 text-white" />,
-            title: "Get Insights",
-            desc: "We automatically categorize your spending and show you where your money goes.",
+            title: "Shop & Earn",
+            desc: "Activate exclusive deals or complete simple financial tasks to earn rewards.",
             color: "bg-purple-500"
         },
         {
             icon: <BellRing className="w-8 h-8 text-white" />,
-            title: "Stay on Track",
-            desc: "Receive smart alerts and weekly reports to help you save more effortlessly.",
+            title: "Get Paid",
+            desc: "Withdraw your cashback directly to your bank account or PayPal instantly.",
             color: "bg-emerald-500"
         }
     ]
 
     return (
-        <section className="py-24 bg-gray-50 relative overflow-hidden">
+        <section id="how-it-works" className="py-24 bg-gray-50 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 <div className="text-center mb-16">
                     <motion.h2
@@ -72,6 +72,16 @@ export default function HowItWorksSection() {
                             </div>
                         </motion.div>
                     ))}
+                </div>
+
+                <div className="mt-16 text-center">
+                    <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm font-medium border border-green-100">
+                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                        Free Forever Plan Available
+                    </div>
+                    <p className="mt-4 text-gray-500 text-sm">
+                        Start with our generous free tier. Upgrade to Pro only when you're ready to earn 2x faster.
+                    </p>
                 </div>
             </div>
         </section>

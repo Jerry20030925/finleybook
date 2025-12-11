@@ -45,12 +45,41 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                 console.error('Failed to parse notifications', e)
             }
         } else {
-            // Add a welcome notification if no history exists
-            addNotification(
-                '欢迎使用 FinleyBook',
-                '系统已准备就绪，我们将为您提供智能的财务管理服务。',
-                'info'
+            // Add helpful default notifications if no history exists
+            const isEnglish = typeof window !== 'undefined' && (
+                localStorage.getItem('language') === 'en' ||
+                navigator.language.startsWith('en')
             )
+            
+            if (isEnglish) {
+                addNotification(
+                    'Welcome to FinleyBook! 🎉',
+                    'Your privacy-first financial dashboard is ready. Start by adding your first transaction.',
+                    'success'
+                )
+                
+                setTimeout(() => {
+                    addNotification(
+                        '💡 Pro Tip Available',
+                        'Set up your monthly budget to unlock financial health insights and savings recommendations.',
+                        'info'
+                    )
+                }, 2000)
+            } else {
+                addNotification(
+                    '欢迎使用 FinleyBook！🎉',
+                    '您的隐私优先财务仪表板已就绪。从添加第一笔交易开始吧。',
+                    'success'
+                )
+                
+                setTimeout(() => {
+                    addNotification(
+                        '💡 专业提示',
+                        '设置月度预算以解锁财务健康洞察和省钱建议。',
+                        'info'
+                    )
+                }, 2000)
+            }
         }
     }, [])
 

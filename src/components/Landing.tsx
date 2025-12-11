@@ -6,6 +6,7 @@ import { ChartBarIcon, DocumentMagnifyingGlassIcon, ShieldCheckIcon, ChatBubbleL
 import AuthModal from './AuthModal'
 import Logo from './Logo'
 import { useLanguage } from './LanguageProvider'
+import { useAuth } from './AuthProvider'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useCurrency, COUNTRIES } from '@/components/CurrencyProvider'
 import Link from 'next/link'
@@ -57,6 +58,7 @@ export default function Landing() {
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
   const { t, language } = useLanguage()
   const { country } = useCurrency()
+  const { loginAsGuest } = useAuth() // Added loginAsGuest
 
   const openAuth = (mode: 'signin' | 'signup') => {
     setAuthMode(mode)
@@ -231,17 +233,29 @@ export default function Landing() {
                 {t('hero.description')}
               </motion.p>
               <motion.div
-                className="mt-10 flex items-center justify-center gap-x-6"
+                className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-x-6"
                 variants={fadeInUp}
               >
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => openAuth('signup')}
-                  className="btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                  className="w-full sm:w-auto btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
                 >
                   <span className="relative z-10">{t('hero.start')}</span>
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={async () => {
+                    try {
+                      await loginAsGuest()
+                    } catch (e) { console.error(e) }
+                  }}
+                  className="w-full sm:w-auto text-sm font-semibold leading-6 text-gray-900 border border-gray-200 bg-white hover:bg-gray-50 px-6 py-3 rounded-xl transition-colors shadow-sm"
+                >
+                  {language === 'en' ? 'Try Demo (Guest)' : '体验演示 (游客)'}
                 </motion.button>
                 <a href="#features" className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors">
                   {t('hero.learn_more')} <span aria-hidden="true">→</span>
@@ -637,7 +651,7 @@ export default function Landing() {
           )
         }
       </div>
-    </div>
+    </div >
 
   )
 }

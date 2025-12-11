@@ -44,8 +44,8 @@ export default function InviteFriendModal({
                         </div>
 
                         {/* Content */}
-                        <div className="overflow-y-auto pt-8">
-                            <ReferralGiftCard />
+                        <div className="flex-1 overflow-y-auto pt-8">
+                            <ReferralGiftCard forceShow={true} onExpire={onClose} />
                         </div>
                     </motion.div>
                 </div>

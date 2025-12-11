@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <title>FinleyBook Logo</title>
+  <!-- Shield Background -->
+  <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 10 5.16-.26 9-4.45 9-10V7l-10-5z" fill="#0284c7"/>
+  <!-- Checkmark -->
+  <path d="M9 12l2 2 4-4" fill="white" stroke="white" stroke-width="1"/>
+  <!-- Circle -->
+  <circle cx="12" cy="12" r="2" fill="white"/>
+</svg>

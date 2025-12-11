@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { ResendService } from '@/lib/resendService';
 import WeeklyReportEmail from '@/emails/WeeklyReport';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { render } from '@react-email/render';
 
 export async function POST(request: Request) {
   try {
@@ -21,22 +20,23 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}));
     const recipientEmail = body.email || userData.email;
 
-    const data = await resend.emails.send({
-      from: 'FinleyBook <hello@finleybook.com>', // 必须是你验证过的域名
-      to: [recipientEmail],
+    const html = await render(WeeklyReportEmail({
+      userName: userData.userName,
+      savedAmount: userData.savedAmount,
+      topCategory: userData.topCategory,
+      nextBillName: userData.nextBillName,
+      nextBillAmount: userData.nextBillAmount,
+    }));
+
+    const data = await ResendService.sendEmail({
+      from: ResendService.SENDERS.default,
+      to: recipientEmail,
       subject: `Weekly Report: You saved $${userData.savedAmount}!`,
-      // 核心：把组件作为 react 属性传入
-      react: WeeklyReportEmail({
-        userName: userData.userName,
-        savedAmount: userData.savedAmount,
-        topCategory: userData.topCategory,
-        nextBillName: userData.nextBillName,
-        nextBillAmount: userData.nextBillAmount,
-      }),
+      html: html
     });
 
     return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json({ error });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Failed to send email' }, { status: 500 });
   }
 }

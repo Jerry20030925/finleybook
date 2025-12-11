@@ -3,6 +3,7 @@
 import { motion, useAnimation } from 'framer-motion'
 import { useEffect } from 'react'
 import { clsx } from 'clsx'
+import { useLanguage } from '@/components/LanguageProvider'
 
 interface ProfitOrbProps {
     totalSaved: number
@@ -10,6 +11,7 @@ interface ProfitOrbProps {
 }
 
 export default function ProfitOrb({ totalSaved, currency = '$' }: ProfitOrbProps) {
+    const { t } = useLanguage()
     const controls = useAnimation()
 
     useEffect(() => {
@@ -53,7 +55,7 @@ export default function ProfitOrb({ totalSaved, currency = '$' }: ProfitOrbProps
                 )}
             >
                 <span className="text-sm font-medium text-emerald-100 uppercase tracking-wider mb-1">
-                    本月已赚
+                    {t('dashboard.profitOrb.label')}
                 </span>
                 <div className="flex items-baseline text-white">
                     <span className="text-4xl font-bold">
@@ -69,7 +71,7 @@ export default function ProfitOrb({ totalSaved, currency = '$' }: ProfitOrbProps
                     </motion.span>
                 </div>
                 <span className="text-xs text-emerald-200 mt-2 bg-emerald-800/30 px-2 py-1 rounded-full">
-                    Profit Center
+                    {t('dashboard.profitOrb.sublabel')}
                 </span>
             </motion.div>
 

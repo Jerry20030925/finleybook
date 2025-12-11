@@ -3,15 +3,18 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { PlusIcon, PencilIcon, TrashIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
-import Navigation from '@/components/Navigation'
+
 import { useAuth } from '@/components/AuthProvider'
 import toast from 'react-hot-toast'
 import { useLanguage } from '@/components/LanguageProvider'
 import { Goal, addGoal, getGoals, updateGoal, deleteGoal } from '@/lib/dataService'
 
+import { useRouter } from 'next/navigation'
+
 export default function GoalsPage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const { t } = useLanguage()
+  const router = useRouter()
   const [goals, setGoals] = useState<Goal[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -36,11 +39,20 @@ export default function GoalsPage() {
     emergency: { label: t('goals.categories.emergency'), color: 'bg-yellow-100 text-yellow-800', icon: '🛡️' }
   }
 
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/')
+    }
+  }, [authLoading, user, router])
+
   useEffect(() => {
     if (user) {
       loadGoals()
+    } else if (!authLoading) {
+      setLoading(false)
     }
-  }, [user])
+  }, [user, authLoading])
 
   const loadGoals = async () => {
     if (!user) return
@@ -172,7 +184,7 @@ export default function GoalsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+
 
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <motion.div

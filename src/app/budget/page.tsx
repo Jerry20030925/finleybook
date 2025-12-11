@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
-import Navigation from '@/components/Navigation'
+
 import { useAuth } from '@/components/AuthProvider'
 import { getUserTransactions, DEFAULT_CATEGORIES } from '@/lib/dataService'
 import toast from 'react-hot-toast'
+import { useLanguage } from '@/components/LanguageProvider'
+import { useCurrency } from '@/components/CurrencyProvider'
 
 interface Budget {
   id: string
@@ -16,8 +18,29 @@ interface Budget {
   spent: number
 }
 
+// Mapping from Chinese category names (stored in DB) to translation keys
+const CATEGORY_MAPPING: { [key: string]: string } = {
+  '餐饮美食': 'category.food',
+  '交通出行': 'category.transport',
+  '购物消费': 'category.shopping',
+  '居住缴费': 'category.housing',
+  '医疗健康': 'category.health',
+  '文化娱乐': 'category.entertainment',
+  '学习教育': 'category.education',
+  '其他支出': 'category.otherExpense',
+  '工资收入': 'category.salary',
+  '投资收益': 'category.investment',
+  '兼职收入': 'category.parttime',
+  '其他收入': 'category.otherIncome'
+}
+
+import { useRouter } from 'next/navigation'
+
 export default function BudgetPage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
+  const { t } = useLanguage()
+  const { formatAmount } = useCurrency()
+  const router = useRouter()
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -29,11 +52,20 @@ export default function BudgetPage() {
     period: 'monthly' as 'monthly' | 'yearly'
   })
 
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/')
+    }
+  }, [authLoading, user, router])
+
   useEffect(() => {
     if (user) {
       loadBudgets()
+    } else if (!authLoading) {
+      setLoading(false)
     }
-  }, [user])
+  }, [user, authLoading])
 
   const loadBudgets = async () => {
     if (!user?.uid) return
@@ -42,21 +74,21 @@ export default function BudgetPage() {
       setLoading(true)
       // Load transactions to calculate spent amounts
       const transactions = await getUserTransactions(user.uid, 1000)
-      
+
       // Get current month/year for calculations
       const now = new Date()
       const currentMonth = now.getMonth()
       const currentYear = now.getFullYear()
-      
+
       // Calculate spent amounts by category
       const spentByCategory = new Map<string, number>()
-      
+
       transactions.forEach(transaction => {
         if (transaction.type === 'expense') {
           const transactionDate = new Date(transaction.date)
           const transactionMonth = transactionDate.getMonth()
           const transactionYear = transactionDate.getFullYear()
-          
+
           // Only include current month expenses
           if (transactionMonth === currentMonth && transactionYear === currentYear) {
             const current = spentByCategory.get(transaction.category) || 0
@@ -77,7 +109,7 @@ export default function BudgetPage() {
       setBudgets(sampleBudgets)
     } catch (error) {
       console.error('Error loading budgets:', error)
-      toast.error('加载预算失败')
+      toast.error(t('budget.loadError'))
     } finally {
       setLoading(false)
     }
@@ -85,9 +117,9 @@ export default function BudgetPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!formData.category || !formData.amount) {
-      toast.error('请填写完整信息')
+      toast.error(t('budget.fillComplete'))
       return
     }
 
@@ -101,10 +133,10 @@ export default function BudgetPage() {
 
     if (editingBudget) {
       setBudgets(prev => prev.map(b => b.id === editingBudget.id ? newBudget : b))
-      toast.success('预算更新成功')
+      toast.success(t('budget.updateSuccess'))
     } else {
       setBudgets(prev => [...prev, newBudget])
-      toast.success('预算添加成功')
+      toast.success(t('budget.addSuccess'))
     }
 
     setFormData({ category: '', amount: '', period: 'monthly' })
@@ -124,7 +156,7 @@ export default function BudgetPage() {
 
   const handleDelete = (id: string) => {
     setBudgets(prev => prev.filter(b => b.id !== id))
-    toast.success('预算删除成功')
+    toast.success(t('budget.deleteSuccess'))
   }
 
   const getProgressColor = (spent: number, budget: number) => {
@@ -137,10 +169,21 @@ export default function BudgetPage() {
   const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0)
   const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0)
 
+  // Helper to translate category
+  const getCategoryName = (category: string) => {
+    // If it's already a translation key, translate it
+    if (category.startsWith('category.')) {
+      return t(category)
+    }
+    // Try to find a mapping, otherwise return original
+    const key = CATEGORY_MAPPING[category]
+    return key ? t(key) : category
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
+
+
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <motion.div
           className="mb-8"
@@ -148,8 +191,8 @@ export default function BudgetPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">预算管理</h1>
-          <p className="text-gray-600">设置和管理您的月度预算</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('budget.title')}</h1>
+          <p className="text-gray-600">{t('budget.description')}</p>
         </motion.div>
 
         {/* Summary Cards */}
@@ -160,17 +203,17 @@ export default function BudgetPage() {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">总预算</h3>
-            <p className="text-2xl font-bold text-blue-600">¥{totalBudget.toLocaleString()}</p>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">{t('budget.totalBudget')}</h3>
+            <p className="text-2xl font-bold text-blue-600">{formatAmount(totalBudget)}</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">已花费</h3>
-            <p className="text-2xl font-bold text-red-600">¥{totalSpent.toLocaleString()}</p>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">{t('budget.spent')}</h3>
+            <p className="text-2xl font-bold text-red-600">{formatAmount(totalSpent)}</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">剩余预算</h3>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">{t('budget.remainingBudget')}</h3>
             <p className={`text-2xl font-bold ${totalBudget - totalSpent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              ¥{(totalBudget - totalSpent).toLocaleString()}
+              {formatAmount(totalBudget - totalSpent)}
             </p>
           </div>
         </motion.div>
@@ -189,7 +232,7 @@ export default function BudgetPage() {
             whileTap={{ scale: 0.95 }}
           >
             <PlusIcon className="w-5 h-5 mr-2" />
-            添加预算
+            {t('budget.addBudget')}
           </motion.button>
         </motion.div>
 
@@ -211,7 +254,7 @@ export default function BudgetPage() {
                 transition={{ delay: index * 0.1, duration: 0.3 }}
               >
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">{budget.category}</h3>
+                  <h3 className="text-lg font-medium text-gray-900">{getCategoryName(budget.category)}</h3>
                   <div className="flex space-x-2">
                     <button
                       onClick={() => handleEdit(budget)}
@@ -230,8 +273,8 @@ export default function BudgetPage() {
 
                 <div className="mb-4">
                   <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>已花费 ¥{budget.spent.toLocaleString()}</span>
-                    <span>预算 ¥{budget.amount.toLocaleString()}</span>
+                    <span>{t('budget.spent')} {formatAmount(budget.spent)}</span>
+                    <span>{t('budget.budgetAmount')} {formatAmount(budget.amount)}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <motion.div
@@ -243,14 +286,14 @@ export default function BudgetPage() {
                     />
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    {percentage.toFixed(1)}% 已使用
+                    {percentage.toFixed(1)}% {t('budget.used')}
                   </div>
                 </div>
 
                 <div className="text-sm">
-                  <span className="text-gray-500">剩余: </span>
+                  <span className="text-gray-500">{t('budget.remaining')}</span>
                   <span className={budget.amount - budget.spent >= 0 ? 'text-green-600' : 'text-red-600'}>
-                    ¥{(budget.amount - budget.spent).toLocaleString()}
+                    {formatAmount(budget.amount - budget.spent)}
                   </span>
                 </div>
               </motion.div>
@@ -268,12 +311,12 @@ export default function BudgetPage() {
               transition={{ duration: 0.2 }}
             >
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {editingBudget ? '编辑预算' : '添加预算'}
+                {editingBudget ? t('budget.edit') : t('budget.addBudget')}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    分类
+                    {t('budget.category')}
                   </label>
                   <select
                     value={formData.category}
@@ -281,16 +324,16 @@ export default function BudgetPage() {
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
                     required
                   >
-                    <option value="">选择分类</option>
+                    <option value="">{t('budget.selectCategory')}</option>
                     {DEFAULT_CATEGORIES.expense.map(category => (
-                      <option key={category} value={category}>{category}</option>
+                      <option key={category} value={category}>{getCategoryName(category)}</option>
                     ))}
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    预算金额
+                    {t('budget.budgetAmount')}
                   </label>
                   <input
                     type="number"
@@ -306,15 +349,15 @@ export default function BudgetPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    周期
+                    {t('budget.period')}
                   </label>
                   <select
                     value={formData.period}
                     onChange={(e) => setFormData(prev => ({ ...prev, period: e.target.value as 'monthly' | 'yearly' }))}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
                   >
-                    <option value="monthly">月度</option>
-                    <option value="yearly">年度</option>
+                    <option value="monthly">{t('budget.monthly')}</option>
+                    <option value="yearly">{t('budget.yearly')}</option>
                   </select>
                 </div>
 
@@ -328,13 +371,13 @@ export default function BudgetPage() {
                     }}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                   >
-                    取消
+                    {t('common.cancel')}
                   </button>
                   <button
                     type="submit"
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    {editingBudget ? '更新' : '添加'}
+                    {editingBudget ? t('budget.update') : t('budget.addBudget')}
                   </button>
                 </div>
               </form>

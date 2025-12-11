@@ -76,7 +76,7 @@ export default function InsightsWidget({ insights }: InsightsWidgetProps) {
                     </div>
                   )}
                   <div className="mt-2 text-xs text-gray-500">
-                    {insight.createdAt.toLocaleDateString('zh-CN')}
+                    {insight.createdAt.toLocaleDateString('en-AU')}
                   </div>
                 </div>
               </div>

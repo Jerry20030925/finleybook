@@ -17,6 +17,22 @@ export async function POST(req: NextRequest) {
             )
         }
 
+        // Determine base URL
+        let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+        if (!baseUrl) {
+            if (process.env.VERCEL_URL) {
+                baseUrl = `https://${process.env.VERCEL_URL}`;
+            } else {
+                // Fallback to request origin if available
+                const origin = req.headers.get('origin');
+                if (origin) {
+                    baseUrl = origin;
+                } else {
+                    baseUrl = 'https://finleybook.com'; // Hard fallback
+                }
+            }
+        }
+
         // Create Stripe Checkout Session
         const session = await stripe.checkout.sessions.create({
             mode: 'subscription',
@@ -27,8 +43,8 @@ export async function POST(req: NextRequest) {
                     quantity: 1,
                 },
             ],
-            success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/subscribe`,
+            success_url: `${baseUrl}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${baseUrl}/subscribe`,
             client_reference_id: userId,
             metadata: {
                 userId,

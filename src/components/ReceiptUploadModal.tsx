@@ -2,11 +2,12 @@
 
 import { Fragment, useState, useCallback } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { XMarkIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline'
+import { XMarkIcon, CameraIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { useDropzone } from 'react-dropzone'
 import toast from 'react-hot-toast'
 import { OCRService } from '@/lib/services/ocrService'
 import { useAuth } from '@/components/AuthProvider'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface ReceiptUploadModalProps {
   onClose: () => void
@@ -22,13 +23,22 @@ export default function ReceiptUploadModal({ onClose }: ReceiptUploadModalProps)
     setFiles(prevFiles => [...prevFiles, ...acceptedFiles])
   }, [])
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.gif']
     },
-    multiple: true
+    multiple: true,
+    noClick: true, // We will handle click manually for better mobile control
+    noKeyboard: true
   })
+
+  // Separate function for camera capture on mobile
+  const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFiles(prev => [...prev, ...Array.from(e.target.files!)])
+    }
+  }
 
   const removeFile = (index: number) => {
     setFiles(files => files.filter((_, i) => i !== index))
@@ -36,12 +46,12 @@ export default function ReceiptUploadModal({ onClose }: ReceiptUploadModalProps)
 
   const handleUpload = async () => {
     if (files.length === 0) {
-      toast.error('请选择要上传的文件')
+      toast.error('Please select a file to upload')
       return
     }
 
     if (!user || !user.uid) {
-      toast.error('用户未登录，请先登录')
+      toast.error('Please sign in first')
       return
     }
 
@@ -56,25 +66,23 @@ export default function ReceiptUploadModal({ onClose }: ReceiptUploadModalProps)
         try {
           const { transaction, document } = await ocrService.processReceiptImage(user.uid, file)
           console.log('Processed transaction:', transaction)
-          console.log('Processed document:', document)
           // Here you would typically save the transaction and document to your database
-          // For now, we just log them
           successfulUploads++
         } catch (fileError) {
           console.error(`Error processing file ${file.name}:`, fileError)
-          toast.error(`处理文件 ${file.name} 失败`)
+          toast.error(`Failed to process ${file.name}`)
         }
       }
-      
+
       if (successfulUploads > 0) {
-        toast.success(`成功处理 ${successfulUploads} 张票据！`)
+        toast.success(`Successfully processed ${successfulUploads} receipts!`)
       } else {
-        toast.error('所有票据处理失败')
+        toast.error('Failed to process receipts')
       }
       onClose()
     } catch (error) {
       console.error('Upload error:', error)
-      toast.error('票据处理失败')
+      toast.error('Receipt processing failed')
     } finally {
       setUploading(false)
       setProcessing(false)
@@ -93,136 +101,188 @@ export default function ReceiptUploadModal({ onClose }: ReceiptUploadModalProps)
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          <div className="fixed inset-0 bg-gray-900/90 transition-opacity backdrop-blur-sm" />
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
-              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              enterTo="opacity-100 translate-y-0 sm:scale-100"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
               leave="ease-in duration-200"
-              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6">
-                <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
-                  <button
-                    type="button"
-                    className="rounded-md bg-white text-gray-400 hover:text-gray-500"
-                    onClick={onClose}
-                  >
-                    <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
+              <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-lg">
+
+                {/* Header */}
+                <div className="relative p-6 border-b border-gray-100 bg-gray-50/50">
+                  <div className="flex items-center justify-between">
+                    <Dialog.Title as="h3" className="text-lg font-bold text-gray-900">
+                      Scan Receipt
+                    </Dialog.Title>
+                    <button
+                      type="button"
+                      className="rounded-full p-1 bg-white hover:bg-gray-100 text-gray-400 hover:text-gray-500 transition-colors"
+                      onClick={onClose}
+                    >
+                      <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+                    </button>
+                  </div>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Snap a photo or upload an image. AI will extract the details.
+                  </p>
                 </div>
 
-                <div className="sm:flex sm:items-start">
-                  <div className="w-full mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                    <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900 mb-6">
-                      上传票据
-                    </Dialog.Title>
-
-                    {/* Upload Area */}
+                {/* Content */}
+                <div className="p-6">
+                  {/* Dropzone / Camera Area */}
+                  {files.length === 0 ? (
                     <div
                       {...getRootProps()}
-                      className={`mt-4 flex justify-center rounded-lg border border-dashed px-6 py-10 ${
-                        isDragActive ? 'border-primary-400 bg-primary-50' : 'border-gray-300'
-                      }`}
+                      className={`relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 ${isDragActive
+                          ? 'border-primary-500 bg-primary-50'
+                          : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+                        }`}
                     >
-                      <div className="text-center">
-                        <CloudArrowUpIcon className="mx-auto h-12 w-12 text-gray-300" />
-                        <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                          <label className="relative cursor-pointer rounded-md bg-white font-semibold text-primary-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary-600 focus-within:ring-offset-2 hover:text-primary-500">
-                            <span>上传文件</span>
-                            <input {...getInputProps()} />
+                      <input {...getInputProps()} />
+
+                      <div className="px-6 py-12 text-center">
+                        <div className="flex justify-center gap-4 mb-4">
+                          {/* Mobile Camera Input Trigger */}
+                          <label className="cursor-pointer group">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              capture="environment"
+                              className="hidden"
+                              onChange={handleCameraCapture}
+                            />
+                            <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-200 transition-colors shadow-sm">
+                              <CameraIcon className="w-8 h-8" />
+                            </div>
+                            <span className="text-xs font-medium text-blue-600 mt-2 block">Camera</span>
                           </label>
-                          <p className="pl-1">或拖拽到这里</p>
+
+                          {/* File Upload Trigger */}
+                          <div onClick={open} className="cursor-pointer group">
+                            <div className="w-16 h-16 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:bg-purple-200 transition-colors shadow-sm">
+                              <PhotoIcon className="w-8 h-8" />
+                            </div>
+                            <span className="text-xs font-medium text-purple-600 mt-2 block">Gallery</span>
+                          </div>
                         </div>
-                        <p className="text-xs leading-5 text-gray-600">
-                          支持 PNG, JPG, GIF 格式
+
+                        <p className="text-sm text-gray-500 font-medium">
+                          Tap to scan or select from gallery
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Supports JPG, PNG, GIF
                         </p>
                       </div>
                     </div>
-
-                    {/* File List */}
-                    {files.length > 0 && (
-                      <div className="mt-6">
-                        <h4 className="text-sm font-medium text-gray-900 mb-3">
-                          已选择的文件 ({files.length})
-                        </h4>
-                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <AnimatePresence>
                           {files.map((file, index) => (
-                            <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
-                              <div className="flex items-center space-x-3">
-                                <div className="flex-shrink-0">
-                                  {file.type.startsWith('image/') && (
-                                    <img
-                                      src={URL.createObjectURL(file)}
-                                      alt="Preview"
-                                      className="h-10 w-10 rounded-lg object-cover"
-                                    />
-                                  )}
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                                  <p className="text-xs text-gray-500">
-                                    {(file.size / 1024 / 1024).toFixed(2)} MB
-                                  </p>
-                                </div>
-                              </div>
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.9 }}
+                              className="relative aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden shadow-sm group"
+                            >
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt="Receipt preview"
+                                className="w-full h-full object-cover"
+                              />
+
+                              {/* Scanning Animation Layer */}
+                              {processing && (
+                                <motion.div
+                                  className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/30 to-transparent z-10"
+                                  initial={{ top: '-100%' }}
+                                  animate={{ top: '100%' }}
+                                  transition={{
+                                    repeat: Infinity,
+                                    duration: 1.5,
+                                    ease: "linear"
+                                  }}
+                                />
+                              )}
+
                               <button
                                 onClick={() => removeFile(index)}
-                                className="text-danger-600 hover:text-danger-700"
+                                className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded-full text-white backdrop-blur-sm transition-opacity opacity-0 group-hover:opacity-100"
                               >
-                                <XMarkIcon className="h-5 w-5" />
+                                <XMarkIcon className="w-4 h-4" />
                               </button>
-                            </div>
+                            </motion.div>
                           ))}
+                        </AnimatePresence>
+
+                        {/* Add More Button */}
+                        {!processing && (
+                          <div
+                            onClick={open}
+                            className="aspect-[3/4] rounded-xl border-2 border-dashed border-gray-300 hover:border-gray-400 bg-gray-50 hover:bg-gray-100 flex flex-col items-center justify-center cursor-pointer transition-colors text-gray-400 hover:text-gray-500"
+                          >
+                            <PhotoIcon className="w-8 h-8 mb-2" />
+                            <span className="text-xs font-medium">Add Page</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Processing Status */}
+                  {processing && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-6 bg-blue-50/80 border border-blue-100 rounded-xl p-4 backdrop-blur-sm"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="relative flex h-3 w-3">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-blue-900">Analyzing Receipt...</p>
+                          <p className="text-xs text-blue-700">Extracting merchant, date, and amount</p>
                         </div>
                       </div>
-                    )}
+                    </motion.div>
+                  )}
 
-                    {/* Processing Status */}
-                    {processing && (
-                      <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div className="flex items-center">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-3"></div>
-                          <span className="text-sm text-blue-800">
-                            正在使用 OCR 技术识别票据信息...
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Action Buttons */}
-                    <div className="mt-6 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                      <button
-                        onClick={handleUpload}
-                        disabled={uploading || files.length === 0}
-                        className="btn-primary flex-1 disabled:opacity-50"
-                      >
-                        {uploading ? '处理中...' : `开始处理 (${files.length})`}
-                      </button>
+                  {/* Action Buttons */}
+                  {!processing && files.length > 0 && (
+                    <div className="mt-6 flex gap-3">
                       <button
                         onClick={onClose}
-                        className="btn-secondary flex-1"
+                        className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors"
                       >
-                        取消
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleUpload}
+                        className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      >
+                        Scan & Process ({files.length})
                       </button>
                     </div>
+                  )}
 
-                    {/* Help Text */}
-                    <div className="mt-4 text-xs text-gray-500">
-                      <p className="mb-1">提示：</p>
-                      <ul className="list-disc list-inside space-y-1">
-                        <li>确保票据图片清晰，文字可见</li>
-                        <li>系统会自动识别金额、日期、商家等信息</li>
-                        <li>识别完成后您可以编辑和确认信息</li>
-                      </ul>
-                    </div>
+                  {/* Tips */}
+                  <div className="mt-6 flex items-start gap-2 text-xs text-gray-400 px-2 pb-2">
+                    <div className="mt-0.5">✨</div>
+                    <p>Pro Tip: Ensure good lighting for best accuracy. Our AI will handle the rest.</p>
                   </div>
+
                 </div>
               </Dialog.Panel>
             </Transition.Child>

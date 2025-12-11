@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { X } from 'lucide-react'
+import { useCurrency } from '@/components/CurrencyProvider'
 
 interface BudgetSetupModalProps {
     isOpen: boolean
@@ -21,6 +22,7 @@ export default function BudgetSetupModal({
 }: BudgetSetupModalProps) {
     const [budget, setBudget] = useState(currentBudget.toString())
     const [wage, setWage] = useState(currentWage.toString())
+    const { country } = useCurrency()
 
     const handleSave = () => {
         const budgetNum = parseFloat(budget)
@@ -78,7 +80,7 @@ export default function BudgetSetupModal({
                                     </label>
                                     <div className="relative">
                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">
-                                            $
+                                            {country.symbol}
                                         </span>
                                         <input
                                             type="number"
@@ -100,7 +102,7 @@ export default function BudgetSetupModal({
                                     </label>
                                     <div className="relative">
                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">
-                                            $
+                                            {country.symbol}
                                         </span>
                                         <input
                                             type="number"

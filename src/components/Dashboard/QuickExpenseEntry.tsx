@@ -1,26 +1,55 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useCurrency } from '../CurrencyProvider'
+import { useLanguage } from '../LanguageProvider'
+import toast from 'react-hot-toast'
 
 interface QuickExpenseEntryProps {
     onAddExpense: (amount: number, category: string, emoji: string) => void
 }
 
-const QUICK_BUTTONS = [
-    { emoji: '☕️', label: 'Coffee', amount: 5, category: 'Food & Drink' },
-    { emoji: '🍔', label: 'Meal', amount: 15, category: 'Food & Drink' },
-    { emoji: '🛒', label: 'Groceries', amount: 50, category: 'Groceries' },
-    { emoji: '🚗', label: 'Transport', amount: 20, category: 'Transportation' },
-    { emoji: '🎬', label: 'Fun', amount: 30, category: 'Entertainment' },
+interface QuickButton {
+    emoji: string
+    labelKey?: string
+    label?: string // Legacy support
+    amount: number
+    category: string
+}
+
+// Default quick buttons - users can customize these
+const DEFAULT_QUICK_BUTTONS: QuickButton[] = [
+    { emoji: '☕️', labelKey: 'Coffee', amount: 5, category: 'Food & Dining' },
+    { emoji: '🍔', labelKey: 'Meal', amount: 15, category: 'Food & Dining' },
+    { emoji: '🛒', labelKey: 'Groceries', amount: 50, category: 'Shopping' },
+    { emoji: '🚗', labelKey: 'Transport', amount: 20, category: 'Transportation' },
+    { emoji: '🎬', labelKey: 'Fun', amount: 30, category: 'Entertainment' },
 ]
 
 export default function QuickExpenseEntry({ onAddExpense }: QuickExpenseEntryProps) {
+    const { t } = useLanguage()
     const [showCustom, setShowCustom] = useState(false)
     const [customAmount, setCustomAmount] = useState('')
     const [selectedButton, setSelectedButton] = useState<number | null>(null)
+    const [quickButtons, setQuickButtons] = useState<QuickButton[]>(DEFAULT_QUICK_BUTTONS)
+    const { formatAmount } = useCurrency()
 
-    const handleQuickAdd = (button: typeof QUICK_BUTTONS[0], index: number) => {
+    // Load user's custom quick buttons on component mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const savedButtons = localStorage.getItem('userQuickButtons')
+                if (savedButtons) {
+                    setQuickButtons(JSON.parse(savedButtons))
+                }
+            } catch (error) {
+                console.error('Error loading custom quick buttons:', error)
+            }
+        }
+    }, [])
+
+    const handleQuickAdd = (button: typeof DEFAULT_QUICK_BUTTONS[0], index: number) => {
         // Visual feedback
         setSelectedButton(index)
 
@@ -32,6 +61,12 @@ export default function QuickExpenseEntry({ onAddExpense }: QuickExpenseEntryPro
         // Add expense
         onAddExpense(button.amount, button.category, button.emoji)
 
+        // Toast feedback
+        toast.success(`Added ${formatAmount(button.amount)}`, {
+            icon: button.emoji,
+            duration: 2000,
+        })
+
         // Reset animation
         setTimeout(() => setSelectedButton(null), 300)
     }
@@ -40,28 +75,37 @@ export default function QuickExpenseEntry({ onAddExpense }: QuickExpenseEntryPro
         const amount = parseFloat(customAmount)
         if (amount > 0) {
             onAddExpense(amount, 'Other', '💰')
+
+            // Toast feedback
+            toast.success(`Added ${formatAmount(amount)}`, {
+                icon: '💰',
+                duration: 2000,
+            })
+
             setCustomAmount('')
             setShowCustom(false)
         }
     }
 
+    // ... (keep useEffect)
+
     return (
         <div className="bg-white rounded-2xl shadow-lg p-6">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">Quick Add</h3>
+                <h3 className="text-lg font-bold text-gray-900">{t('quickActions.title')}</h3>
                 <button
                     onClick={() => setShowCustom(!showCustom)}
                     className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
                 >
-                    {showCustom ? 'Quick' : 'Custom'}
+                    {showCustom ? t('quickActions.viewTransactions') : 'Custom'}
                 </button>
             </div>
 
             {!showCustom ? (
                 <div className="grid grid-cols-5 gap-3">
-                    {QUICK_BUTTONS.map((button, index) => (
+                    {quickButtons.map((button, index) => (
                         <motion.button
-                            key={button.label}
+                            key={index}
                             onClick={() => handleQuickAdd(button, index)}
                             className="flex flex-col items-center gap-2 p-4 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 transition-all"
                             whileTap={{ scale: 0.9 }}
@@ -71,7 +115,9 @@ export default function QuickExpenseEntry({ onAddExpense }: QuickExpenseEntryPro
                             } : {}}
                         >
                             <span className="text-3xl">{button.emoji}</span>
-                            <span className="text-xs font-medium text-gray-700">${button.amount}</span>
+                            <span className="text-xs font-medium text-gray-700">
+                                {button.labelKey || button.label}
+                            </span>
                         </motion.button>
                     ))}
                 </div>

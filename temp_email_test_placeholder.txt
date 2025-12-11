@@ -1,0 +1,15 @@
+
+const { ResendService } = require('./src/lib/resendService');
+
+async function testEmail() {
+    try {
+        console.log('Testing email service...');
+        // We can't really run this without transpiling if it's TS.
+        // But since we are allowed to run "run_command", we can assume we might use ts-node or similar if available.
+        // Alternatively, we can just rely on the build check or use the existing test-email route.
+        console.log('Senders configured:', ResendService.SENDERS);
+    } catch (e) {
+        console.error(e);
+    }
+}
+// This is just a dummy file content for now.

@@ -11,7 +11,10 @@ import { useLanguage } from '../LanguageProvider'
 import toast from 'react-hot-toast'
 import Logo from '../Logo'
 
-import { Mail, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
+import { Mail, Phone, AlertCircle, Loader2 } from 'lucide-react'
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
+import 'react-phone-number-input/style.css'
+import { getGoals, addGoal } from '@/lib/dataService'
 
 interface OnboardingWizardProps {
     initialStep?: number
@@ -21,32 +24,49 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
     const [step, setStep] = useState(initialStep)
     const [data, setData] = useState({
         identity: '',
-        wastedAmount: 50
+        wastedAmount: 50,
+        dreamName: '',
+        dreamAmount: 0,
+        dreamIcon: '',
+        dreamDeadline: ''
     })
+
+    // Auth State
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
     const [isSigningUp, setIsSigningUp] = useState(false)
-    const { user, signInWithGoogle, signUp, signIn, sendPasswordReset, error: providerError } = useAuth()
+    const [authError, setAuthError] = useState<string | null>(null)
+    const [showEmailForm, setShowEmailForm] = useState(false)
+    const [showPhoneForm, setShowPhoneForm] = useState(false)
+    const [showResetForm, setShowResetForm] = useState(false)
+    const [isLoginMode, setIsLoginMode] = useState(false)
+    const [showVerification, setShowVerification] = useState(false)
+    const [verificationCode, setVerificationCode] = useState('')
+    const [timer, setTimer] = useState(0)
+
+    // Phone Auth State
+    const [phoneNumber, setPhoneNumber] = useState('')
+    const [phoneCode, setPhoneCode] = useState('')
+    const [confirmationResult, setConfirmationResult] = useState<any>(null)
+    const [recaptchaVerifier, setRecaptchaVerifier] = useState<any>(null)
+    const [currency, setCurrency] = useState('USD')
+
+    const { signIn, signUp, signInWithGoogle, signInWithPhone, sendPasswordReset, auth } = useAuth()
     const { t } = useLanguage()
     const router = useRouter()
 
-    // Email Auth State
-    const [showEmailForm, setShowEmailForm] = useState(false)
-    const [showResetForm, setShowResetForm] = useState(false)
-    const [isLoginMode, setIsLoginMode] = useState(false)
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [authError, setAuthError] = useState<string | null>(null)
-
-    // Sync provider error to local state
     useEffect(() => {
-        if (providerError && !authError) {
-            setAuthError(providerError)
+        let interval: NodeJS.Timeout
+        if (timer > 0) {
+            interval = setInterval(() => setTimer(t => t - 1), 1000)
         }
-    }, [providerError, authError])
+        return () => clearInterval(interval)
+    }, [timer])
 
     const nextStep = () => setStep(s => s + 1)
 
-    const handleIdentitySelect = (identity: string) => {
-        setData(d => ({ ...d, identity }))
+    const handleIdentitySelect = (id: string) => {
+        setData(d => ({ ...d, identity: id }))
         nextStep()
     }
 
@@ -55,19 +75,100 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
         nextStep()
     }
 
-    const handleDreamNext = () => {
-        nextStep() // Go to signup step
+    const handleDreamNext = (dreamData: { title: string, amount: number, icon: string }) => {
+        setData(d => ({
+            ...d,
+            dreamName: dreamData.title,
+            dreamAmount: dreamData.amount,
+            dreamIcon: dreamData.icon
+        }))
+        nextStep()
     }
 
     const handleGoogleSignup = async () => {
         setIsSigningUp(true)
         try {
-            await signInWithGoogle()
-            // In a real app, we would save `data` to the user's profile here
-            // For MVP, we just let the AuthProvider handle the redirect/state update
+            const userCred = await signInWithGoogle()
+            if (userCred?.user) {
+                await saveUserGoal(userCred.user.uid)
+            }
         } catch (error) {
             console.error('Signup failed', error)
             toast.error(t('auth.googleSignInError'))
+            setIsSigningUp(false)
+        }
+    }
+
+    const saveUserGoal = async (uid: string) => {
+        if (!data.dreamName || !data.dreamAmount) return;
+        try {
+            await addGoal({
+                userId: uid,
+                title: data.dreamName,
+                targetAmount: data.dreamAmount,
+                currentAmount: 0,
+                deadline: data.dreamDeadline || '', // Pass the deadline
+                category: 'purchase', // Default category
+                icon: data.dreamIcon || '🎯',
+                isCompleted: false,
+                description: 'My Big Dream'
+            })
+        } catch (e) {
+            console.error('Failed to save onboarding goal', e)
+        }
+    }
+
+    // ...
+
+    const handleSendCode = async () => {
+        if (!email) {
+            toast.error(t('validation.emailRequired'))
+            return
+        }
+        setIsSigningUp(true)
+        setAuthError(null)
+        try {
+            const res = await fetch('/api/auth/send-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            })
+            if (!res.ok) {
+                const json = await res.json()
+                throw new Error(json.error || 'Failed to send code')
+            }
+            setShowVerification(true)
+            setTimer(60)
+            toast.success('Verification code sent!')
+        } catch (error: any) {
+            console.error('Send code failed', error)
+            setAuthError(error.message)
+        } finally {
+            setIsSigningUp(false)
+        }
+    }
+
+    const handleVerifyCode = async () => {
+        setIsSigningUp(true)
+        setAuthError(null)
+        try {
+            const res = await fetch('/api/auth/verify-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code: verificationCode })
+            })
+            const json = await res.json()
+            if (!res.ok) throw new Error(json.error)
+
+            // Code verified, proceed with signup
+            const userCred = await signUp(email, password)
+            if (userCred?.user) {
+                await saveUserGoal(userCred.user.uid)
+            }
+            router.push('/dashboard')
+        } catch (error: any) {
+            console.error('Verification failed', error)
+            setAuthError(error.message)
             setIsSigningUp(false)
         }
     }
@@ -76,19 +177,21 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
         e.preventDefault()
         if (!email || !password) return
 
-        setIsSigningUp(true)
-        setAuthError(null)
-
-        try {
-            if (isLoginMode) {
+        if (isLoginMode) {
+            // Login flow (no verification needed)
+            setIsSigningUp(true)
+            setAuthError(null)
+            try {
                 await signIn(email, password)
-            } else {
-                await signUp(email, password)
+                router.push('/dashboard')
+            } catch (error: any) {
+                console.error("Auth failed", error)
+                setAuthError(error.message)
+                setIsSigningUp(false)
             }
-        } catch (error: any) {
-            console.error("Auth failed", error)
-            setAuthError(error.message)
-            setIsSigningUp(false)
+        } else {
+            // Signup flow (require verification)
+            await handleSendCode()
         }
     }
 
@@ -108,6 +211,87 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
         } catch (error: any) {
             console.error('Reset failed', error)
             setAuthError(error.message)
+        } finally {
+            setIsSigningUp(false)
+        }
+    }
+
+    const setupRecaptcha = async () => {
+        if (!auth) return
+        try {
+            const { RecaptchaVerifier } = await import('firebase/auth')
+            const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                'size': 'invisible',
+                'callback': () => {
+                    // reCAPTCHA solved
+                }
+            })
+            setRecaptchaVerifier(verifier)
+            return verifier
+        } catch (error) {
+            console.error('Recaptcha setup error:', error)
+        }
+    }
+
+
+
+    const handlePhoneChange = (value: string | undefined) => {
+        setPhoneNumber(value || '')
+        if (value) {
+            // Simple heuristic to detect currency based on calling code
+            // This is a basic mapping, can be expanded
+            if (value.startsWith('+61')) setCurrency('AUD')
+            else if (value.startsWith('+86')) setCurrency('CNY')
+            else if (value.startsWith('+44')) setCurrency('GBP')
+            else if (value.startsWith('+1')) setCurrency('USD')
+            else if (value.startsWith('+81')) setCurrency('JPY')
+            else if (value.startsWith('+33') || value.startsWith('+49')) setCurrency('EUR')
+            // Default to USD if not matched or if it's +1
+        }
+    }
+
+    const handlePhoneSignIn = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!phoneNumber || !isValidPhoneNumber(phoneNumber)) {
+            toast.error('Please enter a valid phone number')
+            return
+        }
+
+        setIsSigningUp(true)
+        setAuthError(null)
+        try {
+            const verifier = recaptchaVerifier || await setupRecaptcha()
+            const confirmation = await signInWithPhone(phoneNumber, verifier)
+            setConfirmationResult(confirmation)
+            toast.success('Verification code sent!')
+        } catch (error: any) {
+            console.error('Phone auth error:', error)
+            setAuthError(error.message || 'Failed to send code')
+            if (recaptchaVerifier) {
+                recaptchaVerifier.clear()
+                setRecaptchaVerifier(null)
+            }
+        } finally {
+            setIsSigningUp(false)
+        }
+    }
+
+    const handleVerifyPhoneCode = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!phoneCode) return
+
+        setIsSigningUp(true)
+        setAuthError(null)
+        try {
+            const result = await confirmationResult.confirm(phoneCode)
+            if (result?.user) {
+                await saveUserGoal(result.user.uid)
+            }
+            toast.success(t('auth.signInSuccess'))
+            router.push('/dashboard')
+        } catch (error: any) {
+            console.error('Code verification error:', error)
+            setAuthError('Invalid verification code')
         } finally {
             setIsSigningUp(false)
         }
@@ -188,6 +372,77 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                                 </button>
                             </div>
                         </form>
+                    ) : showPhoneForm ? (
+                        <div className="space-y-6 text-left">
+                            <div className="flex items-center mb-4">
+                                <button
+                                    onClick={() => {
+                                        setShowPhoneForm(false)
+                                        setConfirmationResult(null)
+                                        setPhoneNumber('')
+                                        setPhoneCode('')
+                                        setAuthError(null)
+                                    }}
+                                    className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
+                                >
+                                    ← Back to options
+                                </button>
+                            </div>
+
+                            {!confirmationResult ? (
+                                <form onSubmit={handlePhoneSignIn} className="space-y-6">
+                                    <div>
+                                        <label htmlFor="phone" className="block text-sm font-bold text-gray-700 mb-2">
+                                            Phone Number
+                                        </label>
+                                        <div className="phone-input-container">
+                                            <PhoneInput
+                                                international
+                                                defaultCountry="US"
+                                                value={phoneNumber}
+                                                onChange={handlePhoneChange}
+                                                className="w-full px-5 py-4 rounded-xl border border-gray-200 focus-within:ring-4 focus-within:ring-indigo-100 focus-within:border-indigo-500 transition-all outline-none text-gray-900 placeholder-gray-400 bg-white"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div id="recaptcha-container"></div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={isSigningUp}
+                                        className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg shadow-indigo-200"
+                                    >
+                                        {isSigningUp ? 'Sending Code...' : 'Send Verification Code'}
+                                    </button>
+                                </form>
+                            ) : (
+                                <form onSubmit={handleVerifyPhoneCode} className="space-y-6">
+                                    <div>
+                                        <label htmlFor="phoneCode" className="block text-sm font-bold text-gray-700 mb-2">
+                                            Verification Code
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="phoneCode"
+                                            value={phoneCode}
+                                            onChange={(e) => setPhoneCode(e.target.value)}
+                                            className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none text-gray-900 placeholder-gray-400 text-center text-2xl tracking-widest"
+                                            placeholder="123456"
+                                            maxLength={6}
+                                            required
+                                        />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={isSigningUp}
+                                        className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg shadow-indigo-200"
+                                    >
+                                        {isSigningUp ? 'Verifying...' : 'Verify & Sign In'}
+                                    </button>
+                                </form>
+                            )}
+                        </div>
                     ) : !showEmailForm ? (
                         <div className="space-y-4">
                             {/* ... Google and Email buttons ... */}
@@ -232,99 +487,174 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                                 <Mail className="w-5 h-5" />
                                 {t('auth.continueEmail')}
                             </button>
-                        </div>
-                    ) : (
-                        <form onSubmit={handleEmailAuth} className="space-y-4 text-left">
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">{t('auth.email')}</label>
-                                <input
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none text-gray-900 placeholder-gray-400"
-                                    placeholder="you@example.com"
-                                />
-                            </div>
-
-                            <div>
-                                <div className="flex justify-between items-center mb-1.5 ml-1">
-                                    <label className="block text-sm font-bold text-gray-700">{t('auth.password')}</label>
-                                    {isLoginMode && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowResetForm(true)}
-                                            className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
-                                        >
-                                            {t('auth.forgotPassword')}
-                                        </button>
-                                    )}
-                                </div>
-                                <input
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none text-gray-900 placeholder-gray-400"
-                                    placeholder="••••••••"
-                                    minLength={6}
-                                />
-                            </div>
 
                             <button
-                                type="submit"
-                                disabled={isSigningUp}
-                                className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg shadow-indigo-200 mt-6"
+                                onClick={() => setShowPhoneForm(true)}
+                                className="w-full bg-white border-2 border-gray-100 text-gray-700 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 hover:border-gray-200 transition-all flex items-center justify-center gap-2"
                             >
-                                {isSigningUp ? (
-                                    <Loader2 className="animate-spin" />
-                                ) : (
-                                    isLoginMode ? t('auth.signIn') : t('auth.signUp')
-                                )}
+                                <Phone className="w-5 h-5" />
+                                Continue with Phone
                             </button>
+                        </div>
+                    ) : (
+                        showVerification ? (
+                            <div className="space-y-4 text-left" >
+                                <div className="text-center mb-6">
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">Check your email</h3>
+                                    <p className="text-sm text-gray-600">
+                                        We sent a code to <span className="font-bold">{email}</span>
+                                    </p>
+                                </div>
 
-                            <div className="text-center mt-6">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">Verification Code</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={verificationCode}
+                                        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                        className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none text-gray-900 placeholder-gray-400 text-center text-2xl tracking-widest font-mono"
+                                        placeholder="000000"
+                                        maxLength={6}
+                                    />
+                                </div>
+
                                 <button
                                     type="button"
-                                    onClick={() => setIsLoginMode(!isLoginMode)}
-                                    className="text-indigo-600 hover:text-indigo-800 font-bold text-sm"
+                                    onClick={handleVerifyCode}
+                                    disabled={isSigningUp || verificationCode.length !== 6}
+                                    className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg shadow-indigo-200"
                                 >
-                                    {isLoginMode ? t('auth.createAccount') : t('auth.haveAccount')}
+                                    {isSigningUp ? (
+                                        <Loader2 className="animate-spin" />
+                                    ) : (
+                                        'Verify & Create Account'
+                                    )}
                                 </button>
-                            </div>
 
-                            <div className="text-center">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowEmailForm(false)}
-                                    className="text-gray-400 text-sm hover:text-gray-600 font-medium flex items-center justify-center gap-1 mx-auto"
-                                >
-                                    ← {t('common.back')}
-                                </button>
+                                <div className="text-center mt-4">
+                                    <button
+                                        type="button"
+                                        onClick={handleSendCode}
+                                        disabled={timer > 0}
+                                        className="text-indigo-600 hover:text-indigo-800 font-medium text-sm disabled:text-gray-400"
+                                    >
+                                        {timer > 0 ? `Resend code in ${timer}s` : 'Resend Code'}
+                                    </button>
+                                </div>
+
+                                <div className="text-center mt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowVerification(false)}
+                                        className="text-gray-400 text-sm hover:text-gray-600 font-medium"
+                                    >
+                                        ← Change Email
+                                    </button>
+                                </div>
                             </div>
-                        </form>
+                        ) : (
+                            <form onSubmit={handleEmailAuth} className="space-y-4 text-left">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">{t('auth.email')}</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none text-gray-900 placeholder-gray-400"
+                                        placeholder="you@example.com"
+                                    />
+                                </div>
+
+                                <div>
+                                    <div className="flex justify-between items-center mb-1.5 ml-1">
+                                        <label className="block text-sm font-bold text-gray-700">{t('auth.password')}</label>
+                                        {isLoginMode && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowResetForm(true)}
+                                                className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                                            >
+                                                {t('auth.forgotPassword')}
+                                            </button>
+                                        )}
+                                    </div>
+                                    <input
+                                        type="password"
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none text-gray-900 placeholder-gray-400"
+                                        placeholder="••••••••"
+                                        minLength={6}
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={isSigningUp}
+                                    className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg shadow-indigo-200 mt-6"
+                                >
+                                    {isSigningUp ? (
+                                        <Loader2 className="animate-spin" />
+                                    ) : (
+                                        isLoginMode ? t('auth.signIn') : t('auth.signUp')
+                                    )}
+                                </button>
+
+                                <div className="text-center mt-6">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsLoginMode(!isLoginMode)}
+                                        className="text-indigo-600 hover:text-indigo-800 font-bold text-sm"
+                                    >
+                                        {isLoginMode ? t('auth.createAccount') : t('auth.haveAccount')}
+                                    </button>
+                                </div>
+
+                                <div className="text-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowEmailForm(false)}
+                                        className="text-gray-400 text-sm hover:text-gray-600 font-medium flex items-center justify-center gap-1 mx-auto"
+                                    >
+                                        ← {t('common.back')}
+                                    </button>
+                                </div>
+                            </form>
+                        )
                     )}
 
                     <p className="text-xs text-gray-400 mt-8">
                         {t('onboarding.final.terms')}
                     </p>
-                </motion.div>
-            </div>
+                </motion.div >
+            </div >
         )
     }
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                {/* Progress Dots */}
-                <div className="flex justify-center gap-2 mb-8">
-                    {[0, 1, 2, 3].map(i => (
-                        <div
-                            key={i}
-                            className={`w-2 h-2 rounded-full transition-colors duration-300 ${i === step ? 'bg-indigo-600' : 'bg-gray-200'
-                                }`}
+                {/* Progress Bar */}
+                <div className="mb-8">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">
+                            Step {step + 1} of 3
+                        </span>
+                        <span className="text-xs text-gray-400 font-medium">
+                            {step === 0 ? 'Foundation' : step === 1 ? 'Discovery' : 'Visualization'}
+                        </span>
+                    </div>
+                    <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${((step + 1) / 3) * 100}%` }}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                            className="h-full bg-indigo-600 rounded-full"
                         />
-                    ))}
+                    </div>
                 </div>
 
                 <AnimatePresence mode="wait">
@@ -346,7 +676,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
                         >
-                            <PainStep onNext={handlePainNext} />
+                            <PainStep onNext={handlePainNext} currency={currency} />
                         </motion.div>
                     )}
 
@@ -357,7 +687,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
                         >
-                            <DreamStep annualLoss={data.wastedAmount * 12} onNext={handleDreamNext} />
+                            <DreamStep onNext={handleDreamNext} currency={currency} />
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -365,3 +695,4 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
         </div>
     )
 }
+

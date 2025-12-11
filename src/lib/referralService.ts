@@ -16,14 +16,15 @@ import {
 import { stripe } from './stripe';
 
 // Constants
+// Constants
 export const REWARD_MONTHS = 1; // 1 month free
-export const REWARD_AMOUNT_USD = 999; // $9.99 in cents
+export const REWARD_AMOUNT_FREE = 500; // $5.00 in cents
+export const REWARD_AMOUNT_PRO = 2000; // $20.00 in cents
 export const REFERRAL_LEVELS = {
     LEVEL_1: 1,
     LEVEL_2: 3,
     LEVEL_3: 10
 };
-
 export interface ReferralStats {
     userId: string;
     referralCode: string;
@@ -137,16 +138,21 @@ export async function trackReferralSignup(newUserId: string, referralCode: strin
  * Grants rewards to both parties.
  */
 async function grantReferralReward(referrerId: string, refereeId: string) {
-    // 1. Credit Referrer (Stripe Balance)
-    try {
-        // Get referrer's Stripe Customer ID
-        // We need to store stripeCustomerId in user profile or look it up.
-        // Assuming we can find it or we'll skip if not found.
-        // For this MVP, let's update Firestore stats first.
+    let rewardAmount = 0;
 
-        await runTransaction(db, async (transaction) => {
+    // 1. Credit Referrer (Firestore Update)
+    try {
+        rewardAmount = await runTransaction(db, async (transaction) => {
             const statsRef = doc(db, 'users', referrerId, 'referral_stats', 'summary');
             const statsDoc = await transaction.get(statsRef);
+
+            // Check Referrer's Subscription Status to determine reward
+            const userRef = doc(db, 'users', referrerId);
+            const userDoc = await transaction.get(userRef);
+            const userData = userDoc.data();
+            const isPro = userData?.subscription?.plan === 'pro' && userData?.subscription?.status === 'active';
+
+            const amount = isPro ? REWARD_AMOUNT_PRO : REWARD_AMOUNT_FREE;
 
             if (!statsDoc.exists()) {
                 throw new Error('Referrer stats not found');
@@ -162,21 +168,40 @@ async function grantReferralReward(referrerId: string, refereeId: string) {
 
             transaction.update(statsRef, {
                 totalReferrals: increment(1),
-                totalEarned: increment(REWARD_AMOUNT_USD), // Tracking value
+                totalEarned: increment(amount), // Tracking value
                 currentLevel: newLevel,
                 updatedAt: serverTimestamp()
             });
+
+            return amount;
         });
 
-        // TODO: Call Stripe to add customer balance transaction for Referrer
-        // This requires server-side Stripe key. We should do this in an API route or Server Action,
-        // not directly in client-side code if this file is shared. 
-        // *Correction*: This file `referralService.ts` imports `stripe` from `./stripe` which might be server-only?
-        // Let's check `src/lib/stripe.ts`. If it exports `stripe` initialized with secret key, it's server-only.
-
+        // 2. Credit Stripe (Server-Side Only)
         if (stripe) {
-            // We need the customer ID. 
-            // For now, we'll implement the Stripe credit in the API route that calls this service.
+            // We need the customer ID.
+            // Assumption: User document contains 'stripeCustomerId'
+            const referrerUserRef = doc(db, 'users', referrerId);
+            // In the runTransaction above we got userDoc, but that was inside the transaction callback.
+            // We are now outside the transaction (or need to stay inside/pass data out).
+            // Actually, we can't easily share the transaction scope with an async Stripe call 
+            // *inside* the transaction loop (Firestore transactions are synchronous-ish or shouldn't await external APIs).
+            // So we do it AFTER the transaction commits successfully.
+
+            // Re-fetch customer ID quickly (or better, get it from the earlier step if we restructure)
+            // For now, let's fetch it cleanly.
+            const userSnap = await getDoc(referrerUserRef);
+            const stripeCustomerId = userSnap.data()?.stripeCustomerId;
+
+            if (stripeCustomerId) {
+                await stripe.customers.createBalanceTransaction(stripeCustomerId, {
+                    amount: rewardAmount,
+                    currency: 'aud', // or user currency
+                    description: `Referral Reward for user ${refereeId}`
+                });
+                console.log(`Credited ${rewardAmount} to ${stripeCustomerId} for referral`);
+            } else {
+                console.warn(`Referrer ${referrerId} has no stripeCustomerId. Skipping Stripe credit.`);
+            }
         }
 
     } catch (error) {

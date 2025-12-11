@@ -57,6 +57,11 @@ const initializeFirebase = async () => {
       firebaseApp = initializeApp(firebaseConfig);
     }
     auth = getAuth(firebaseApp);
+
+    // Ensure persistence is set to LOCAL
+    const { setPersistence, browserLocalPersistence } = await import('firebase/auth');
+    await setPersistence(auth, browserLocalPersistence);
+
     db = getFirestore(firebaseApp);
     storage = getStorage(firebaseApp);
 
