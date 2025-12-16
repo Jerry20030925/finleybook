@@ -251,7 +251,7 @@ export default function ReportsPage() {
           .print-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; break-inside: avoid; box-shadow: none !important; }
         }
       `}</style>
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 print:p-0 print:max-w-none">
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 print:p-0 print:max-w-none pb-24 md:pb-6">
         {/* Letterhead */}
         <div className="hidden print:flex bg-slate-900 text-white p-10 mb-10 justify-between items-center print-color-adjust-exact border-b-4 border-slate-700">
           <div className="flex items-center gap-5">
@@ -315,7 +315,7 @@ export default function ReportsPage() {
               )}
             </div>
             <div className="flex flex-wrap gap-3">
-              <motion.button onClick={handlePrint} className="flex items-center justify-center h-10 px-4 bg-white border border-gray-200 text-gray-700 font-medium rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all text-sm" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <motion.button onClick={handlePrint} className="hidden md:flex items-center justify-center h-10 px-4 bg-white border border-gray-200 text-gray-700 font-medium rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all text-sm" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <PrinterIcon className="w-4 h-4 mr-2" />{t('reports.print')}
               </motion.button>
               {generatedPdfUrl ? (

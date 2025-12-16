@@ -140,6 +140,9 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Budget
     'budget.overBudget': 'Over budget by {amount}',
+    'budget.emptyTitle': 'No Budgets Yet',
+    'budget.emptyDesc': 'Set monthly spending limits to track your savings goals.',
+    'budget.createFirst': 'Create First Budget',
 
     // Auth
     'auth.welcomeBack': 'Welcome Back',
@@ -886,6 +889,9 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Budget
     'budget.overBudget': '超支 {amount}',
+    'budget.emptyTitle': '暂无预算',
+    'budget.emptyDesc': '设置每月支出上限，轻松实现储蓄目标。',
+    'budget.createFirst': '创建第一个预算',
 
     // Auth
     'auth.welcomeBack': '欢迎回来',

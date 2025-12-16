@@ -239,8 +239,7 @@ export default function NanoBanana({ transactions }: NanoBananaProps) {
                                 />
                             )}
 
-                            {/* Budget Line Mockup */}
-                            <ReferenceLine y={1000} stroke="gray" strokeDasharray="3 3" label={{ position: 'top', value: 'Budget Limit', fontSize: 10, fill: 'gray' }} />
+                            {/* Budget Line Removed - Dynamic later */}
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>

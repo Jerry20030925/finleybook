@@ -251,60 +251,76 @@ export default function BudgetPage() {
             }
           }}
         >
-          {budgets.map((budget) => {
-            const percentage = Math.min((budget.spent / budget.amount) * 100, 100)
-            return (
-              <motion.div
-                key={budget.id}
-                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
-                variants={{
-                  hidden: { opacity: 0, scale: 0.9 },
-                  show: { opacity: 1, scale: 1 }
-                }}
+          {budgets.length === 0 && !loading ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+              <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4">
+                <PlusIcon className="w-8 h-8" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">{t('budget.emptyTitle') || 'No Budgets Yet'}</h3>
+              <p className="text-gray-500 mb-6 max-w-xs">{t('budget.emptyDesc') || 'Set monthly spending limits to track your savings goals.'}</p>
+              <button
+                onClick={() => setShowModal(true)}
+                className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">{getCategoryName(budget.category)}</h3>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleEdit(budget)}
-                      className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                    >
-                      <PencilIcon className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(budget.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                    >
-                      <TrashIcon className="w-4 h-4" />
-                    </button>
+                {t('budget.createFirst') || 'Create First Budget'}
+              </button>
+            </div>
+          ) : (
+            budgets.map((budget) => {
+              const percentage = Math.min((budget.spent / budget.amount) * 100, 100)
+              return (
+                <motion.div
+                  key={budget.id}
+                  className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+                  variants={{
+                    hidden: { opacity: 0, scale: 0.9 },
+                    show: { opacity: 1, scale: 1 }
+                  }}
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">{getCategoryName(budget.category)}</h3>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(budget)}
+                        className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                      >
+                        <PencilIcon className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(budget.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>{t('budget.spent')} {formatAmount(budget.spent)}</span>
-                    <span>{t('budget.budgetAmount')} {formatAmount(budget.amount)}</span>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm text-gray-600 mb-2">
+                      <span>{t('budget.spent')} {formatAmount(budget.spent)}</span>
+                      <span>{t('budget.budgetAmount')} {formatAmount(budget.amount)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full ${getProgressColor(budget.spent, budget.amount)}`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {percentage.toFixed(1)}% {t('budget.used')}
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full ${getProgressColor(budget.spent, budget.amount)}`}
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {percentage.toFixed(1)}% {t('budget.used')}
-                  </div>
-                </div>
 
-                <div className="text-sm">
-                  <span className="text-gray-500">{t('budget.remaining')}</span>
-                  <span className={budget.amount - budget.spent >= 0 ? 'text-green-600' : 'text-red-600'}>
-                    {formatAmount(budget.amount - budget.spent)}
-                  </span>
-                </div>
-              </motion.div>
-            )
-          })}
+                  <div className="text-sm">
+                    <span className="text-gray-500">{t('budget.remaining')}</span>
+                    <span className={budget.amount - budget.spent >= 0 ? 'text-green-600' : 'text-red-600'}>
+                      {formatAmount(budget.amount - budget.spent)}
+                    </span>
+                  </div>
+                </motion.div>
+              )
+            })
+          )}
         </motion.div>
 
         {/* Add/Edit Budget Modal */}
