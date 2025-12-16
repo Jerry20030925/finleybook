@@ -115,9 +115,9 @@ export default function RootLayout({
           <ErrorBoundary>
             <AuthProvider>
               <NotificationProvider>
-                <SmartNotificationManager />
                 <CurrencyProvider>
                   <SubscriptionProvider>
+                    <SmartNotificationManager />
                     <NoSSR>
                       <AIChatInput />
                       <Navigation />
