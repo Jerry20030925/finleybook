@@ -208,7 +208,20 @@ export default function RecentTransactions() {
                 </motion.button>
               </motion.div>
             ) : (
-              <div className="space-y-3">
+              <motion.div
+                className="space-y-3"
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.1
+                    }
+                  }
+                }}
+                initial="hidden"
+                animate="show"
+              >
                 <AnimatePresence mode='popLayout'>
                   {transactions.map((transaction, index) => {
                     const isGroceries = transaction.category === 'Groceries' || transaction.category === '购物消费';
@@ -218,12 +231,14 @@ export default function RecentTransactions() {
                       <motion.div
                         key={transaction.id}
                         layout
-                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        variants={{
+                          hidden: { opacity: 0, y: 20, scale: 0.95 },
+                          show: { opacity: 1, y: 0, scale: 1 }
+                        }}
                         exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                         whileHover={{ scale: 1.01, y: -2 }}
                         whileTap={{ scale: 0.99 }}
-                        transition={{ duration: 0.3 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
                         className="group relative overflow-hidden bg-white border border-slate-100 rounded-2xl p-4 hover:border-primary-200 hover:shadow-md transition-all duration-300 cursor-pointer"
                       >
                         {/* Hover gradient background - More subtle and smooth */}
@@ -309,7 +324,7 @@ export default function RecentTransactions() {
                     </button>
                   </motion.div>
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
         </motion.div>

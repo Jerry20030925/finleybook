@@ -7,6 +7,7 @@ import { useAuth } from './AuthProvider'
 import { useCurrency } from './CurrencyProvider'
 import { useLanguage } from './LanguageProvider'
 import { Transaction } from '@/lib/dataService'
+import CountUp from './CountUp'
 
 interface FinancialOverviewProps {
   transactions?: Transaction[]
@@ -14,17 +15,19 @@ interface FinancialOverviewProps {
 
 interface FinancialStat {
   name: string
-  value: string
+  // value was string, but we want raw number for CountUp now.
+  // We will pass the raw value to CountUp and let it handle formatting.
+  // However, keeping standard structure is good.
   rawValue: number
   change: string
   changeType: 'positive' | 'negative' | 'neutral'
   description: string
   icon?: any
+  isPercentage?: boolean
 }
 
 export default function FinancialOverview({ transactions = [] }: FinancialOverviewProps) {
   const [stats, setStats] = useState<FinancialStat[]>([])
-  const [animatedValues, setAnimatedValues] = useState<{ [key: string]: number }>({})
   const [isLoading, setIsLoading] = useState(true)
   const [currentDate, setCurrentDate] = useState('')
 
@@ -37,7 +40,7 @@ export default function FinancialOverview({ transactions = [] }: FinancialOvervi
   }, [])
 
   const { user } = useAuth()
-  const { formatAmount } = useCurrency()
+  const { country } = useCurrency() // We need symbol for formatting wrapper
   const { t } = useLanguage()
 
   useEffect(() => {
@@ -64,7 +67,7 @@ export default function FinancialOverview({ transactions = [] }: FinancialOvervi
 
         const monthlyExpenses = monthlyTransactions
           .filter(t => t.type === 'expense')
-          .reduce((sum, t) => sum + Math.abs(t.amount), 0) // Ensure positive expense value
+          .reduce((sum, t) => sum + Math.abs(t.amount), 0)
 
         // Calculate total assets
         const totalIncome = transactions
@@ -86,7 +89,6 @@ export default function FinancialOverview({ transactions = [] }: FinancialOvervi
         const newStats: FinancialStat[] = [
           {
             name: t('dashboard.totalAssets'),
-            value: formatAmount(totalAssets),
             rawValue: totalAssets,
             change: '+0%',
             changeType: totalAssets >= 0 ? 'positive' : 'negative',
@@ -94,7 +96,6 @@ export default function FinancialOverview({ transactions = [] }: FinancialOvervi
           },
           {
             name: t('dashboard.monthlyExpenses'),
-            value: formatAmount(monthlyExpenses),
             rawValue: monthlyExpenses,
             change: '+0%',
             changeType: 'negative',
@@ -102,7 +103,6 @@ export default function FinancialOverview({ transactions = [] }: FinancialOvervi
           },
           {
             name: t('dashboard.pendingCashback'),
-            value: formatAmount(pendingCashback),
             rawValue: pendingCashback,
             change: '+0%',
             changeType: 'positive',
@@ -111,45 +111,15 @@ export default function FinancialOverview({ transactions = [] }: FinancialOvervi
           },
           {
             name: t('dashboard.savingsRate'),
-            value: `${Math.max(0, savingsRate).toFixed(1)}%`,
-            rawValue: savingsRate,
+            rawValue: Math.max(0, savingsRate),
             change: '+0%',
             changeType: savingsRate > 0 ? 'positive' : 'neutral',
-            description: t('dashboard.monthlySavingsRatio')
+            description: t('dashboard.monthlySavingsRatio'),
+            isPercentage: true
           }
         ]
 
         setStats(newStats)
-
-        // Settings animation targets
-        const targets = {
-          [t('dashboard.totalAssets')]: Math.abs(totalAssets),
-          [t('dashboard.monthlyExpenses')]: monthlyExpenses,
-          [t('dashboard.pendingCashback')]: pendingCashback,
-          [t('dashboard.savingsRate')]: Math.max(0, savingsRate)
-        }
-
-        // Start number animation
-        Object.entries(targets).forEach(([key, target]) => {
-          let start = 0
-          const duration = 2000
-          const startTime = Date.now()
-
-          const animate = () => {
-            const elapsed = Date.now() - startTime
-            const progress = Math.min(elapsed / duration, 1)
-            const easeOutCubic = 1 - Math.pow(1 - progress, 3)
-            const current = start + (target - start) * easeOutCubic
-
-            setAnimatedValues(prev => ({ ...prev, [key]: current }))
-
-            if (progress < 1) {
-              requestAnimationFrame(animate)
-            }
-          }
-
-          animate()
-        })
 
       } catch (error) {
         console.error('Error calculating financial data:', error)
@@ -159,18 +129,7 @@ export default function FinancialOverview({ transactions = [] }: FinancialOvervi
     }
 
     calculateFinancialData()
-    calculateFinancialData()
-  }, [user?.uid, t, transactions, formatAmount])
-
-  const formatValue = (stat: FinancialStat) => {
-    const animatedValue = animatedValues[stat.name]
-    if (animatedValue === undefined) return stat.value
-
-    if (stat.name === t('dashboard.savingsRate')) {
-      return `${animatedValue.toFixed(1)}%`
-    }
-    return formatAmount(Math.floor(animatedValue))
-  }
+  }, [user?.uid, t, transactions])
 
   return (
     <>
@@ -260,8 +219,8 @@ export default function FinancialOverview({ transactions = [] }: FinancialOvervi
                       )}
                     </motion.div>
                     <div className={`text-xs font-bold px-2 py-1 rounded-lg ${stat.changeType === 'positive' ? 'text-emerald-700 bg-emerald-50' :
-                        stat.changeType === 'negative' ? 'text-rose-700 bg-rose-50' :
-                          'text-slate-500 bg-slate-50'
+                      stat.changeType === 'negative' ? 'text-rose-700 bg-rose-50' :
+                        'text-slate-500 bg-slate-50'
                       }`}>
                       {stat.change}
                     </div>
@@ -269,14 +228,26 @@ export default function FinancialOverview({ transactions = [] }: FinancialOvervi
 
                   <dt className="text-sm font-medium text-slate-500 truncate mb-1">{stat.name}</dt>
                   <dd className="flex items-baseline">
-                    <motion.p
+                    <motion.div
                       className="text-2xl font-bold text-slate-900"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.2 + 0.1 * index }}
                     >
-                      {formatValue(stat)}
-                    </motion.p>
+                      {stat.isPercentage ? (
+                        <CountUp
+                          value={stat.rawValue}
+                          decimals={1}
+                          suffix="%"
+                        />
+                      ) : (
+                        <CountUp
+                          value={stat.rawValue}
+                          prefix={country.symbol}
+                          decimals={2}
+                        />
+                      )}
+                    </motion.div>
                   </dd>
                   <p className="mt-4 text-xs text-slate-400 font-medium">
                     {stat.description}
