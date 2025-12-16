@@ -11,7 +11,8 @@ import {
     TrophyIcon,
     EllipsisHorizontalIcon,
     CalculatorIcon,
-    UserIcon
+    UserIcon,
+    ChartBarIcon
 } from '@heroicons/react/24/outline'
 import {
     HomeIcon as HomeIconSolid,
@@ -28,48 +29,62 @@ import { isMobileApp } from '@/lib/mobileUtils'
 import { useAuth } from './AuthProvider'
 import { useSubscription } from './SubscriptionProvider'
 
+import { useGlobalModal } from './GlobalModalProvider'
+import { PlusIcon } from '@heroicons/react/24/solid'
+
 export default function BottomNavigation() {
     const pathname = usePathname()
     const { t } = useLanguage()
     const { user } = useAuth()
     const { isProMember } = useSubscription()
+    const { openAddTransaction } = useGlobalModal()
 
     // Authentication Guard
     if (!user) return null
 
-    // Only show on mobile app or small screens
-    // We can use CSS media queries to hide on desktop, and checks for mobile app
-    // But for the native app "feel", this is crucial.
-    // We'll enforce it via CSS mostly, but if isMobileApp is false, we might want to hide it entirely if it's desktop web.
-    // Actually, usually bottom nav is good for mobile web too.
-    // But let's stick to the user request: "Mobile Interface".
-
     if (!isMobileApp()) {
-        // Can also check window width if we want mobile web to have it, 
-        // but for now let's just show it if isMobileApp() to start, or maybe hidden md:hidden
+        // Option to hide on desktop if needed
     }
 
     const tabs = [
         { name: t('nav.dashboard'), href: '/dashboard', icon: HomeIcon, activeIcon: HomeIconSolid },
-        { name: t('nav.transactions'), href: '/transactions', icon: BanknotesIcon, activeIcon: BanknotesIconSolid },
+        { name: t('nav.reports'), href: '/reports', icon: ChartBarIcon, activeIcon: ChartBarIcon }, // Using Reports instead of Transactions list
+        { name: 'ADD', href: '#', icon: PlusIcon, activeIcon: PlusIcon, isAction: true }, // Special Action Button
         { name: t('nav.budget'), href: '/budget', icon: CalculatorIcon, activeIcon: CalculatorIconSolid },
-        { name: t('nav.goals'), href: '/goals', icon: TrophyIcon, activeIcon: TrophyIconSolid },
         { name: t('nav.me'), href: '/profile', icon: UserIcon, activeIcon: UserIconSolid },
     ]
-
-    // If we have too many, we might need a 'More' tab. 
-    // currently 5 which fits standard guidelines.
 
     return (
         <div className={clsx(
             "fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 pb-[env(safe-area-inset-bottom)] z-50",
-            // Hide on desktop (md and up) regardless of isMobileApp, just in case
             "md:hidden"
         )}>
-            <div className="flex justify-around items-center h-16">
+            <div className="flex justify-around items-end h-16 pb-1">
                 {tabs.map((tab) => {
                     const isActive = pathname === tab.href
                     const Icon = isActive ? tab.activeIcon : tab.icon
+
+                    if (tab.isAction) {
+                        return (
+                            <div key="add-action" className="relative -top-5">
+                                <motion.button
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={async () => {
+                                        if (isMobileApp() && isProMember) {
+                                            try {
+                                                const { Haptics, ImpactStyle } = await import('@capacitor/haptics')
+                                                await Haptics.impact({ style: ImpactStyle.Medium })
+                                            } catch (e) { }
+                                        }
+                                        openAddTransaction()
+                                    }}
+                                    className="w-14 h-14 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center border-4 border-white"
+                                >
+                                    <PlusIcon className="w-8 h-8" />
+                                </motion.button>
+                            </div>
+                        )
+                    }
 
                     return (
                         <Link
@@ -80,27 +95,17 @@ export default function BottomNavigation() {
                                     try {
                                         const { Haptics, ImpactStyle } = await import('@capacitor/haptics')
                                         await Haptics.impact({ style: ImpactStyle.Light })
-                                    } catch (e) {
-                                        // Ignore
-                                    }
+                                    } catch (e) { }
                                 }
                             }}
                             className={clsx(
-                                "flex flex-col items-center justify-center w-full h-full space-y-1 relative",
-                                isActive ? "text-primary-600" : "text-gray-500 hover:text-gray-700"
+                                "flex flex-col items-center justify-center w-full h-full space-y-1 relative pt-2",
+                                isActive ? "text-primary-600" : "text-gray-400 hover:text-gray-600"
                             )}
                         >
-                            {/* Animated Background Indicator (Optional, subtle) */}
-                            {isActive && (
-                                <motion.div
-                                    layoutId="bottomNavIndicator"
-                                    className="absolute -top-1 w-12 h-1 bg-primary-500 rounded-b-full"
-                                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                />
-                            )}
 
                             <motion.div
-                                animate={{ scale: isActive ? 1.1 : 1 }}
+                                animate={{ scale: isActive ? 1.1 : 1, y: isActive ? -2 : 0 }}
                                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                             >
                                 <Icon className="w-6 h-6" />

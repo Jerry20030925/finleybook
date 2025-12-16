@@ -11,6 +11,8 @@ import StructuredData from '@/components/StructuredData'
 import { Toaster } from 'react-hot-toast'
 import { LanguageProvider } from '@/components/LanguageProvider'
 import { CurrencyProvider } from '@/components/CurrencyProvider'
+import { GlobalModalProvider } from '@/components/GlobalModalProvider'
+import GlobalTransactionWrapper from '@/components/GlobalTransactionWrapper'
 import SmartNotificationManager from '@/components/SmartNotificationManager'
 import AIChatInput from '@/components/AIChatInput'
 import NoSSR from '@/components/NoSSR'
@@ -117,15 +119,18 @@ export default function RootLayout({
               <NotificationProvider>
                 <CurrencyProvider>
                   <SubscriptionProvider>
-                    <SmartNotificationManager />
-                    <NoSSR>
-                      <Navigation />
-                      <div className="pb-24 md:pb-0"> {/* Increased padding to 6rem (96px) for safe bottom nav */}
-                        {children}
-                      </div>
-                      <BottomNavigation />
-                      <Toaster position="top-right" />
-                    </NoSSR>
+                    <GlobalModalProvider>
+                      <SmartNotificationManager />
+                      <GlobalTransactionWrapper />
+                      <NoSSR>
+                        <Navigation />
+                        <div className="pb-24 md:pb-0"> {/* Increased padding to 6rem (96px) for safe bottom nav */}
+                          {children}
+                        </div>
+                        <BottomNavigation />
+                        <Toaster position="top-right" />
+                      </NoSSR>
+                    </GlobalModalProvider>
                   </SubscriptionProvider>
                 </CurrencyProvider>
               </NotificationProvider>
