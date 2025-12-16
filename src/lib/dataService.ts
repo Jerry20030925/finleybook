@@ -494,3 +494,68 @@ export const addCashbackTransaction = async (transaction: Omit<CashbackTransacti
   }
 }
 
+
+// --- Budget Operations ---
+
+export interface Budget {
+  id?: string
+  userId: string
+  category: string
+  amount: number
+  period: 'monthly' | 'yearly'
+  spent: number // Calculated field, not necessarily stored, but good to have in type
+  createdAt: Date
+}
+
+export const getBudgets = async (userId: string) => {
+  try {
+    const q = query(
+      collection(db, 'budgets'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate() || new Date()
+    })) as Budget[]
+  } catch (error) {
+    console.error('Error fetching budgets:', error)
+    return []
+  }
+}
+
+export const addBudget = async (budget: Omit<Budget, 'id' | 'createdAt' | 'spent'>) => {
+  try {
+    const budgetData = {
+      ...budget,
+      userId: budget.userId,
+      createdAt: Timestamp.now()
+    }
+    const docRef = await addDoc(collection(db, 'budgets'), budgetData)
+    return docRef.id
+  } catch (error) {
+    console.error('Error adding budget:', error)
+    throw error
+  }
+}
+
+export const updateBudget = async (budgetId: string, updates: Partial<Budget>) => {
+  try {
+    const docRef = doc(db, 'budgets', budgetId)
+    await updateDoc(docRef, updates)
+  } catch (error) {
+    console.error('Error updating budget:', error)
+    throw error
+  }
+}
+
+export const deleteBudget = async (budgetId: string) => {
+  try {
+    await deleteDoc(doc(db, 'budgets', budgetId))
+  } catch (error) {
+    console.error('Error deleting budget:', error)
+    throw error
+  }
+}

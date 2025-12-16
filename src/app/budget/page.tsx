@@ -5,18 +5,12 @@ import { motion } from 'framer-motion'
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
 
 import { useAuth } from '@/components/AuthProvider'
-import { getUserTransactions, DEFAULT_CATEGORIES } from '@/lib/dataService'
+import { getUserTransactions, DEFAULT_CATEGORIES, getBudgets, addBudget, updateBudget, deleteBudget, type Budget } from '@/lib/dataService'
 import toast from 'react-hot-toast'
 import { useLanguage } from '@/components/LanguageProvider'
 import { useCurrency } from '@/components/CurrencyProvider'
 
-interface Budget {
-  id: string
-  category: string
-  amount: number
-  period: 'monthly' | 'yearly'
-  spent: number
-}
+
 
 // Mapping from Chinese category names (stored in DB) to translation keys
 const CATEGORY_MAPPING: { [key: string]: string } = {
@@ -72,10 +66,14 @@ export default function BudgetPage() {
 
     try {
       setLoading(true)
-      // Load transactions to calculate spent amounts
+
+      // 1. Fetch Budgets (Real Data)
+      const fetchedBudgets = await getBudgets(user.uid)
+
+      // 2. Fetch Transactions for calculation (Real Data)
       const transactions = await getUserTransactions(user.uid, 1000)
 
-      // Get current month/year for calculations
+      // Get current month/year for monthly calculations
       const now = new Date()
       const currentMonth = now.getMonth()
       const currentYear = now.getFullYear()
@@ -91,22 +89,21 @@ export default function BudgetPage() {
 
           // Only include current month expenses
           if (transactionMonth === currentMonth && transactionYear === currentYear) {
+            // Normalize category if needed (assuming DB stores localized string or key)
+            // We match directly for now as simple string match
             const current = spentByCategory.get(transaction.category) || 0
             spentByCategory.set(transaction.category, current + transaction.amount)
           }
         }
       })
 
-      // Create sample budgets with real spent data
-      const sampleBudgets: Budget[] = [
-        { id: '1', category: '餐饮美食', amount: 1000, period: 'monthly', spent: spentByCategory.get('餐饮美食') || 0 },
-        { id: '2', category: '交通出行', amount: 500, period: 'monthly', spent: spentByCategory.get('交通出行') || 0 },
-        { id: '3', category: '购物消费', amount: 800, period: 'monthly', spent: spentByCategory.get('购物消费') || 0 },
-        { id: '4', category: '居住缴费', amount: 2000, period: 'monthly', spent: spentByCategory.get('居住缴费') || 0 },
-        { id: '5', category: '文化娱乐', amount: 400, period: 'monthly', spent: spentByCategory.get('文化娱乐') || 0 },
-      ]
+      // Merge budgets with calculated spent
+      const budgetsWithSpent = fetchedBudgets.map(b => ({
+        ...b,
+        spent: spentByCategory.get(b.category) || 0
+      }))
 
-      setBudgets(sampleBudgets)
+      setBudgets(budgetsWithSpent)
     } catch (error) {
       console.error('Error loading budgets:', error)
       toast.error(t('budget.loadError'))
@@ -115,33 +112,43 @@ export default function BudgetPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (!user?.uid) return
     if (!formData.category || !formData.amount) {
       toast.error(t('budget.fillComplete'))
       return
     }
 
-    const newBudget: Budget = {
-      id: editingBudget ? editingBudget.id : Date.now().toString(),
-      category: formData.category,
-      amount: parseFloat(formData.amount),
-      period: formData.period,
-      spent: editingBudget ? editingBudget.spent : 0
-    }
+    try {
+      if (editingBudget && editingBudget.id) {
+        await updateBudget(editingBudget.id, {
+          category: formData.category,
+          amount: parseFloat(formData.amount),
+          period: formData.period
+        })
+        toast.success(t('budget.updateSuccess'))
+      } else {
+        await addBudget({
+          userId: user.uid,
+          category: formData.category,
+          amount: parseFloat(formData.amount),
+          period: formData.period
+        })
+        toast.success(t('budget.addSuccess'))
+      }
 
-    if (editingBudget) {
-      setBudgets(prev => prev.map(b => b.id === editingBudget.id ? newBudget : b))
-      toast.success(t('budget.updateSuccess'))
-    } else {
-      setBudgets(prev => [...prev, newBudget])
-      toast.success(t('budget.addSuccess'))
-    }
+      // Reload to reflect changes
+      await loadBudgets()
 
-    setFormData({ category: '', amount: '', period: 'monthly' })
-    setShowModal(false)
-    setEditingBudget(null)
+      setFormData({ category: '', amount: '', period: 'monthly' })
+      setShowModal(false)
+      setEditingBudget(null)
+    } catch (error) {
+      console.error('Error saving budget:', error)
+      toast.error(t('budget.error'))
+    }
   }
 
   const handleEdit = (budget: Budget) => {
@@ -154,9 +161,17 @@ export default function BudgetPage() {
     setShowModal(true)
   }
 
-  const handleDelete = (id: string) => {
-    setBudgets(prev => prev.filter(b => b.id !== id))
-    toast.success(t('budget.deleteSuccess'))
+  const handleDelete = async (id: string) => {
+    if (!confirm(t('common.confirmDelete') || 'Are you sure?')) return
+
+    try {
+      await deleteBudget(id)
+      toast.success(t('budget.deleteSuccess'))
+      await loadBudgets()
+    } catch (error) {
+      console.error('Error deleting budget:', error)
+      toast.error(t('budget.error'))
+    }
   }
 
   const getProgressColor = (spent: number, budget: number) => {
@@ -281,13 +296,13 @@ export default function BudgetPage() {
                     <h3 className="text-lg font-medium text-gray-900">{getCategoryName(budget.category)}</h3>
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleEdit(budget)}
+                        onClick={() => budget.id && handleEdit(budget)}
                         className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
                       >
                         <PencilIcon className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(budget.id)}
+                        onClick={() => budget.id && handleDelete(budget.id)}
                         className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                       >
                         <TrashIcon className="w-4 h-4" />

@@ -12,7 +12,7 @@ import QuickActions from './QuickActions'
 import FinancialGarden from './Dashboard/FinancialGarden'
 import CashbackCard from './Dashboard/CashbackCard'
 import VisionBoard from './VisionBoard'
-import { getUserTransactions, Transaction, addTransaction, getGoals, Goal } from '@/lib/dataService'
+import { getUserTransactions, Transaction, addTransaction, getGoals, Goal, getBudgets } from '@/lib/dataService'
 import { collection, query, where, orderBy, limit, onSnapshot, addDoc, doc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useLanguage } from './LanguageProvider'
@@ -113,6 +113,11 @@ export default function Dashboard() {
             setPrimaryGoal(goals[0])
           }
         })
+
+        // 4. Fetch Budgets for Total Monthly Spend Limit
+        const budgets = await getBudgets(user.uid)
+        const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0)
+        setMonthlyBudget(totalBudget)
 
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error)
