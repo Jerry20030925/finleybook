@@ -9,6 +9,7 @@ import RecentTransactions from './RecentTransactions'
 import NanoBanana from './NanoBanana'
 import SmartSuggestions from './Dashboard/SmartSuggestions'
 import QuickActions from './QuickActions'
+import TouchableScale from './TouchableScale'
 import FinancialGarden from './Dashboard/FinancialGarden'
 import CashbackCard from './Dashboard/CashbackCard'
 import VisionBoard from './VisionBoard'
@@ -237,15 +238,12 @@ export default function Dashboard() {
               />
 
               {/* 1. HERO: Financial Overview (Top Anchor) */}
-              <motion.div
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  show: { opacity: 1, y: 0 }
-                }}
-                className="mb-8"
+              <TouchableScale
+                className="mb-8 block"
+                scale={0.98}
               >
                 <FinancialOverview transactions={transactions} />
-              </motion.div>
+              </TouchableScale>
 
               {/* Main Grid Layout (66% Left / 33% Right) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
@@ -264,26 +262,19 @@ export default function Dashboard() {
                   </motion.div>
 
                   {/* 3. Recent Transactions (High Usage) */}
-                  <motion.div
-                    variants={{
-                      hidden: { opacity: 0, y: 20 },
-                      show: { opacity: 1, y: 0 }
-                    }}
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  <TouchableScale
+                    scale={0.99}
+                    onClick={() => router.push('/transactions')}
                   >
                     <RecentTransactions />
-                  </motion.div>
+                  </TouchableScale>
 
                   {/* 4. Charts (Secondary) */}
-                  <motion.div
-                    variants={{
-                      hidden: { opacity: 0, y: 20 },
-                      show: { opacity: 1, y: 0 }
-                    }}
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  <TouchableScale
+                    scale={0.99}
                   >
                     <NanoBanana transactions={transactions} />
-                  </motion.div>
+                  </TouchableScale>
                 </div>
 
                 {/* Right Column (33% -> col-span-4) - ACTION & INSIGHTS */}
