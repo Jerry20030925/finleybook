@@ -119,7 +119,6 @@ export default function RootLayout({
                   <SubscriptionProvider>
                     <SmartNotificationManager />
                     <NoSSR>
-                      <AIChatInput />
                       <Navigation />
                       <div className="pb-24 md:pb-0"> {/* Increased padding to 6rem (96px) for safe bottom nav */}
                         {children}

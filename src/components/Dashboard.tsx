@@ -247,18 +247,18 @@ export default function Dashboard() {
                 {/* Left Column (66% -> col-span-8) - DATA HEAVY */}
                 <div className="lg:col-span-8 space-y-4 md:space-y-8">
 
-                  {/* 2. Charts (NanoBanana) */}
+                  {/* 2. Quick Actions (Prioritized for Mobile) */}
                   <motion.div
                     variants={{
                       hidden: { opacity: 0, y: 20 },
                       show: { opacity: 1, y: 0 }
                     }}
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                    className="mb-2"
                   >
-                    <NanoBanana transactions={transactions} />
+                    <QuickActions onInvite={() => setShowInviteModal(true)} onDataRefresh={fetchTransactions} />
                   </motion.div>
 
-                  {/* 3. Recent Transactions */}
+                  {/* 3. Recent Transactions (High Usage) */}
                   <motion.div
                     variants={{
                       hidden: { opacity: 0, y: 20 },
@@ -267,6 +267,17 @@ export default function Dashboard() {
                     whileHover={{ y: -4, transition: { duration: 0.2 } }}
                   >
                     <RecentTransactions />
+                  </motion.div>
+
+                  {/* 4. Charts (Secondary) */}
+                  <motion.div
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      show: { opacity: 1, y: 0 }
+                    }}
+                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  >
+                    <NanoBanana transactions={transactions} />
                   </motion.div>
                 </div>
 
@@ -333,15 +344,7 @@ export default function Dashboard() {
                     </Link>
                   </motion.div>
 
-                  {/* 5. Quick Actions */}
-                  <motion.div
-                    variants={{
-                      hidden: { opacity: 0, y: 20 },
-                      show: { opacity: 1, y: 0 }
-                    }}
-                  >
-                    <QuickActions onInvite={() => setShowInviteModal(true)} onDataRefresh={fetchTransactions} />
-                  </motion.div>
+                  {/* 5. Quick Actions - MOVED UP */}
                 </div>
               </div>
             </motion.main>

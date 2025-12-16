@@ -21,9 +21,26 @@ interface ParsedTransaction {
     emotional_context: 'happy' | 'stress' | 'impulse' | 'sad' | 'neutral'
 }
 
-export default function AIChatInput() {
+interface AIChatInputProps {
+    isOpen?: boolean
+    onClose?: () => void
+    trigger?: React.ReactNode // Optional custom trigger
+}
+
+export default function AIChatInput({ isOpen: externalIsOpen, onClose: externalOnClose, trigger }: AIChatInputProps = {}) {
     const { user } = useAuth()
-    const [isOpen, setIsOpen] = useState(false)
+    const [internalIsOpen, setInternalIsOpen] = useState(false)
+
+    // Controlled vs Uncontrolled logic
+    const isControlled = externalIsOpen !== undefined
+    const isOpen = isControlled ? externalIsOpen : internalIsOpen
+    const setIsOpen = (value: boolean) => {
+        if (isControlled) {
+            if (!value && externalOnClose) externalOnClose()
+        } else {
+            setInternalIsOpen(value)
+        }
+    }
     const [input, setInput] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [parsedTx, setParsedTx] = useState<ParsedTransaction | null>(null)
@@ -177,18 +194,22 @@ export default function AIChatInput() {
                 )}
             </AnimatePresence>
 
-            {/* Floating Action Button */}
-            <motion.button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-2xl text-white transition-all ${isOpen ? 'bg-gray-800 rotate-90' : 'bg-gradient-to-r from-cyan-500 to-blue-600'
-                    }`}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                initial={false}
-                animate={isOpen ? { rotate: 90 } : { rotate: 0 }}
-            >
-                {isOpen ? <XMarkIcon className="w-6 h-6" /> : <SparklesIcon className="w-6 h-6 animate-pulse" />}
-            </motion.button>
+            {/* Trigger Button (Custom or Floating FAB) */}
+            {trigger ? (
+                <div onClick={() => setIsOpen(!isOpen)}>{trigger}</div>
+            ) : !isControlled && (
+                <motion.button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className={`fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-2xl text-white transition-all ${isOpen ? 'bg-gray-800 rotate-90' : 'bg-gradient-to-r from-cyan-500 to-blue-600'
+                        }`}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    initial={false}
+                    animate={isOpen ? { rotate: 90 } : { rotate: 0 }}
+                >
+                    {isOpen ? <XMarkIcon className="w-6 h-6" /> : <SparklesIcon className="w-6 h-6 animate-pulse" />}
+                </motion.button>
+            )}
 
             {/* Chat Interface */}
             <AnimatePresence>

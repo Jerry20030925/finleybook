@@ -11,6 +11,8 @@ import { motion } from 'framer-motion'
 import SubscriptionStatus from '@/components/SubscriptionStatus'
 import ReferralGiftCard from '@/components/ReferralGiftCard'
 import { useCurrency } from '@/components/CurrencyProvider'
+import AIChatInput from '@/components/AIChatInput'
+import { SparklesIcon } from '@heroicons/react/24/solid'
 
 export default function ProfilePage() {
     const { user, loading } = useAuth()
@@ -276,7 +278,39 @@ export default function ProfilePage() {
                         <SubscriptionStatus />
                     </div>
                 </div>
+                {/* AI Assistant Access */}
+                <div className="bg-gradient-to-r from-gray-900 via-slate-800 to-gray-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <SparklesIcon className="w-32 h-32 transform rotate-12 translate-x-8 -translate-y-8" />
+                    </div>
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="p-2 bg-blue-500/20 rounded-lg backdrop-blur-sm">
+                                <SparklesIcon className="w-6 h-6 text-blue-400" />
+                            </div>
+                            <h3 className="text-xl font-bold">Finley AI Assistant</h3>
+                        </div>
+                        <p className="text-gray-300 text-sm mb-4 max-w-sm">
+                            Your personal financial intelligence. Ask about your spending, set goals, or get savings tips.
+                        </p>
+                        <AIChatInput
+                            trigger={
+                                <button className="bg-white text-gray-900 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors shadow-lg active:scale-95 flex items-center gap-2">
+                                    <SparklesIcon className="w-4 h-4 text-blue-600" />
+                                    Launch Assistant
+                                </button>
+                            }
+                        />
+                    </div>
+                </div>
+
             </div >
+
+            {/* Background decoration */}
+            <div className="fixed inset-0 pointer-events-none z-0 opacity-30">
+                <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-blue-50 to-transparent" />
+            </div>
+
         </div >
     )
 }
