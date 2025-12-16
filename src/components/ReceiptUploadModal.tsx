@@ -105,17 +105,17 @@ export default function ReceiptUploadModal({ onClose }: ReceiptUploadModalProps)
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-end justify-center p-0 sm:p-4 text-center sm:items-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
+              enterFrom="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
+              enterTo="opacity-100 translate-y-0 sm:scale-100"
               leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
+              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+              leaveTo="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-lg">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-t-2xl sm:rounded-2xl bg-white text-left shadow-2xl transition-all w-full sm:w-full sm:max-w-lg h-[85vh] sm:h-auto overflow-y-scroll sm:overflow-visible absolute bottom-0 sm:relative sm:bottom-auto">
 
                 {/* Header */}
                 <div className="relative p-6 border-b border-gray-100 bg-gray-50/50">
@@ -143,8 +143,8 @@ export default function ReceiptUploadModal({ onClose }: ReceiptUploadModalProps)
                     <div
                       {...getRootProps()}
                       className={`relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 ${isDragActive
-                          ? 'border-primary-500 bg-primary-50'
-                          : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
                         }`}
                     >
                       <input {...getInputProps()} />

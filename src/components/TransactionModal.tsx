@@ -149,21 +149,21 @@ export default function TransactionModal({ isOpen, onClose, onSuccess }: Transac
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-0">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
-              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              enterFrom="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
               enterTo="opacity-100 translate-y-0 sm:scale-100"
               leave="ease-in duration-200"
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              leaveTo="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-t-2xl sm:rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all w-full sm:my-8 sm:w-full sm:max-w-lg sm:p-6 h-[85vh] sm:h-auto overflow-y-scroll sm:overflow-visible">
+                <div className="absolute right-4 top-4 block z-10">
                   <button
                     type="button"
-                    className="rounded-md bg-white text-gray-400 hover:text-gray-500"
+                    className="rounded-full bg-gray-100 p-1 text-gray-400 hover:text-gray-500 focus:outline-none"
                     onClick={onClose}
                   >
                     <XMarkIcon className="h-6 w-6" />

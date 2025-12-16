@@ -475,6 +475,7 @@ const translations: Record<Language, Record<string, string>> = {
     'reports.title': 'Financial Reports',
     'reports.subtitle': 'Professional financial analysis and trend insights',
     'reports.print': 'Print / Save as PDF',
+    'reports.downloadPDF': 'Download PDF',
     'reports.exportCSV': 'Export CSV',
     'reports.timeRange.currentMonth': 'This Month',
     'reports.timeRange.lastMonth': 'Last Month',
@@ -667,6 +668,54 @@ const translations: Record<Language, Record<string, string>> = {
     'level.tooltip.desc': 'Invite friends to upgrade your level. Higher levels unlock exclusive badges and rewards.',
     'level.tooltip.next': 'Next Level: Invite {count} more friends',
 
+    // Error Boundary
+    'error.title': 'Oops, something went wrong',
+    'error.desc': 'The app encountered an unexpected error. Your data is safe. Please try refreshing the page.',
+    'error.refresh': 'Refresh Page',
+    'error.details': 'View Error Details (Dev)',
+
+    // Wallet - New Additions
+    'wallet.status.level.gold': 'Gold Saver',
+    'wallet.status.level.silver': 'Silver Saver',
+    'wallet.status.level.bronze': 'Bronze Saver',
+    'wallet.status.keepEarning': 'Keep earning to level up!',
+    'wallet.stripe.connecting': 'Connecting to Stripe...',
+    'wallet.stripe.redirecting': 'Redirecting to Stripe...',
+    'wallet.stripe.error': 'Failed to connect Stripe account',
+    'wallet.withdraw.success': 'Withdrawal initiated! Funds are on the way.',
+    'wallet.withdraw.minAmount': 'You need at least $0.01 to withdraw.',
+    'wallet.pending.status.pending': 'Pending',
+    'wallet.pending.status.approved': 'Approved',
+    'wallet.pending.status.ready': 'Ready',
+
+    // Wealth - New Additions
+    'wealth.tooltip.howItWorks.title': 'How Cashback Works',
+    'wealth.tooltip.howItWorks.desc': 'We track your click to the merchant. When you make a purchase, the merchant notifies us (usually within 3-5 days), and we credit your wallet.',
+    'wealth.search.recent': 'Recent Searches',
+    'wealth.search.clear': 'Clear',
+    'wealth.section.featured': 'Featured Products',
+    'wealth.section.matching': 'Matching Stores',
+    'wealth.section.trending': 'Trending Stores',
+    'wealth.noResults.tip': 'Try searching for broader terms like "Tech" or "Shoes"',
+
+    // Landing Page
+    'landing.hero.demo.guest': 'Try Demo (Guest)',
+    'landing.hero.demo.viz.totalBalance': 'Total Balance',
+    'landing.hero.demo.viz.monthlyBudget': 'Monthly Budget',
+    'landing.demo.title': 'Experience the Power',
+    'landing.demo.subtitle': 'See how FinleyBook transforms your financial data.',
+    'landing.demo.viz.totalAssets': 'Total Assets',
+    'landing.demo.viz.income': 'Income',
+    'landing.demo.viz.expense': 'Expense',
+    'landing.footer.pricing': 'Pricing',
+    'landing.footer.blog': 'Blog',
+    'landing.footer.about': 'About',
+
+    'landing.stats.trusted': 'Trusted by Users',
+    'landing.stats.desc': 'Join thousands of users on their journey to financial intelligence.',
+    'landing.stats.users': 'Active Users',
+    'landing.stats.assets': 'Assets Managed',
+    'landing.stats.reviews': 'User Rating',
 
   },
   zh: {
@@ -682,6 +731,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.budget': '预算管理',
     'nav.goals': '理财目标',
     'nav.reports': '报表分析',
+    'reports.downloadPDF': '下载 PDF',
     'nav.settings': '设置',
     'nav.profile': '个人资料',
     'nav.subscription': '订阅管理',
@@ -791,6 +841,49 @@ const translations: Record<Language, Record<string, string>> = {
     'quickActions.inviteFriend': '邀请好友',
     'quickActions.inviteFriendDesc': '送 Pro 会员',
 
+    // Wallet - New Additions
+    'wallet.status.level.gold': '金牌储蓄家',
+    'wallet.status.level.silver': '银牌储蓄家',
+    'wallet.status.level.bronze': '铜牌储蓄家',
+    'wallet.status.keepEarning': '继续赚取返利以升级！',
+    'wallet.stripe.connecting': '正在连接 Stripe...',
+    'wallet.stripe.redirecting': '正在跳转至 Stripe...',
+    'wallet.stripe.error': '连接 Stripe 账户失败',
+    'wallet.withdraw.success': '提现已发起！资金正在路上。',
+    'wallet.withdraw.minAmount': '提现金额至少需要 $0.01。',
+    'wallet.pending.status.pending': '处理中',
+    'wallet.pending.status.approved': '已批准',
+    'wallet.pending.status.ready': '可提现',
+
+    // Wealth - New Additions
+    'wealth.tooltip.howItWorks.title': '返利如何运作',
+    'wealth.tooltip.howItWorks.desc': '我们会追踪您到商家的点击。当您完成购买后，商家会通知我们（通常在 3-5 天内），我们会将返利存入您的钱包。',
+    'wealth.search.recent': '最近搜索',
+    'wealth.search.clear': '清除',
+    'wealth.section.featured': '精选商品',
+    'wealth.section.matching': '匹配商家',
+    'wealth.section.trending': '热门商家',
+    'wealth.noResults.tip': '尝试搜索更广泛的关键词，如“科技”或“鞋子”',
+
+    // Landing Page
+    'landing.hero.demo.guest': '体验演示 (游客)',
+    'landing.hero.demo.viz.totalBalance': '总余额',
+    'landing.hero.demo.viz.monthlyBudget': '月度预算',
+    'landing.demo.title': '体验强大功能',
+    'landing.demo.subtitle': '看看 FinleyBook 如何改变您的财务管理方式。',
+    'landing.demo.viz.totalAssets': '总资产',
+    'landing.demo.viz.income': '收入',
+    'landing.demo.viz.expense': '支出',
+    'landing.footer.pricing': '定价',
+    'landing.footer.blog': '博客',
+    'landing.footer.about': '关于我们',
+
+    'landing.stats.trusted': '深受用户信赖',
+    'landing.stats.desc': '加入数万名用户的行列，开始您的智能财务之旅',
+    'landing.stats.users': '活跃用户',
+    'landing.stats.assets': '管理资产',
+    'landing.stats.reviews': '用户好评',
+
     // Budget
     'budget.overBudget': '超支 {amount}',
 
@@ -798,6 +891,12 @@ const translations: Record<Language, Record<string, string>> = {
     'auth.welcomeBack': '欢迎回来',
     'auth.createAccount': '创建账户',
     'auth.signIn': '登录',
+
+    // Error Boundary
+    'error.title': '哎呀，出现了问题',
+    'error.desc': '应用遇到了意外错误，别担心，您的数据是安全的。请尝试刷新页面重试。',
+    'error.refresh': '刷新页面',
+    'error.details': '查看错误详情 (开发模式)',
     'auth.signUp': '注册',
     'auth.email': '邮箱',
     'auth.password': '密码',

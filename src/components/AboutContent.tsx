@@ -15,194 +15,194 @@ import { useLanguage } from '@/components/LanguageProvider'
 const translations = {
     zh: {
         hero: {
-            title_prefix: '让您的梦想',
-            title_highlight: '落地生根',
-            description: 'FinleyBook 不仅仅是一个工具，它是您2025年的显化引擎。我们将抽象的愿景板转化为具体的每日任务，让梦想不再是空想。',
-            cta: '开始显化'
+            title_prefix: '让您的财富',
+            title_highlight: '因AI而增值',
+            description: 'FinleyBook 不仅仅是一个记账工具，它是您2025年的智能财富控制中心。我们将繁琐的财务数据转化为清晰的行动指南，让每一分钱都为您工作。',
+            cta: '开启财富之旅'
         },
         stats: [
-            { label: '愿景板生成', value: '50万+' },
-            { label: '每日任务完成', value: '200万+' },
-            { label: '梦想达成', value: '1万+' },
+            { label: '资产追踪总额', value: '$500M+' },
+            { label: '节省开支', value: '$2M+' },
+            { label: '返现发放', value: '$500k+' },
             { label: '用户好评', value: '4.9/5' }
         ],
         mission: {
             title: '我们的使命',
-            description: '在这个充满噪音的世界，我们帮助您找回内心的声音。通过AI技术，我们将“吸引力法则”变得结构化、可执行、可追踪。',
+            description: '在这个充满噪音的金融世界，我们致力于为您提供清晰、客观、个性化的财富洞察。通过AI技术，我们将“财务自由”变得结构化、可执行、可追踪。',
             features: [
                 {
                     icon: LightBulbIcon,
-                    title: 'AI 愿景拆解',
-                    description: '上传您的梦想图片，AI 自动将其拆解为第一周需要执行的3个关键行动。'
+                    title: 'AI 财务诊断',
+                    description: '不仅是记录，更是分析。AI 诊断您的消费习惯，自动发现省钱机会和投资漏洞。'
                 },
                 {
                     icon: ShieldCheckIcon,
-                    title: '每日显化追踪',
-                    description: '不再是年底的遗憾，而是每天的一小步。我们追踪您的每一个微小进步。'
+                    title: '银行级安全',
+                    description: '您的数据安全是我们的生命线。我们采用 SOC2 标准和 256位加密，确保资产信息万无一失。'
                 },
                 {
                     icon: ChartBarIcon,
-                    title: '能量数据分析',
-                    description: '分析您的行动模式，找出阻碍您显化的潜在障碍。'
+                    title: '现金流预测',
+                    description: '不仅仅看过去，更要看未来。只需一键，即可生成未来资产趋势图。'
                 },
                 {
                     icon: HeartIcon,
-                    title: '梦想社区',
-                    description: '连接志同道合的追梦人，共享显化能量。'
+                    title: '财富社区',
+                    description: '加入那些认真对待财富的人。分享投资心得，获取真实的市场洞察。'
                 }
             ]
         },
         team: {
-            title: '造梦团队',
-            description: '我们是一群相信“显化科技”的工程师、心理学家和艺术家。',
+            title: '核心团队',
+            description: '我们是一群来自金融科技、网络安全和AI领域的专家。',
             members: [
                 {
                     name: '张明',
-                    role: '创始人 & 首席显化官',
-                    description: '前阿里巴巴技术专家，致力于将古老的智慧与现代AI技术相结合。',
+                    role: '创始人 & CEO',
+                    description: '前阿里巴巴金融科技专家，致力于用技术降低财富管理的门槛。',
                     image: 'https://ui-avatars.com/api/?name=张明&background=0ea5e9&color=fff&size=200'
                 },
                 {
                     name: '李欣',
-                    role: '产品设计负责人',
-                    description: '心理学硕士，专注于如何通过视觉刺激激发潜意识的行动力。',
+                    role: '首席产品官',
+                    description: '拥有CFA认证，专注于打造既专业又易用的金融产品体验。',
                     image: 'https://ui-avatars.com/api/?name=李欣&background=10b981&color=fff&size=200'
                 },
                 {
                     name: '王涛',
-                    role: 'AI算法专家',
-                    description: '构建了核心的“图像转任务”引擎，让每一张愿景图都能说话。',
+                    role: '首席技术官',
+                    description: '负责构建我们安全、高频的金融数据处理引擎。',
                     image: 'https://ui-avatars.com/api/?name=王涛&background=8b5cf6&color=fff&size=200'
                 },
                 {
                     name: '赵雅',
-                    role: '社区运营',
-                    description: '致力于打造温暖、支持性的追梦社区环境。',
+                    role: '用户成功总监',
+                    description: '确保每一位用户都能通过我们的工具实现真正的财富增长。',
                     image: 'https://ui-avatars.com/api/?name=赵雅&background=f59e0b&color=fff&size=200'
                 }
             ]
         },
         values: {
-            title: '核心理念',
+            title: '核心价值观',
             items: [
                 {
                     icon: GlobeAsiaAustraliaIcon,
-                    title: '知行合一',
-                    description: '真正的显化不在于想，而在于做。我们是行动派的信仰者。'
+                    title: '数据驱动',
+                    description: '我们相信数字不说谎。在此基础上做出的决策，才是最理性的。'
                 },
                 {
                     icon: UserGroupIcon,
                     title: '长期主义',
-                    description: '不追求一夜暴富，相信复利的力量，无论是财富还是个人成长。'
+                    description: '我们不追求短期博弈，专注于为您创造长期的复利价值。'
                 },
                 {
                     icon: LightBulbIcon,
-                    title: '科技赋能',
-                    description: '用最前沿的AI技术，服务最古老的人类梦想。'
+                    title: '技术普惠',
+                    description: '让每个人都能享受到私人银行级别的财富管理服务。'
                 }
             ]
         },
         cta_section: {
-            title: '2025，是您显化的一年',
-            description: '别再等待了。现在就上传您的第一张愿景图。',
-            start: '立即开始',
-            learn_more: '阅读显化指南'
+            title: '您的财富，值得更好的管理',
+            description: '别再让钱在不知不觉中流失。现在就开始智能化管理。',
+            start: '免费开始',
+            learn_more: '了解功能'
         }
     },
     en: {
         hero: {
-            title_prefix: 'Turn Dreams Into',
-            title_highlight: 'Daily Missions',
-            description: 'FinleyBook is not just a tool; it is your Manifestation Engine for 2025. We transform abstract vision boards into concrete daily missions, making dreams actionable.',
-            cta: 'Start Manifesting'
+            title_prefix: 'Empower Your Wealth',
+            title_highlight: 'With AI Intelligence',
+            description: 'FinleyBook is not just a tool; it is your intelligent Wealth Command Center for 2025. We transform complex financial data into clear, actionable daily insights.',
+            cta: 'Start Growing Wealth'
         },
         stats: [
-            { label: 'Vision Boards Created', value: '500k+' },
-            { label: 'Daily Missions Done', value: '2M+' },
-            { label: 'Dreams Achieved', value: '10k+' },
+            { label: 'Assets Tracked', value: '$500M+' },
+            { label: 'Money Saved', value: '$2M+' },
+            { label: 'Cashback Paid', value: '$500k+' },
             { label: 'User Rating', value: '4.9/5' }
         ],
         mission: {
             title: 'Our Mission',
-            description: 'In a noisy world, we help you find your inner voice. Using AI, we structure the "Law of Attraction" into an actionable, trackable system.',
+            description: 'In a noisy financial world, we provide clarity. Using AI, we structure "Financial Freedom" into an actionable, trackable system for everyone.',
             features: [
                 {
                     icon: LightBulbIcon,
-                    title: 'AI Vision Breakdown',
-                    description: 'Upload your dream image, and AI automatically breaks it down into 3 key actions for the first week.'
+                    title: 'AI Financial Diagnostics',
+                    description: 'More than just tracking. AI analyzes your habits to automatically find savings and investment gaps.'
                 },
                 {
                     icon: ShieldCheckIcon,
-                    title: 'Daily Manifestation Tracking',
-                    description: 'Not just a year-end regret, but a daily step forward. We track every micro-progress you make.'
+                    title: 'Bank-Grade Security',
+                    description: 'We treat your data like our own. SOC2 compliant standards and 256-bit encryption keep your assets safe.'
                 },
                 {
                     icon: ChartBarIcon,
-                    title: 'Energy Analytics',
-                    description: 'Analyze your action patterns to find potential blocks hindering your manifestation.'
+                    title: 'Cashflow Forecasting',
+                    description: 'Don\'t just look back. See your financial future with our predictive trend analysis engine.'
                 },
                 {
                     icon: HeartIcon,
-                    title: 'Dream Community',
-                    description: 'Connect with like-minded dreamers and share manifestation energy.'
+                    title: 'Wealth Community',
+                    description: 'Connect with serious wealth builders. Share strategies and get real market insights.'
                 }
             ]
         },
         team: {
-            title: 'The Dream Team',
-            description: 'We are a group of engineers, psychologists, and artists who believe in "Manifestation Tech".',
+            title: 'Leadership Team',
+            description: 'We are experts in Fintech, Cybersecurity, and AI, dedicated to your financial success.',
             members: [
                 {
                     name: 'Ming Zhang',
-                    role: 'Founder & Chief Manifestation Officer',
-                    description: 'Former Tech Lead at Alibaba, dedicated to combining ancient wisdom with modern AI.',
+                    role: 'Founder & CEO',
+                    description: 'Former Fintech Lead at Alibaba, dedicated to democratizing wealth management.',
                     image: 'https://ui-avatars.com/api/?name=Ming+Zhang&background=0ea5e9&color=fff&size=200'
                 },
                 {
                     name: 'Xin Li',
-                    role: 'Head of Product Design',
-                    description: 'Psychology Master, focused on stimulating subconscious action through visual cues.',
+                    role: 'CPO',
+                    description: 'CFA Charterholder, focused on building professional yet accessible financial products.',
                     image: 'https://ui-avatars.com/api/?name=Xin+Li&background=10b981&color=fff&size=200'
                 },
                 {
                     name: 'Tao Wang',
-                    role: 'AI Algorithm Expert',
-                    description: 'Built the core "Image-to-Task" engine, letting every vision board image speak.',
+                    role: 'CTO',
+                    description: 'Architecting our high-frequency, secure financial data processing engine.',
                     image: 'https://ui-avatars.com/api/?name=Tao+Wang&background=8b5cf6&color=fff&size=200'
                 },
                 {
                     name: 'Ya Zhao',
-                    role: 'Community Lead',
-                    description: 'Dedicated to building a warm, supportive environment for dreamers.',
+                    role: 'Head of Customer Success',
+                    description: 'Ensuring every user achieves tangible wealth growth with our tools.',
                     image: 'https://ui-avatars.com/api/?name=Ya+Zhao&background=f59e0b&color=fff&size=200'
                 }
             ]
         },
         values: {
-            title: 'Core Philosophy',
+            title: 'Core Values',
             items: [
                 {
                     icon: GlobeAsiaAustraliaIcon,
-                    title: 'Action Oriented',
-                    description: 'Real manifestation is not about thinking, but doing. We believe in action.'
+                    title: 'Data First',
+                    description: 'Numbers don\'t lie. We believe rational decisions come from accurate data.'
                 },
                 {
                     icon: UserGroupIcon,
                     title: 'Long-termism',
-                    description: 'We don\'t chase quick riches. We believe in the power of compounding, for wealth and growth.'
+                    description: 'We ignore short-term noise and focus on creating compounding value for you.'
                 },
                 {
                     icon: LightBulbIcon,
-                    title: 'Tech Empowered',
-                    description: 'Using cutting-edge AI to serve the oldest human dreams.'
+                    title: 'Democratizing Finance',
+                    description: 'Bringing Private Banking level services to everyone through technology.'
                 }
             ]
         },
         cta_section: {
-            title: '2025 Is Your Year',
-            description: 'Stop waiting. Upload your first vision board image now.',
-            start: 'Start Now',
-            learn_more: 'Read Guide'
+            title: 'Your Wealth Deserves Better',
+            description: 'Stop leaks in your cash flow. Start intelligent management today.',
+            start: 'Start for Free',
+            learn_more: 'View Features'
         }
     }
 }
@@ -457,7 +457,7 @@ export default function AboutContent() {
                             {t.cta_section.start}
                         </Link>
                         <Link
-                            href="/blog"
+                            href="/features/wealth-tracker"
                             className="border border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-200"
                         >
                             {t.cta_section.learn_more}

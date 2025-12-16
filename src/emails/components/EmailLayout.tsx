@@ -50,7 +50,7 @@ export const EmailLayout = ({ children, preview, unsubscribeUrl }: EmailLayoutPr
                             <Link href="https://instagram.com/finleybook1" target="_blank" style={{ margin: '0 8px', display: 'inline-block' }}>
                                 <Img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="32" height="32" alt="Instagram" />
                             </Link>
-                            <Link href="https://tiktok.com/@finleybook" target="_blank" style={{ margin: '0 8px', display: 'inline-block' }}>
+                            <Link href="https://www.tiktok.com/@finleybook1?_r=1&_t=ZS-923DYtBDdrs" target="_blank" style={{ margin: '0 8px', display: 'inline-block' }}>
                                 <Img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" width="32" height="32" alt="TikTok" />
                             </Link>
                             <Link href="https://x.com/finleybook1" target="_blank" style={{ margin: '0 8px', display: 'inline-block' }}>

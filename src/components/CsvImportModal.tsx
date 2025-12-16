@@ -20,6 +20,7 @@ import Papa from 'papaparse'
 import { addTransactionsBatch, getUserTransactions, Transaction } from '@/lib/dataService'
 import { useAuth } from './AuthProvider'
 import confetti from 'canvas-confetti'
+import { parse, isValid as isValidDateFn } from 'date-fns'
 
 interface CsvImportModalProps {
     isOpen: boolean
@@ -228,14 +229,34 @@ export default function CsvImportModal({ isOpen, onClose, onSuccess }: CsvImport
             // Parse Amount
             let amount = parseFloat(rawAmount?.replace(/[^0-9.-]/g, '') || '0')
             // Handle "Debit" columns where positive numbers are expenses (negative in our system)
-            // Heuristic: If header contains "debit", negate it. Or just assume user uploads expenses as negative?
             // For now, let's assume standard bank export: negative = expense, positive = income.
             // Some banks use "Debit" column (positive) and "Credit" column. This simple mapper assumes one Amount column.
             // Advanced: If amount is NaN, check if it's in (brackets)
 
-            // Parse Date (Simple attempt, can be improved with date-fns)
-            // Assuming standard formats like DD/MM/YYYY or YYYY-MM-DD
-            const parsedDate = new Date(rawDate)
+            // Parse Date with Robust Handling
+            // Support: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
+            let parsedDate = new Date(rawDate)
+
+            // If standard parsing fails or gives invalid date, try specific formats
+            if (isNaN(parsedDate.getTime())) {
+                const formatsToTry = [
+                    'dd/MM/yyyy',
+                    'd/M/yyyy',
+                    'MM/dd/yyyy',
+                    'M/d/yyyy',
+                    'yyyy-MM-dd',
+                    'dd-MM-yyyy'
+                ]
+
+                for (const fmt of formatsToTry) {
+                    const d = parse(rawDate, fmt, new Date())
+                    if (isValidDateFn(d)) {
+                        parsedDate = d
+                        break
+                    }
+                }
+            }
+
             const isValidDate = !isNaN(parsedDate.getTime())
 
             const isValid = !isNaN(amount) && !!rawDate && isValidDate

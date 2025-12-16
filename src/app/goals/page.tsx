@@ -186,7 +186,7 @@ export default function GoalsPage() {
     <div className="min-h-screen bg-gray-50">
 
 
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 pb-24">
         <motion.div
           className="mb-8"
           initial={{ opacity: 0, y: 20 }}

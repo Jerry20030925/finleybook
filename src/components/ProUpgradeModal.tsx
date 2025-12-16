@@ -85,13 +85,15 @@ export default function ProUpgradeModal({ isOpen, onClose, featureName = 'This f
                                     ))}
                                 </div>
 
-                                <button
+                                <motion.button
                                     onClick={() => router.push('/wallet')}
-                                    className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 group shadow-lg shadow-indigo-500/20"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-all group shadow-lg shadow-indigo-500/20"
                                 >
                                     <span>Upgrade Now</span>
                                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                </button>
+                                </motion.button>
 
                                 <p className="text-center mt-4 text-xs text-gray-400">
                                     7-day money-back guarantee. Cancel anytime.

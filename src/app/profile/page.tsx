@@ -97,7 +97,11 @@ export default function ProfilePage() {
                         </div>
                         <div className="text-center sm:text-left">
                             <h1 className="text-2xl font-bold text-gray-900">{user.displayName || t('profile.user')}</h1>
-                            <p className="text-gray-500">{t('profile.joined', { date: 'Dec 2025' })}</p>
+                            <p className="text-gray-500">{t('profile.joined', {
+                                date: user.metadata.creationTime
+                                    ? new Date(user.metadata.creationTime).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
+                                    : 'Dec 2025'
+                            })}</p>
                             <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-2">
                                 {badges.map((badge, idx) => (
                                     <div
@@ -150,6 +154,20 @@ export default function ProfilePage() {
                                 )}
                             </div>
                         ))}
+                    </div>
+                </div>
+
+                {/* Reports & Analytics (Moved from Bottom Nav) */}
+                <div onClick={() => router.push('/reports')} className="cursor-pointer bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <ChartBarIcon className="w-32 h-32 transform rotate-12 translate-x-8 -translate-y-8" />
+                    </div>
+                    <div className="relative z-10">
+                        <h3 className="text-xl font-bold mb-1">{t('nav.reports')}</h3>
+                        <p className="text-white/80 text-sm mb-4">View your financial trends and insights</p>
+                        <span className="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
+                            Open Reports <span aria-hidden="true">&rarr;</span>
+                        </span>
                     </div>
                 </div>
 

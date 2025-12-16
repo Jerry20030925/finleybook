@@ -17,6 +17,12 @@
     "deploy": "npm run build && firebase deploy"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
+    "@capacitor/local-notifications": "^8.0.0",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@react-email/components": "^1.0.1",
@@ -65,6 +71,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20.9.0",
     "@types/pdf-parse": "^1.1.5",

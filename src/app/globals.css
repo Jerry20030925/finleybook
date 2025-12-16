@@ -10,12 +10,47 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+/* Mobile Optimizations */
+html,
+body {
+  /* Prevent bounce/overscroll on the body itself to separate pull-to-refresh logic */
+  overscroll-behavior-y: none;
+  /* Disable tap highlight color on mobile */
+  -webkit-tap-highlight-color: transparent;
+  /* Smoother scrolling */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent iOS zooming on inputs by enforcing 16px font size */
+@media screen and (max-width: 768px) {
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Hide scrollbar for cleaner look (optional, but nice for horizontal lists) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {

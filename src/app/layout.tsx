@@ -15,16 +15,30 @@ import SmartNotificationManager from '@/components/SmartNotificationManager'
 import AIChatInput from '@/components/AIChatInput'
 import NoSSR from '@/components/NoSSR'
 import Navigation from '@/components/Navigation'
+import BottomNavigation from '@/components/BottomNavigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
-    default: 'FinleyBook - AI Wealth Tracker & Cashback Glitch Finder',
-    template: '%s | FinleyBook',
+    default: 'FinleyBook | AI Wealth Management & Cashback Rewards',
+    template: '%s | FinleyBook - Smart Finance',
   },
-  description: 'The #1 AI Money App. Track net worth, find 90% off price glitches, and earn double cashback on daily shopping. Join the AI wealth revolution today.',
-  keywords: ['AI Finance', 'Cashback App', 'Price Glitch Finder', 'Wealth Management', 'Bank Bounties', 'Money Saving App', 'FinleyBook', 'Personal Finance Dashboard', '现金回扣', '省钱神器', '澳洲理财'],
+  description: 'Maximize your wealth with FinleyBook. The #1 AI-powered personal finance tracker offering automated expense insights, net worth tracking, and exclusive cashback rewards in Australia and globally.',
+  keywords: [
+    'Wealth Management',
+    'AI Finance',
+    'Cashback Australia',
+    'Best Expense Tracker',
+    'Net Worth Calculator',
+    'Financial Independence',
+    'Money Management App',
+    'Personal Finance Dashboard',
+    '财富管理',
+    '澳洲理财',
+    '智能记账',
+    'Passive Income'
+  ],
   authors: [{ name: 'FinleyBook Team' }],
   creator: 'FinleyBook',
   publisher: 'FinleyBook',
@@ -39,28 +53,28 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   verification: {
-    google: 'verification_token', // Placeholder for user to update
+    google: 'verification_token', // TODO: User to provide Google Site Verification Token from Search Console
   },
   openGraph: {
     type: 'website',
     locale: 'en_AU',
     url: 'https://finleybook.com',
-    title: 'FinleyBook - Earn Cashback & Track Wealth with AI',
-    description: 'Stop overpaying. FinleyBook finds hidden price glitches, bank bounties, and cashback rewards automatically. The smartest way to build wealth in 2025.',
+    title: 'FinleyBook | Intelligent Wealth Management & Cashback Rewards',
+    description: 'Elevate your financial game. FinleyBook combines advanced AI analytics with automated wealth tracking and premium rewards discovery. Smart finance for the modern era.',
     siteName: 'FinleyBook',
     images: [
       {
         url: 'https://finleybook.com/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'FinleyBook AI Wealth & Cashback',
+        alt: 'FinleyBook AI Wealth Dashboard',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FinleyBook - AI Wealth & Cashback App',
-    description: 'Find Price Glitches. Earn Cashback. Track Net Worth. The all-in-one AI finance superapp.',
+    title: 'FinleyBook - AI Wealth & Premium Rewards',
+    description: 'Track Net Worth. Optimize Spending. Maximize Rewards. The intelligent finance platform for wealth builders.',
     images: ['https://finleybook.com/og-image.png'],
     creator: '@finleybook',
   },
@@ -97,8 +111,8 @@ export default function RootLayout({
         <StructuredData type="software" />
       </head>
       <body className={inter.className}>
-        <ErrorBoundary>
-          <LanguageProvider>
+        <LanguageProvider>
+          <ErrorBoundary>
             <AuthProvider>
               <NotificationProvider>
                 <SmartNotificationManager />
@@ -107,15 +121,18 @@ export default function RootLayout({
                     <NoSSR>
                       <AIChatInput />
                       <Navigation />
-                      {children}
+                      <div className="pb-24 md:pb-0"> {/* Increased padding to 6rem (96px) for safe bottom nav */}
+                        {children}
+                      </div>
+                      <BottomNavigation />
                       <Toaster position="top-right" />
                     </NoSSR>
                   </SubscriptionProvider>
                 </CurrencyProvider>
               </NotificationProvider>
             </AuthProvider>
-          </LanguageProvider>
-        </ErrorBoundary>
+          </ErrorBoundary>
+        </LanguageProvider>
         <Script
           id="skimlinks-script"
           strategy="lazyOnload"

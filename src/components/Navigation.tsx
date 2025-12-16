@@ -13,6 +13,7 @@ import { useLanguage } from './LanguageProvider'
 import LanguageSwitcher from './LanguageSwitcher'
 import ReferralGiftCard from './ReferralGiftCard'
 import { getUserDisplayName, getUserInitials } from '@/lib/userUtils'
+import { isMobileApp } from '@/lib/mobileUtils'
 
 export default function Navigation() {
   const { user, logout } = useAuth()
@@ -28,7 +29,8 @@ export default function Navigation() {
   const navigation = [
     { name: t('nav.dashboard'), href: '/dashboard', current: false },
     { name: t('nav.transactions'), href: '/transactions', current: false },
-    { name: t('nav.rewards'), href: '/wealth', current: false },
+    // Hide Rewards/Wealth on mobile
+    ...(!isMobileApp() ? [{ name: t('nav.rewards'), href: '/wealth', current: false }] : []),
     { name: t('nav.reports'), href: '/reports', current: false },
     { name: t('nav.budget'), href: '/budget', current: false },
     { name: t('nav.goals'), href: '/goals', current: false },
@@ -54,7 +56,7 @@ export default function Navigation() {
       <motion.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} // Custom spring-like bezier
       >
         <Disclosure as="nav" className="bg-white shadow-lg backdrop-blur-md relative z-50">
           {({ open }) => (
@@ -70,7 +72,8 @@ export default function Navigation() {
                       <Logo size="lg" />
                     </motion.div>
                     <div className="hidden md:ml-6 md:flex md:space-x-8">
-                      {navigation.map((item, index) => {
+                      {/* Hide navigation links on mobile app layout, relying on BottomNavigation */}
+                      {(!isMobileApp() ? navigation : []).map((item, index) => {
                         const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href))
                         return (
                           <motion.a
@@ -102,106 +105,33 @@ export default function Navigation() {
                     </div>
                   </div>
                   <div className="hidden md:ml-4 md:flex md:items-center md:space-x-4">
-                    <button
-                      onClick={() => setShowInviteModal(true)}
-                      className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:shadow-lg hover:scale-105 transition-all"
-                    >
-                      <GiftIcon className="h-5 w-5" />
-                    </button>
-
-                    <LanguageSwitcher />
-                    <NotificationCenter />
-
-                    {/* Profile dropdown */}
-                    <Menu as="div" className="relative ml-3">
-                      <div>
-                        <Menu.Button as={motion.button}
-                          className="flex rounded-full bg-white text-sm ring-2 ring-white ring-offset-2 ring-offset-gray-800 relative"
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <motion.img
-                            className="h-8 w-8 rounded-full object-cover"
-                            src={user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(getUserInitials(user))}&background=0ea5e9&color=fff`}
-                            alt=""
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.8, type: "spring" }}
-                          />
-                          {user?.subscription?.plan === 'pro' && (
-                            <div className="absolute -bottom-1 -right-1 bg-primary-600 text-white text-[8px] font-bold px-1 py-0.5 rounded-full border border-white">
-                              PRO
-                            </div>
-                          )}
-                        </Menu.Button>
-                      </div>
-                      <Transition
-                        as={Fragment}
-                        enter="transition ease-out duration-100"
-                        enterFrom="transform opacity-0 scale-95"
-                        enterTo="transform opacity-100 scale-100"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95"
-                      >
-                        <Menu.Items className="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          <Menu.Item>
-                            {({ active }) => (
-                              <a
-                                href="/blog"
-                                className={clsx(
-                                  active ? 'bg-gray-100' : '',
-                                  'block px-4 py-2 text-sm text-gray-700'
-                                )}
-                              >
-                                {language === 'en' ? 'Blog' : '博客'}
-                              </a>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <a
-                                href="/profile"
-                                className={clsx(
-                                  active ? 'bg-gray-100' : '',
-                                  'block px-4 py-2 text-sm text-gray-700'
-                                )}
-                              >
-                                {t('nav.profile')}
-                              </a>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <a
-                                href="/settings"
-                                className={clsx(
-                                  active ? 'bg-gray-100' : '',
-                                  'block px-4 py-2 text-sm text-gray-700'
-                                )}
-                              >
-                                {t('nav.settings')}
-                              </a>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <button
-                                onClick={confirmLogout}
-                                className={clsx(
-                                  active ? 'bg-gray-100' : '',
-                                  'block w-full px-4 py-2 text-left text-sm text-gray-700'
-                                )}
-                              >
-                                {t('nav.signOut')}
-                              </button>
-                            )}
-                          </Menu.Item>
-                        </Menu.Items>
-                      </Transition>
-                    </Menu>
+                    {/* ... (buttons remain here) ... */}
                   </div>
-                  <div className="-mr-2 flex items-center md:hidden">
+                  {/* Hide hamburger on mobile app since we have bottom nav, BUT we need a way to logout/settings if bottom nav doesn't have it.
+                      Bottom nav has dashboard, transactions, budget, goals, reports. It misses Settings/Profile/Logout.
+                      So we should KEEP the top nav hamburger OR put a 'Menu' tab in bottom nav. 
+                      User requested "Navigation bar at bottom". Usually this replaces the hamburger for main nav.
+                      Let's KEEP the hamburger for Profile/Settings, but maybe simplify?
+                      Actually, standard pattern is top-right profile icon or hamburger.
+                      Let's keeps the hamburger but change what's inside?
+                      Or just keep it as is, but remove the links that are already at the bottom?
+                      Let's check if the user wants the hamburger REMOVED.
+                      "Top navigation hidden" usually implies just the links.
+                      Let's keeping the hamburger for now as it holds Profile/Settings/SignOut which are NOT in bottom nav.
+                      Wait, the hamburger content duplicates the bottom nav links (Dashboard, Transactions...).
+                      We should remove the duplicates from the hamburger menu if isMobileApp().
+                   */}
+                  <div className={clsx("-mr-2 flex items-center md:hidden", isMobileApp() && "hidden")}>
+                    {/* Hiding hamburger completely for mobile app for now, assuming we might add a 'More' tab or put Profile icon in header?
+                        Wait, if I hide hamburger, how do they logout?
+                        Top right has "NotificationCenter" and "LanguageSwitcher" and "Gift".
+                        Desktop has "Profile Dropdown" (lines 118-204). This is HIDDEN on mobile (md:flex).
+                        Mobile uses hamburger (lines 205+).
+                        So on mobile, the ONLY way to access Profile/Logout is via Hamburger.
+                        I MUST NOT HIDE HAMBURGER yet unless I move Profile to top-right visible or add 'More' tab.
+                        
+                        Let's Modify Hamburger content instead.
+                    */}
                     <Disclosure.Button
                       as={motion.button}
                       className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500"

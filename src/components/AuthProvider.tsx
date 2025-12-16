@@ -12,6 +12,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<any>
   signUp: (email: string, password: string) => Promise<any>
   signInWithGoogle: () => Promise<any>
+  signInWithApple: () => Promise<any>
   signInWithPhone: (phoneNumber: string, appVerifier: any) => Promise<any>
   loginAsGuest: () => Promise<any>
   sendPasswordReset: (email: string) => Promise<void>
@@ -230,7 +231,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setError(null)
-      const { GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } = await import('firebase/auth')
+      const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = await import('firebase/auth')
       const provider = new GoogleAuthProvider()
 
       // Add custom parameters for better UX
@@ -239,26 +240,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         hd: '' // Allow any domain
       })
 
-      // Use popup method which is often more reliable for desktop and avoids page reloads
-      const result = await signInWithPopup(auth, provider)
+      // Use redirect for mobile app to avoid popup blockers, popup for web
+      // We can use a simple check or the provided isMobileApp utility if imported (but circular dep risk)
+      // Ideally we rely on the caller or just checking user agent, but let's try popup first and fallback?
+      // No, fallback often triggers popup blocked too. 
+      // Safe bet: If window.Capacitor exists, use Redirect.
+      const isMobile = (window as any).Capacitor?.isNativePlatform();
 
-      // Check for new user
-      const isNewUser = (result as any)._tokenResponse?.isNewUser ||
-        result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
-
-      if (isNewUser) {
-        await trackReferral(result.user.uid)
-        // Send Welcome Email
-        fetch('/api/email/welcome', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: result.user.email, name: result.user.displayName }),
-        }).catch(console.error)
+      let result;
+      if (isMobile) {
+        // Redirect flow does not return a result immediately.
+        // It resolves in getRedirectResult on init.
+        await signInWithRedirect(auth, provider)
+        return // Return nothing, let the init listener handle it
+      } else {
+        result = await signInWithPopup(auth, provider)
       }
-      return result
+
+      if (result) {
+        // This block only runs for Popup flow
+        // Check for new user
+        const isNewUser = (result as any)._tokenResponse?.isNewUser ||
+          result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+
+        if (isNewUser) {
+          await trackReferral(result.user.uid)
+          // Send Welcome Email
+          fetch('/api/email/welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: result.user.email, name: result.user.displayName }),
+          }).catch(console.error)
+        }
+        return result
+      }
 
     } catch (error: any) {
       console.error('Google sign in error:', error)
+      setError(error.message)
+      throw error
+    }
+  }
+
+  const signInWithApple = async () => {
+    if (!auth) {
+      const errorMsg = error || 'Auth not initialized'
+      throw new Error(errorMsg)
+    }
+    try {
+      setError(null)
+      const { OAuthProvider, signInWithPopup, signInWithRedirect } = await import('firebase/auth')
+      const provider = new OAuthProvider('apple.com')
+
+      provider.addScope('email')
+      provider.addScope('name')
+
+      const isMobile = (window as any).Capacitor?.isNativePlatform();
+
+      if (isMobile) {
+        await signInWithRedirect(auth, provider)
+        return
+      } else {
+        const result = await signInWithPopup(auth, provider)
+        // Handle result same as Google if needed (tracking etc)
+        const isNewUser = (result as any)._tokenResponse?.isNewUser ||
+          result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+
+        if (isNewUser) {
+          await trackReferral(result.user.uid)
+        }
+        return result
+      }
+    } catch (error: any) {
+      console.error('Apple sign in error:', error)
       setError(error.message)
       throw error
     }
@@ -351,6 +405,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signIn,
       signUp,
       signInWithGoogle,
+      signInWithApple,
       signInWithPhone,
       loginAsGuest,
       sendPasswordReset,

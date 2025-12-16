@@ -14,16 +14,17 @@ interface Country {
     currency: CurrencyCode
     symbol: string
     flag: string
+    phoneCode: string
 }
 
 export const COUNTRIES: Country[] = [
-    { code: 'CN', name: 'China', currency: 'CNY', symbol: '¥', flag: '🇨🇳' },
-    { code: 'US', name: 'United States', currency: 'USD', symbol: '$', flag: '🇺🇸' },
-    { code: 'AU', name: 'Australia', currency: 'AUD', symbol: '$', flag: '🇦🇺' },
-    { code: 'GB', name: 'United Kingdom', currency: 'GBP', symbol: '£', flag: '🇬🇧' },
-    { code: 'JP', name: 'Japan', currency: 'JPY', symbol: '¥', flag: '🇯🇵' },
-    { code: 'CA', name: 'Canada', currency: 'CAD', symbol: '$', flag: '🇨🇦' },
-    { code: 'EU', name: 'Europe', currency: 'EUR', symbol: '€', flag: '🇪🇺' },
+    { code: 'CN', name: 'China', currency: 'CNY', symbol: '¥', flag: '🇨🇳', phoneCode: '+86' },
+    { code: 'US', name: 'United States', currency: 'USD', symbol: '$', flag: '🇺🇸', phoneCode: '+1' },
+    { code: 'AU', name: 'Australia', currency: 'AUD', symbol: '$', flag: '🇦🇺', phoneCode: '+61' },
+    { code: 'GB', name: 'United Kingdom', currency: 'GBP', symbol: '£', flag: '🇬🇧', phoneCode: '+44' },
+    { code: 'JP', name: 'Japan', currency: 'JPY', symbol: '¥', flag: '🇯🇵', phoneCode: '+81' },
+    { code: 'CA', name: 'Canada', currency: 'CAD', symbol: '$', flag: '🇨🇦', phoneCode: '+1' },
+    { code: 'EU', name: 'Europe', currency: 'EUR', symbol: '€', flag: '🇪🇺', phoneCode: '' }, // Europe generic, no single phone code
 ]
 
 interface CurrencyContextType {

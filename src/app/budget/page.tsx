@@ -184,7 +184,7 @@ export default function BudgetPage() {
     <div className="min-h-screen bg-gray-50">
 
 
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 pb-24">
         <motion.div
           className="mb-8"
           initial={{ opacity: 0, y: 20 }}
@@ -239,19 +239,28 @@ export default function BudgetPage() {
         {/* Budgets Grid */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1
+              }
+            }
+          }}
         >
-          {budgets.map((budget, index) => {
+          {budgets.map((budget) => {
             const percentage = Math.min((budget.spent / budget.amount) * 100, 100)
             return (
               <motion.div
                 key={budget.id}
                 className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.3 }}
+                variants={{
+                  hidden: { opacity: 0, scale: 0.9 },
+                  show: { opacity: 1, scale: 1 }
+                }}
               >
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-lg font-medium text-gray-900">{getCategoryName(budget.category)}</h3>
@@ -277,12 +286,9 @@ export default function BudgetPage() {
                     <span>{t('budget.budgetAmount')} {formatAmount(budget.amount)}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <motion.div
+                    <div
                       className={`h-2 rounded-full ${getProgressColor(budget.spent, budget.amount)}`}
                       style={{ width: `${percentage}%` }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${percentage}%` }}
-                      transition={{ delay: index * 0.1 + 0.5, duration: 0.8 }}
                     />
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
@@ -303,85 +309,91 @@ export default function BudgetPage() {
 
         {/* Add/Edit Budget Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <motion.div
-              className="bg-white p-6 rounded-xl max-w-md w-full mx-4"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {editingBudget ? t('budget.edit') : t('budget.addBudget')}
-              </h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('budget.category')}
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
-                    required
-                  >
-                    <option value="">{t('budget.selectCategory')}</option>
-                    {DEFAULT_CATEGORIES.expense.map(category => (
-                      <option key={category} value={category}>{getCategoryName(category)}</option>
-                    ))}
-                  </select>
-                </div>
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4 text-center">
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setShowModal(false)} />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('budget.budgetAmount')}
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.amount}
-                    onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500"
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0"
-                    required
-                  />
-                </div>
+              <motion.div
+                className="relative bg-white rounded-t-2xl sm:rounded-xl w-full sm:max-w-md mx-auto p-6 shadow-xl transform transition-all h-auto sm:h-auto"
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 500 }}
+              >
+                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-12 h-1.5 bg-gray-300 rounded-full sm:hidden mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-6 sm:mb-4 text-left">
+                  {editingBudget ? t('budget.edit') : t('budget.addBudget')}
+                </h3>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('budget.category')}
+                    </label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+                      required
+                    >
+                      <option value="">{t('budget.selectCategory')}</option>
+                      {DEFAULT_CATEGORIES.expense.map(category => (
+                        <option key={category} value={category}>{getCategoryName(category)}</option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('budget.period')}
-                  </label>
-                  <select
-                    value={formData.period}
-                    onChange={(e) => setFormData(prev => ({ ...prev, period: e.target.value as 'monthly' | 'yearly' }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
-                  >
-                    <option value="monthly">{t('budget.monthly')}</option>
-                    <option value="yearly">{t('budget.yearly')}</option>
-                  </select>
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('budget.budgetAmount')}
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.amount}
+                      onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500"
+                      placeholder="0.00"
+                      step="0.01"
+                      min="0"
+                      required
+                    />
+                  </div>
 
-                <div className="flex space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowModal(false)
-                      setEditingBudget(null)
-                      setFormData({ category: '', amount: '', period: 'monthly' })
-                    }}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                  >
-                    {t('common.cancel')}
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    {editingBudget ? t('budget.update') : t('budget.addBudget')}
-                  </button>
-                </div>
-              </form>
-            </motion.div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('budget.period')}
+                    </label>
+                    <select
+                      value={formData.period}
+                      onChange={(e) => setFormData(prev => ({ ...prev, period: e.target.value as 'monthly' | 'yearly' }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+                    >
+                      <option value="monthly">{t('budget.monthly')}</option>
+                      <option value="yearly">{t('budget.yearly')}</option>
+                    </select>
+                  </div>
+
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowModal(false)
+                        setEditingBudget(null)
+                        setFormData({ category: '', amount: '', period: 'monthly' })
+                      }}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    >
+                      {t('common.cancel')}
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      {editingBudget ? t('budget.update') : t('budget.addBudget')}
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
           </div>
         )}
       </main>

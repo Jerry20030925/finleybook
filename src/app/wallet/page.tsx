@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { useLanguage } from '@/components/LanguageProvider';
 import { useRouter } from 'next/navigation';
-import useSound from 'use-sound';
+// import useSound from 'use-sound'; // Sound file missing, disabled for production
 import { TrendingUp, Zap, ArrowRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot, orderBy, limit, doc } from 'firebase/firestore';
+import Skeleton from '@/components/Skeleton';
 
 export default function WalletPage() {
     const { user, loading: authLoading } = useAuth();
@@ -17,7 +18,7 @@ export default function WalletPage() {
     const [balance, setBalance] = useState({ available: 0, pending: 0, lifetime: 0 });
     const [stripeStatus, setStripeStatus] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [playCashRegister] = useSound('/sounds/cash-register.mp3'); // Ensure this file exists or use a CDN URL if possible, but for now we assume local
+    // const [playCashRegister] = useSound('/sounds/cash-register.mp3');
 
 
 
@@ -122,7 +123,7 @@ export default function WalletPage() {
 
     const handleWithdraw = async () => {
         if (balance.available < 1) {
-            toast.error('You need at least $0.01 to withdraw.');
+            toast.error(t('wallet.withdraw.minAmount'));
             return;
         }
 
@@ -139,8 +140,8 @@ export default function WalletPage() {
             const data = await response.json();
 
             if (response.ok) {
-                toast.success('Withdrawal initiated! Funds are on the way.', { id: toastId });
-                playCashRegister();
+                toast.success(t('wallet.withdraw.success'), { id: toastId });
+                // playCashRegister();
             } else {
                 toast.error(data.error || 'Withdrawal failed', { id: toastId });
             }
@@ -149,10 +150,31 @@ export default function WalletPage() {
         }
     };
 
-    if (loading) return <div className="p-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div></div>;
+    // ... imports
+
+    if (loading) return (
+        <div className="max-w-4xl mx-auto px-4 py-8 pb-24 space-y-8">
+            <Skeleton className="h-32 w-full rounded-xl" />
+            <div className="flex justify-between items-end">
+                <Skeleton className="h-20 w-40" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Skeleton className="h-48 rounded-xl" />
+                <Skeleton className="h-48 rounded-xl" />
+                <Skeleton className="h-48 rounded-xl" />
+            </div>
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <div className="space-y-4">
+                <Skeleton className="h-8 w-40" />
+                <Skeleton className="h-20 w-full rounded-xl" />
+                <Skeleton className="h-20 w-full rounded-xl" />
+                <Skeleton className="h-20 w-full rounded-xl" />
+            </div>
+        </div>
+    );
 
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-4 py-8 pb-24">
 
             {/* Pro Banner */}
             <div className="mb-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-4 text-white flex items-center justify-between shadow-lg relative overflow-hidden group cursor-pointer" onClick={() => router.push('/subscribe')}>
@@ -203,8 +225,8 @@ export default function WalletPage() {
                     <button
                         onClick={handleWithdraw}
                         className={`mt-4 w-full py-3 px-4 rounded-xl text-sm font-bold shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 ${balance.available > 0
-                                ? 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)] animate-pulse'
-                                : 'bg-gray-800 text-gray-400 border border-gray-700'
+                            ? 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)] animate-pulse'
+                            : 'bg-gray-800 text-gray-400 border border-gray-700'
                             }`}
                     >
                         {t('wallet.withdraw')}
@@ -235,9 +257,9 @@ export default function WalletPage() {
                             <div className="h-1.5 flex-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
                         </div>
                         <div className="flex justify-between text-[10px] text-gray-400 mt-1.5 font-medium">
-                            <span>Pending</span>
-                            <span>Approved</span>
-                            <span>Ready</span>
+                            <span>{t('wallet.pending.status.pending')}</span>
+                            <span>{t('wallet.pending.status.approved')}</span>
+                            <span>{t('wallet.pending.status.ready')}</span>
                         </div>
                     </div>
                 </div>
@@ -255,9 +277,9 @@ export default function WalletPage() {
                         </div>
                         <div>
                             <p className="font-bold text-white">
-                                {balance.lifetime > 100000 ? 'Gold Saver' : balance.lifetime > 10000 ? 'Silver Saver' : 'Bronze Saver'}
+                                {balance.lifetime > 100000 ? t('wallet.status.level.gold') : balance.lifetime > 10000 ? t('wallet.status.level.silver') : t('wallet.status.level.bronze')}
                             </p>
-                            <p className="opacity-80">Keep earning to level up!</p>
+                            <p className="opacity-80">{t('wallet.status.keepEarning')}</p>
                         </div>
                     </div>
                 </div>

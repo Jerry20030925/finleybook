@@ -212,7 +212,7 @@ export default function Landing() {
                 variants={fadeInUp}
               >
                 {t('hero.title_prefix')}
-                <span className="text-primary-600 mx-2 inline-block relative">
+                <span className="mx-2 inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-indigo-600">
                   {t('hero.title_highlight')}
                   <motion.svg
                     className="absolute w-full h-3 -bottom-1 left-0 text-primary-200 -z-10"
@@ -255,7 +255,7 @@ export default function Landing() {
                   }}
                   className="w-full sm:w-auto text-sm font-semibold leading-6 text-gray-900 border border-gray-200 bg-white hover:bg-gray-50 px-6 py-3 rounded-xl transition-colors shadow-sm"
                 >
-                  {language === 'en' ? 'Try Demo (Guest)' : '体验演示 (游客)'}
+                  {t('landing.hero.demo.guest')}
                 </motion.button>
                 <a href="#features" className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors">
                   {t('hero.learn_more')} <span aria-hidden="true">→</span>
@@ -284,13 +284,13 @@ export default function Landing() {
                           <WalletIcon className="h-6 w-6" />
                         </div>
                         <div>
-                          <div className="text-sm text-gray-500">Total Balance</div>
+                          <div className="text-sm text-gray-500">{t('landing.hero.demo.viz.totalBalance')}</div>
                           <div className="text-3xl font-bold text-gray-900">¥124,500.00</div>
                         </div>
                       </div>
                       <div className="space-y-3">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-500">Monthly Budget</span>
+                          <span className="text-gray-500">{t('landing.hero.demo.viz.monthlyBudget')}</span>
                           <span className="font-medium text-gray-900">75%</span>
                         </div>
                         <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -398,10 +398,10 @@ export default function Landing() {
             <div className="mx-auto max-w-2xl lg:max-w-none">
               <div className="text-center mb-16">
                 <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                  {language === 'en' ? 'Experience the Power' : '体验强大功能'}
+                  {t('landing.demo.title')}
                 </h2>
                 <p className="mt-4 text-lg leading-8 text-gray-600">
-                  {language === 'en' ? 'See how FinleyBook transforms your financial data.' : '看看 FinleyBook 如何改变您的财务管理方式。'}
+                  {t('landing.demo.subtitle')}
                 </p>
               </div>
 
@@ -456,7 +456,7 @@ export default function Landing() {
                       >
                         <div className="flex justify-between items-end">
                           <div>
-                            <div className="text-sm text-gray-500">Total Assets</div>
+                            <div className="text-sm text-gray-500">{t('landing.demo.viz.totalAssets')}</div>
                             <div className="text-2xl font-bold text-gray-900">{demoData[demoTab].total}</div>
                           </div>
                           <div className={`text-sm px-2 py-1 rounded-full ${demoData[demoTab].change.startsWith('+') ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'
@@ -479,11 +479,11 @@ export default function Landing() {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-gray-50 p-3 rounded-lg">
-                            <div className="text-xs text-gray-500">Income</div>
+                            <div className="text-xs text-gray-500">{t('landing.demo.viz.income')}</div>
                             <div className="font-semibold text-green-600">{demoData[demoTab].income}</div>
                           </div>
                           <div className="bg-gray-50 p-3 rounded-lg">
-                            <div className="text-xs text-gray-500">Expense</div>
+                            <div className="text-xs text-gray-500">{t('landing.demo.viz.expense')}</div>
                             <div className="font-semibold text-red-600">{demoData[demoTab].expense}</div>
                           </div>
                         </div>
@@ -541,17 +541,17 @@ export default function Landing() {
             <div className="mx-auto max-w-2xl lg:max-w-none">
               <div className="text-center space-y-4">
                 <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                  深受用户信赖
+                  {t('landing.stats.trusted')}
                 </h2>
                 <p className="text-lg leading-8 text-gray-300">
-                  加入数万名用户的行列，开始您的智能财务之旅
+                  {t('landing.stats.desc')}
                 </p>
               </div>
               <dl className="mt-16 grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-3">
                 {[
-                  { id: 1, name: '活跃用户', value: '10,000+' },
-                  { id: 2, name: '管理资产', value: '¥500M+' },
-                  { id: 3, name: '用户好评', value: '99.9%' },
+                  { id: 1, name: t('landing.stats.users'), value: '10,000+' },
+                  { id: 2, name: t('landing.stats.assets'), value: '¥500M+' },
+                  { id: 3, name: t('landing.stats.reviews'), value: '99.9%' },
                 ].map((stat) => (
                   <motion.div
                     key={stat.id}
@@ -622,6 +622,18 @@ export default function Landing() {
                   <div className="w-px h-3 bg-gray-300 hidden md:block"></div>
                   <Link href="/terms" className="hover:underline hover:text-gray-800 transition-colors">
                     {t('footer.terms')}
+                  </Link>
+                  <div className="w-px h-3 bg-gray-300 hidden md:block"></div>
+                  <Link href="/subscription" className="hover:underline hover:text-gray-800 transition-colors">
+                    {t('landing.footer.pricing')}
+                  </Link>
+                  <div className="w-px h-3 bg-gray-300 hidden md:block"></div>
+                  <Link href="/blog" className="hover:underline hover:text-gray-800 transition-colors">
+                    {t('landing.footer.blog')}
+                  </Link>
+                  <div className="w-px h-3 bg-gray-300 hidden md:block"></div>
+                  <Link href="/about" className="hover:underline hover:text-gray-800 transition-colors">
+                    {t('landing.footer.about')}
                   </Link>
                 </div>
               </div>

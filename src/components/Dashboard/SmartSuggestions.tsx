@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, ArrowRight, TrendingUp, TrendingDown, Coffee, ShoppingBag, Car, Wallet, AlertTriangle, Lightbulb, Pizza } from 'lucide-react'
 import { Transaction } from '@/lib/dataService'
 import { useCurrency } from '../CurrencyProvider'
+import Link from 'next/link'
 
 interface SmartSuggestionsProps {
     transactions: Transaction[]
@@ -196,7 +197,16 @@ export default function SmartSuggestions({ transactions, monthlyBudget }: SmartS
                                 activeSuggestion.type === 'kudos' ? 'text-green-700' :
                                     'text-indigo-700'
                                 }`}>
-                                {activeSuggestion.message}
+                                {activeSuggestion.message.split(" ").map((word, i) => (
+                                    <motion.span
+                                        key={i}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: i * 0.03 + 0.2 }}
+                                    >
+                                        {word}{" "}
+                                    </motion.span>
+                                ))}
                             </p>
                         </div>
                     </div>
@@ -205,9 +215,9 @@ export default function SmartSuggestions({ transactions, monthlyBudget }: SmartS
 
             <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center text-xs text-gray-400">
                 <span>{currentIndex + 1} / {suggestions.length} Insights</span>
-                <span className="flex items-center gap-1">
+                <Link href="/help" className="flex items-center gap-1 hover:text-indigo-600 transition-colors cursor-pointer">
                     Ask Finley <ArrowRight size={10} />
-                </span>
+                </Link>
             </div>
         </div>
     )

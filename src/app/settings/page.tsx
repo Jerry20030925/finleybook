@@ -13,7 +13,8 @@ import {
     ArrowDownTrayIcon,
     TrashIcon,
     LockClosedIcon as Lock,
-    QuestionMarkCircleIcon
+    QuestionMarkCircleIcon,
+    ArrowTopRightOnSquareIcon
 } from '@heroicons/react/24/outline'
 import { AlertTriangle, Zap } from 'lucide-react'
 import { updateProfile } from 'firebase/auth'
@@ -198,6 +199,7 @@ export default function SettingsPage() {
             // Update Firestore as well
             await setDoc(doc(db, 'users', user.uid), {
                 displayName: displayName,
+                phoneNumber: recoveryPhone,
                 updatedAt: new Date()
             }, { merge: true })
 
@@ -279,7 +281,7 @@ export default function SettingsPage() {
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar Navigation */}
-                    <nav className="lg:w-64 flex-shrink-0 space-y-2">
+                    <nav className="w-full flex flex-row overflow-x-auto gap-2 pb-2 lg:pb-0 lg:flex-col lg:w-64 lg:gap-2 flex-shrink-0 scrollbar-hide">
                         {tabs.map((tab) => {
                             const isActive = activeTab === tab.id
                             return (
@@ -287,26 +289,26 @@ export default function SettingsPage() {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`${isActive
-                                        ? 'bg-white text-primary-600 shadow-medium'
-                                        : 'text-slate-400 hover:bg-white/10 hover:text-white lg:hover:bg-white lg:hover:text-slate-700'
-                                        } group flex w-full items-center px-4 py-3 text-sm font-medium transition-all rounded-xl relative overflow-hidden`}
+                                        ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
+                                        : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-100'
+                                        } group flex items-center px-4 py-3 text-sm font-bold transition-all rounded-xl relative overflow-hidden flex-shrink-0 whitespace-nowrap lg:w-full`}
                                 >
-                                    {isActive && (
-                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-600 rounded-l-xl" />
-                                    )}
                                     <tab.icon
-                                        className={`${isActive ? 'text-primary-600' : 'text-slate-400 group-hover:text-current'
+                                        className={`${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'
                                             } mr-3 h-5 w-5 flex-shrink-0 transition-colors`}
                                         aria-hidden="true"
                                     />
                                     {tab.name}
+                                    {isActive && (
+                                        <div className="absolute right-4 w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse hidden lg:block" />
+                                    )}
                                 </button>
                             )
                         })}
                     </nav>
 
                     {/* Content Area */}
-                    <div className="flex-1 bg-white shadow-soft rounded-2xl p-6 sm:p-8 min-h-[600px] border border-slate-100/50 relative overflow-hidden">
+                    <div className="flex-1 bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-6 sm:p-10 min-h-[600px] border border-slate-100 relative overflow-hidden">
                         {/* Tab Content Animations */}
                         <div className="relative z-10">
                             {activeTab === 'general' && (
@@ -344,7 +346,7 @@ export default function SettingsPage() {
                                                         type="text"
                                                         value={displayName}
                                                         onChange={(e) => setDisplayName(e.target.value)}
-                                                        className="block w-full rounded-lg border-slate-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-4 py-2.5 bg-slate-50 focus:bg-white transition-colors"
+                                                        className="block w-full rounded-lg border-slate-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-4 py-2.5 bg-slate-50 focus:bg-white transition-colors text-slate-900 font-medium placeholder-slate-400"
                                                     />
                                                 </div>
                                                 <div className="mt-4 hidden sm:block">
@@ -370,6 +372,27 @@ export default function SettingsPage() {
                                         </div>
                                     </div>
 
+                                    <div className="flex flex-col sm:flex-row gap-6">
+                                        <div className="flex-1">
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                Phone Number
+                                            </label>
+                                            <div className="flex rounded-lg shadow-sm">
+                                                <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-slate-200 bg-slate-50 text-gray-500 sm:text-sm">
+                                                    {country.phoneCode || '+xx'}
+                                                </span>
+                                                <input
+                                                    type="tel"
+                                                    value={recoveryPhone}
+                                                    onChange={(e) => setRecoveryPhone(e.target.value)}
+                                                    className="flex-1 block w-full min-w-0 rounded-none rounded-r-lg border-slate-200 focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-4 py-2.5 bg-slate-50 focus:bg-white transition-colors text-slate-900 font-medium placeholder-slate-400"
+                                                    placeholder="Enter phone number"
+                                                />
+                                            </div>
+                                            <p className="mt-1 text-xs text-slate-500">Used for account recovery and identity verification.</p>
+                                        </div>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="bg-slate-50 p-6 rounded-xl border border-slate-100">
                                             <label className="block text-sm font-bold text-slate-900 mb-4">
@@ -381,7 +404,7 @@ export default function SettingsPage() {
                                                     <select
                                                         value={language}
                                                         onChange={(e) => setLanguage(e.target.value as 'en' | 'zh')}
-                                                        className="block w-full rounded-lg border-slate-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                                        className="block w-full rounded-lg border-slate-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm text-slate-900 font-medium"
                                                     >
                                                         <option value="en">English (US)</option>
                                                         <option value="zh">中文 (Simplified)</option>
@@ -392,7 +415,7 @@ export default function SettingsPage() {
                                                     <select
                                                         value={country.code}
                                                         onChange={(e) => setCountry(e.target.value as any)}
-                                                        className="block w-full rounded-lg border-slate-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                                        className="block w-full rounded-lg border-slate-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm text-slate-900 font-medium"
                                                     >
                                                         {COUNTRIES.map((c) => (
                                                             <option key={c.code} value={c.code}>
@@ -536,50 +559,40 @@ export default function SettingsPage() {
                                 <div className="space-y-8 animate-in fade-in duration-500">
                                     <h3 className="text-xl font-bold text-slate-900">Subscription & Billing</h3>
 
-                                    <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-8 relative overflow-hidden shadow-xl">
-                                        <div className="absolute top-0 right-0 p-32 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                                        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                                            <div>
-                                                <div className="text-slate-300 font-medium mb-1">Current Plan</div>
-                                                <h4 className="text-3xl font-bold flex items-center gap-3">
-                                                    {user?.subscription?.plan === 'pro' ? 'Pro Member' : 'Free Plan'}
-                                                    {user?.subscription?.plan === 'pro' && <span className="text-xs bg-yellow-400 text-black px-2 py-0.5 rounded font-bold">ACTIVE</span>}
-                                                </h4>
-                                                <p className="text-slate-400 mt-2 max-w-md">
-                                                    {user?.subscription?.plan === 'pro'
-                                                        ? 'You have access to all premium features including unlimited AI insights and exclusive cashback rates.'
-                                                        : 'Upgrade to unlock the full potential of your wealth journey.'}
-                                                </p>
-                                            </div>
-                                            {user?.subscription?.plan !== 'pro' && (
-                                                <Link
-                                                    href="/subscribe"
-                                                    className="bg-white text-black px-6 py-3 rounded-xl font-bold hover:bg-slate-100 transition-colors shadow-lg"
-                                                >
-                                                    Upgrade to Pro
-                                                </Link>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Features Grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="p-4 rounded-xl border border-slate-200 flex items-center gap-3 opacity-75">
-                                            <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-                                                <Zap size={20} />
-                                            </div>
-                                            <div>
-                                                <div className="font-bold text-slate-900">AI Budgeting</div>
-                                                <div className="text-xs text-slate-500">Smart categorization</div>
-                                            </div>
-                                        </div>
-                                        <div className="p-4 rounded-xl border border-primary-100 bg-primary-50/30 flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
-                                                <ShieldCheckIcon className="h-5 w-5" />
-                                            </div>
-                                            <div>
-                                                <div className="font-bold text-slate-900">Pro Protection</div>
-                                                <div className="text-xs text-slate-500">Enhanced security active</div>
+                                    <div className="relative group overflow-hidden rounded-2xl">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 transition-transform duration-500 group-hover:scale-105"></div>
+                                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                                        <div className="relative z-10 p-8 sm:p-10 text-white">
+                                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <div className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold border border-white/10 uppercase tracking-wider">
+                                                            Current Plan
+                                                        </div>
+                                                        {user?.subscription?.plan === 'pro' && (
+                                                            <div className="px-3 py-1 bg-amber-400 text-black rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                                                                <Zap size={12} fill="black" /> Active
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <h4 className="text-4xl sm:text-5xl font-black mb-4 tracking-tight">
+                                                        {user?.subscription?.plan === 'pro' ? 'Pro Member' : 'Free Plan'}
+                                                    </h4>
+                                                    <p className="text-indigo-100 max-w-lg text-lg leading-relaxed font-medium">
+                                                        {user?.subscription?.plan === 'pro'
+                                                            ? 'You are enjoying maximum cashback rates, unlimited AI insights, and priority support.'
+                                                            : 'Upgrade to unlock 50% cashback rates, unlimited AI scans, and instant withdrawals.'}
+                                                    </p>
+                                                </div>
+                                                {user?.subscription?.plan !== 'pro' && (
+                                                    <Link
+                                                        href="/subscribe"
+                                                        className="group/btn relative inline-flex items-center gap-2 bg-white text-indigo-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
+                                                    >
+                                                        Upgrade to Pro
+                                                        <ArrowTopRightOnSquareIcon className="w-5 h-5" />
+                                                    </Link>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

@@ -220,18 +220,23 @@ export default function RecentTransactions() {
                         layout
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                        exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                        whileHover={{ scale: 1.01, y: -2 }}
+                        whileTap={{ scale: 0.99 }}
+                        transition={{ duration: 0.3 }}
                         className="group relative overflow-hidden bg-white border border-slate-100 rounded-2xl p-4 hover:border-primary-200 hover:shadow-md transition-all duration-300 cursor-pointer"
-                        whileHover={{ y: -2 }}
                       >
-                        {/* Hover gradient background */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-slate-50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                        {/* Hover gradient background - More subtle and smooth */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-slate-50/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                         <div className="flex items-center justify-between relative z-10">
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors border border-slate-100">
+                            <motion.div
+                              className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors border border-slate-100"
+                              whileHover={{ rotate: 5, scale: 1.1 }}
+                            >
                               {getCategoryIcon(transaction.category)}
-                            </div>
+                            </motion.div>
                             <div>
                               <p className="font-bold text-slate-900 group-hover:text-primary-700 transition-colors">
                                 {transaction.description.includes('Quick add') ? transaction.category : transaction.description}

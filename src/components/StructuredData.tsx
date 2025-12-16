@@ -38,28 +38,16 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           '@type': 'Organization',
           '@id': `${baseUrl}/#organization`,
           name: 'FinleyBook',
-          alternateName: 'FinleyBook AI Finance',
-          description: 'FinleyBook is an AI-powered personal finance platform helping Australians track expenses and earn cashback.',
           url: baseUrl,
-          logo: {
-            '@type': 'ImageObject',
-            url: `${baseUrl}/logo.png`,
-            width: 512,
-            height: 512
-          },
-          image: {
-            '@type': 'ImageObject',
-            url: `${baseUrl}/og-image.jpg`,
-            width: 1200,
-            height: 630
-          },
+          logo: `${baseUrl}/logo.png`, // Google prefers a direct image URL in 'logo' field or ImageObject
           sameAs: [
             'https://www.linkedin.com/company/finleybook',
             'https://www.crunchbase.com/organization/finleybook',
-            'https://www.tiktok.com/@finleybook',
+            'https://www.tiktok.com/@finleybook1?_r=1&_t=ZS-923DYtBDdrs',
             'https://www.instagram.com/finleybook',
             'https://x.com/finleybook1'
           ],
+          description: 'FinleyBook is a premier AI-powered personal finance platform helping users build wealth through automated tracking and smart rewards.',
           contactPoint: {
             '@type': 'ContactPoint',
             contactType: 'customer service',
@@ -87,10 +75,10 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         const softwareData = {
           '@type': 'SoftwareApplication',
           name: 'FinleyBook',
-          description: 'The #1 AI Wealth Tracker & Cashback App. Find price glitches, earn double rewards, and track your net worth automatically.',
+          description: 'The Intelligent AI Wealth Platform. Automated net worth tracking, smart expense analytics, and premium cashback optimization.',
           url: baseUrl,
           applicationCategory: 'FinanceApplication',
-          applicationSubCategory: 'ShoppingApplication',
+          applicationSubCategory: 'PersonalFinanceApplication',
           operatingSystem: 'Windows, macOS, Android, iOS',
           screenshot: `${baseUrl}/og-image.png`,
           offers: {
@@ -107,11 +95,11 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             worstRating: 1
           },
           featureList: [
-            'AI Wealth Tracker',
-            'Cashback Glitch Finder',
-            'Bank Bounties Hunter',
-            'Expense Manager',
-            'Net Worth Calculator'
+            'AI Wealth Management',
+            'Net Worth Tracking',
+            'Smart Expense Analytics',
+            'Premium Cashback Rewards',
+            'Financial Goal Planning'
           ]
         }
         return softwareData

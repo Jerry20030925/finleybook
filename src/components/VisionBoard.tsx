@@ -180,7 +180,7 @@ export default function VisionBoard({ primaryGoal, compact = false }: VisionBoar
             />
 
             {/* Custom Background Control */}
-            <div className="absolute top-4 right-4 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-4 right-4 z-20 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                 {isEditingBg ? (
                     <div className="flex items-center gap-2 bg-black/50 backdrop-blur-md p-1 rounded-lg border border-white/20">
                         <input
@@ -191,11 +191,11 @@ export default function VisionBoard({ primaryGoal, compact = false }: VisionBoar
                             onChange={(e) => setBgInput(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
                         />
-                        <button onClick={(e) => { e.stopPropagation(); handleUpdateBg(); }} className="p-1 hover:text-green-400"><Check size={14} /></button>
-                        <button onClick={(e) => { e.stopPropagation(); setIsEditingBg(false); }} className="p-1 hover:text-red-400"><X size={14} /></button>
+                        <button onClick={(e) => { e.stopPropagation(); handleUpdateBg(); }} className="p-2 hover:text-green-400"><Check size={16} /></button>
+                        <button onClick={(e) => { e.stopPropagation(); setIsEditingBg(false); }} className="p-2 hover:text-red-400"><X size={16} /></button>
                     </div>
                 ) : (
-                    <button
+                    <motion.button
                         onClick={(e) => {
                             e.stopPropagation();
                             if (!isProMember) {
@@ -205,11 +205,13 @@ export default function VisionBoard({ primaryGoal, compact = false }: VisionBoar
                             setIsEditingBg(true);
                             setBgInput(primaryGoal.image_url || '');
                         }}
-                        className="p-2 bg-black/30 text-white/50 hover:text-white rounded-full backdrop-blur-sm hover:bg-black/50 transition-all"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="p-3 md:p-2 bg-black/30 text-white/70 hover:text-white rounded-full backdrop-blur-sm hover:bg-black/50 transition-all shadow-lg"
                         title="Change Background"
                     >
-                        <ImageIcon size={16} />
-                    </button>
+                        <ImageIcon size={18} />
+                    </motion.button>
                 )}
             </div>
 
@@ -217,7 +219,11 @@ export default function VisionBoard({ primaryGoal, compact = false }: VisionBoar
             <div className="relative z-10 h-full flex flex-col justify-between p-8 md:p-10">
                 {/* Top Section: Title & Progress */}
                 <div className="flex justify-between items-start">
-                    <div>
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                    >
                         <div className="inline-flex items-center gap-2 bg-black/30 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-indigo-300 mb-2 border border-white/10">
                             <Sparkles size={12} />
                             <span>Vision Board</span>
@@ -225,8 +231,13 @@ export default function VisionBoard({ primaryGoal, compact = false }: VisionBoar
                         <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-white drop-shadow-lg">
                             {primaryGoal.title}
                         </h2>
-                    </div>
-                    <div className="text-right hidden md:block">
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-right hidden md:block"
+                    >
                         <div className="text-5xl font-black text-indigo-400 drop-shadow-lg">
                             <CountUp end={percentage} duration={2} suffix="%" />
                         </div>
@@ -241,7 +252,7 @@ export default function VisionBoard({ primaryGoal, compact = false }: VisionBoar
                                 Dream Unlocked!
                             </div>
                         )}
-                    </div>
+                    </motion.div>
                 </div>
 
                 {/* Bottom Section: The Breakdown */}

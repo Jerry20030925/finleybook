@@ -120,7 +120,7 @@ export class ResendService {
             <a href="https://instagram.com/finleybook1" target="_blank" style="margin: 0 8px; display: inline-block;">
                 <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="24" height="24" alt="Instagram" style="border:0;display:block;" />
             </a>
-            <a href="https://tiktok.com/@finleybook" target="_blank" style="margin: 0 8px; display: inline-block;">
+            <a href="https://www.tiktok.com/@finleybook1?_r=1&_t=ZS-923DYtBDdrs" target="_blank" style="margin: 0 8px; display: inline-block;">
                 <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" width="24" height="24" alt="TikTok" style="border:0;display:block;" />
             </a>
             <a href="https://x.com/finleybook1" target="_blank" style="margin: 0 8px; display: inline-block;">
@@ -179,7 +179,7 @@ export class ResendService {
             <a href="https://instagram.com/finleybook1" target="_blank" style="margin: 0 8px; display: inline-block;">
                 <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="24" height="24" alt="Instagram" style="border:0;display:block;" />
             </a>
-            <a href="https://tiktok.com/@finleybook" target="_blank" style="margin: 0 8px; display: inline-block;">
+            <a href="https://www.tiktok.com/@finleybook1?_r=1&_t=ZS-923DYtBDdrs" target="_blank" style="margin: 0 8px; display: inline-block;">
                 <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" width="24" height="24" alt="TikTok" style="border:0;display:block;" />
             </a>
             <a href="https://x.com/finleybook1" target="_blank" style="margin: 0 8px; display: inline-block;">

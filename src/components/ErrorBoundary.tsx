@@ -8,12 +8,15 @@ interface ErrorBoundaryState {
   error: Error | null
 }
 
+import { useLanguage } from './LanguageProvider'
+
 interface ErrorBoundaryProps {
   children: React.ReactNode
   fallback?: React.ReactNode
+  t?: (key: string) => string
 }
 
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundaryInner extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props)
     this.state = { hasError: false, error: null }
@@ -28,6 +31,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   render() {
+    const { t } = this.props
+    // Fallback t function if not provided (shouldn't happen with wrapper)
+    const translate = t || ((k: string) => k)
+
     if (this.state.hasError) {
       return this.props.fallback || (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
@@ -69,7 +76,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              哎呀，出现了问题
+              {translate('error.title')}
             </motion.h1>
 
             <motion.p
@@ -78,7 +85,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              应用遇到了意外错误，别担心，您的数据是安全的。请尝试刷新页面重试。
+              {translate('error.desc')}
             </motion.p>
 
             <motion.button
@@ -90,7 +97,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              刷新页面
+              {translate('error.refresh')}
             </motion.button>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
@@ -101,7 +108,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                 transition={{ delay: 0.8 }}
               >
                 <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
-                  查看错误详情 (开发模式)
+                  {translate('error.details')}
                 </summary>
                 <pre className="mt-2 text-xs bg-gray-100 p-3 rounded-lg overflow-auto text-red-600">
                   {this.state.error.stack}
@@ -117,4 +124,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 }
 
-export default ErrorBoundary
+export default function ErrorBoundary(props: Omit<ErrorBoundaryProps, 't'>) {
+  const { t } = useLanguage()
+  return <ErrorBoundaryInner {...props} t={t} />
+}

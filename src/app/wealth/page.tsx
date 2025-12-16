@@ -91,16 +91,17 @@ export default function WealthPage() {
         setActiveMerchant(merchant)
         setIsTracking(true)
 
-        // Simulate tracking delay then redirect
+        // Direct redirect to the tracking endpoint
+        // This will log the click in the backend and redirect to the real merchant site
+        if (user?.uid) {
+            window.open(`/api/shop/${merchant.id}?uid=${user.uid}`, '_blank')
+        }
+
+        // Reset state after a brief moment
         setTimeout(() => {
-            if (user?.uid) {
-                // For demo purposes, we'll simulate a $150 spend to trigger the Auto-Log Hook
-                const demoAmount = 150
-                window.open(`/api/shop/${merchant.id}?uid=${user.uid}&amount=${demoAmount}`, '_blank')
-            }
             setIsTracking(false)
             setActiveMerchant(null)
-        }, 2000)
+        }, 1000)
     }
 
     const handleProductClick = (product: Product) => {
@@ -148,9 +149,20 @@ export default function WealthPage() {
                             <Wallet className="text-green-200" />
                             {t('wealth.title')}
                         </h1>
-                        <Link href="/wallet" className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm transition-all">
+                        <Link href="/wallet" className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm transition-all flex items-center gap-2">
                             {t('wealth.myWallet')} &rarr;
                         </Link>
+
+                        {/* Transparency Tooltip */}
+                        <div className="group relative ml-2">
+                            <div className="bg-white/10 p-2 rounded-full cursor-help hover:bg-white/20 transition-colors">
+                                <ShieldCheck size={16} className="text-green-200" />
+                            </div>
+                            <div className="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs p-3 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                                <p className="font-bold mb-1">{t('wealth.tooltip.howItWorks.title')}</p>
+                                <p>{t('wealth.tooltip.howItWorks.desc')}</p>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Global Search Bar */}
@@ -193,8 +205,8 @@ export default function WealthPage() {
                                     className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 p-4 z-50 text-gray-900"
                                 >
                                     <div className="flex justify-between items-center mb-2">
-                                        <span className="text-xs font-bold text-gray-500 uppercase">Recent Searches</span>
-                                        <button onClick={clearRecentSearches} className="text-xs text-gray-400 hover:text-red-500">Clear</button>
+                                        <span className="text-xs font-bold text-gray-500 uppercase">{t('wealth.search.recent')}</span>
+                                        <button onClick={clearRecentSearches} className="text-xs text-gray-400 hover:text-red-500">{t('wealth.search.clear')}</button>
                                     </div>
                                     <div className="space-y-1">
                                         {recentSearches.map((term, i) => (
@@ -310,7 +322,7 @@ export default function WealthPage() {
                                         <div className="bg-indigo-100 p-1.5 rounded-lg">
                                             <Tag size={16} className="text-indigo-600" />
                                         </div>
-                                        <h3 className="font-bold text-gray-900">Featured Products</h3>
+                                        <h3 className="font-bold text-gray-900">{t('wealth.section.featured')}</h3>
                                     </div>
                                     <motion.div
                                         variants={{
@@ -382,7 +394,7 @@ export default function WealthPage() {
                                         <Zap size={16} className="text-orange-600" />
                                     </div>
                                     <h3 className="font-bold text-gray-900">
-                                        {debouncedSearchQuery ? 'Matching Stores' : 'Trending Stores'}
+                                        {debouncedSearchQuery ? t('wealth.section.matching') : t('wealth.section.trending')}
                                     </h3>
                                 </div>
                             )}
@@ -406,7 +418,7 @@ export default function WealthPage() {
                                             <div className="col-span-full">
                                                 <div className="text-center py-8 text-gray-500 mb-8">
                                                     <p className="text-lg font-medium">{t('wealth.noResults', { query: debouncedSearchQuery })}</p>
-                                                    <p className="text-sm">Try searching for broader terms like "Tech" or "Shoes"</p>
+                                                    <p className="text-sm">{t('wealth.noResults.tip')}</p>
                                                 </div>
                                             </div>
                                         )

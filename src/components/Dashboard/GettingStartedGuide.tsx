@@ -165,8 +165,14 @@ export default function GettingStartedGuide({
                     <div>
                         <div className="flex items-center gap-3 mb-1">
                             <h2 className="text-lg font-bold text-gray-900">Getting Started</h2>
-                            <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-wide border border-indigo-200">
-                                Level: {level}
+                            <span className="relative px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-wide border border-indigo-200 overflow-hidden">
+                                <span className="relative z-10">Level: {level}</span>
+                                <motion.div
+                                    className="absolute inset-0 bg-white/40 skew-x-12"
+                                    initial={{ x: '-100%' }}
+                                    animate={{ x: '200%' }}
+                                    transition={{ repeat: Infinity, duration: 2, ease: "linear", repeatDelay: 1 }}
+                                />
                             </span>
                         </div>
                         <p className="text-gray-500 text-sm">Complete these quests to master FinleyBook</p>

@@ -17,6 +17,7 @@ import { useCurrency } from '@/components/CurrencyProvider'
 import CsvImportModal from '@/components/CsvImportModal'
 
 import { useRouter } from 'next/navigation'
+import Skeleton from '@/components/Skeleton';
 
 export default function TransactionsPage() {
   const { user, loading: authLoading } = useAuth()
@@ -108,7 +109,7 @@ export default function TransactionsPage() {
     <div className="min-h-screen bg-gray-50">
 
 
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 pb-24">
         <motion.div
           className="mb-8"
           initial={{ opacity: 0, y: 20 }}
@@ -246,14 +247,29 @@ export default function TransactionsPage() {
         {/* Transactions List */}
         <motion.div
           className="bg-white rounded-xl shadow-sm border border-gray-100"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.05
+              }
+            }
+          }}
         >
           {loading ? (
-            <div className="p-8 text-center">
-              <div className="inline-block w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-2 text-gray-500">{t('common.loading')}</p>
+            <div className="p-6 space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex justify-between items-center">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                  <Skeleton className="h-6 w-16" />
+                </div>
+              ))}
             </div>
           ) : filteredTransactions.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
@@ -261,13 +277,14 @@ export default function TransactionsPage() {
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {filteredTransactions.map((transaction, index) => (
+              {filteredTransactions.slice(0, 50).map((transaction) => ( // Performance limit for animation
                 <motion.div
                   key={transaction.id}
                   className="p-6 hover:bg-gray-50 transition-colors"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                  variants={{
+                    hidden: { opacity: 0, y: 10 },
+                    show: { opacity: 1, y: 0 }
+                  }}
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -295,6 +312,11 @@ export default function TransactionsPage() {
                   </div>
                 </motion.div>
               ))}
+              {filteredTransactions.length > 50 && (
+                <div className="p-4 text-center text-sm text-gray-500">
+                  Showing first 50 of {filteredTransactions.length} items
+                </div>
+              )}
             </div>
           )}
         </motion.div>

@@ -115,11 +115,11 @@ export default function AmazonCashbackInput() {
                             className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-base text-gray-900"
                         />
 
-                        <div className="flex gap-3">
+                        <div className="flex flex-col sm:flex-row gap-3">
                             <select
                                 value={selectedGoalId}
                                 onChange={(e) => setSelectedGoalId(e.target.value)}
-                                className="w-1/3 px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 text-sm"
+                                className="w-full sm:w-1/3 px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 text-sm appearance-none"
                             >
                                 <option value="">Boost Goal...</option>
                                 {goals.map(g => <option key={g.id} value={g.id}>{g.title}</option>)}
@@ -131,13 +131,13 @@ export default function AmazonCashbackInput() {
                                 placeholder="Est. Price"
                                 value={estimatedAmount}
                                 onChange={(e) => setEstimatedAmount(e.target.value)}
-                                className="w-1/3 px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 text-sm"
+                                className="w-full sm:w-1/3 px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 text-sm"
                             />
 
                             <button
                                 type="submit"
                                 disabled={loading || !url}
-                                className="flex-1 bg-black text-white font-bold rounded-xl py-3 px-6 transition-all disabled:opacity-50 flex items-center justify-center gap-2 hover:bg-gray-800"
+                                className="w-full sm:flex-1 bg-black text-white font-bold rounded-xl py-3 px-6 transition-all disabled:opacity-50 flex items-center justify-center gap-2 hover:bg-gray-800"
                             >
                                 {loading ? <Loader2 size={18} className="animate-spin" /> : 'Analyze'}
                             </button>

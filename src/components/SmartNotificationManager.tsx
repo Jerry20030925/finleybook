@@ -3,9 +3,11 @@
 import { useEffect, useRef } from 'react'
 import { useAuth } from './AuthProvider'
 import { useNotification } from './NotificationProvider'
+import { useSubscription } from './SubscriptionProvider'
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { Transaction } from '@/lib/dataService'
+import { isMobileApp } from '@/lib/mobileUtils'
 
 // Define budget limits (matching BudgetWidget)
 const BUDGET_LIMITS: { [key: string]: number } = {
@@ -18,6 +20,7 @@ const BUDGET_LIMITS: { [key: string]: number } = {
 export default function SmartNotificationManager() {
     const { user } = useAuth()
     const { addNotification } = useNotification()
+    const { isProMember } = useSubscription()
 
     // Refs to track state without triggering re-renders
     const processedTransactionIds = useRef<Set<string>>(new Set())
@@ -66,7 +69,7 @@ export default function SmartNotificationManager() {
             })
 
             // 3. Check Budget Limits
-            Object.entries(BUDGET_LIMITS).forEach(([category, limit]) => {
+            Object.entries(BUDGET_LIMITS).forEach(async ([category, limit]) => {
                 const spent = categorySpending[category] || 0
                 const percentage = (spent / limit) * 100
 
@@ -74,11 +77,32 @@ export default function SmartNotificationManager() {
                 if (percentage >= 80 && percentage < 100) {
                     const key = `${category}-80`
                     if (!notifiedBudgets.current.has(key)) {
-                        addNotification(
-                            '预算预警',
-                            `${category} 预算已使用 ${percentage.toFixed(0)}% (¥${spent}/¥${limit})`,
-                            'warning'
-                        )
+                        const title = '预算预警'
+                        const body = `${category} 预算已使用 ${percentage.toFixed(0)}% (¥${spent}/¥${limit})`
+
+                        addNotification(title, body, 'warning')
+
+                        // Native Push (Pro Only)
+                        if (await isMobileApp() && isProMember) {
+                            try {
+                                const { LocalNotifications } = await import('@capacitor/local-notifications');
+                                await LocalNotifications.schedule({
+                                    notifications: [{
+                                        title,
+                                        body,
+                                        id: Math.floor(Math.random() * 100000), // Random ID for now
+                                        schedule: { at: new Date(Date.now() + 100) },
+                                        sound: undefined,
+                                        attachments: undefined,
+                                        actionTypeId: "",
+                                        extra: undefined
+                                    }]
+                                });
+                            } catch (e) {
+                                console.error('Failed to schedule native notification', e);
+                            }
+                        }
+
                         notifiedBudgets.current.add(key)
                     }
                 }
@@ -87,11 +111,32 @@ export default function SmartNotificationManager() {
                 if (percentage >= 100) {
                     const key = `${category}-100`
                     if (!notifiedBudgets.current.has(key)) {
-                        addNotification(
-                            '预算超支',
-                            `${category} 预算已超支！当前支出 ¥${spent} (预算 ¥${limit})`,
-                            'error'
-                        )
+                        const title = '预算超支'
+                        const body = `${category} 预算已超支！当前支出 ¥${spent} (预算 ¥${limit})`
+
+                        addNotification(title, body, 'error')
+
+                        // Native Push (Critical) - Pro Only
+                        if (await isMobileApp() && isProMember) {
+                            try {
+                                const { LocalNotifications } = await import('@capacitor/local-notifications');
+                                await LocalNotifications.schedule({
+                                    notifications: [{
+                                        title,
+                                        body,
+                                        id: Math.floor(Math.random() * 100000),
+                                        schedule: { at: new Date(Date.now() + 100) },
+                                        sound: undefined, // Default
+                                        attachments: undefined,
+                                        actionTypeId: "",
+                                        extra: undefined
+                                    }]
+                                });
+                            } catch (e) {
+                                console.error('Failed to schedule native notification', e);
+                            }
+                        }
+
                         notifiedBudgets.current.add(key)
                     }
                 }

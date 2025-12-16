@@ -1,4 +1,4 @@
-import HomePage from '@/components/HomePage'
+import AppEntry from '@/components/AppEntry'
 
 export const dynamic = 'force-static'
 
@@ -17,7 +17,7 @@ export default function Home() {
     <>
       <StructuredData type="software" />
       <StructuredData type="organization" />
-      <HomePage />
+      <AppEntry />
     </>
   )
 }

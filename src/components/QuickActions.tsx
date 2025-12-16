@@ -11,6 +11,7 @@ import {
   Gift,
   Coffee
 } from 'lucide-react'
+import TouchableScale from './TouchableScale'
 import TransactionModal from './TransactionModal'
 import ReceiptUploadModal from './ReceiptUploadModal'
 import CsvImportModal from './CsvImportModal'
@@ -123,20 +124,21 @@ export default function QuickActions({ onInvite, onDataRefresh }: QuickActionsPr
           <h2 className="text-lg font-bold text-gray-900">{t('quickActions.title')}</h2>
         </div>
 
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
           {actions.map((action, index) => (
-            <motion.button
+            <TouchableScale
               key={action.name}
               onClick={() => handleAction(action.action)}
-              className="flex flex-col items-center gap-3 group"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              title={action.name}
+              className="flex flex-col items-center gap-2 md:gap-3 group border-0 bg-transparent p-0"
+              scale={0.95}
             >
               <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center text-white shadow-md transition-all duration-300 group-hover:shadow-xl ${action.color}`}>
-                <action.icon size={28} strokeWidth={2} />
+                <action.icon size={26} strokeWidth={2} className="md:w-7 md:h-7" />
               </div>
-            </motion.button>
+              <span className="text-xs font-medium text-gray-600 text-center leading-tight max-w-[80px] line-clamp-2 md:line-clamp-1">
+                {action.name}
+              </span>
+            </TouchableScale>
           ))}
         </div>
       </div>

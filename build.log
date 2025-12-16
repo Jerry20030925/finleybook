@@ -1,0 +1,1077 @@
+
+> finleybook@1.0.0 build
+> next build
+
+  ▲ Next.js 14.2.33
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+Firebase Admin initialized successfully
+Firebase Admin initialized successfully
+Firebase Admin initialized successfully
+Firebase Admin initialized successfully
+Firebase Admin initialized successfully
+Firebase Admin initialized successfully
+Firebase Admin initialized successfully
+Firebase Admin initialized successfully
+   Generating static pages (0/76) ...
+   Generating static pages (19/76) 
+Firebase Admin initialized successfully
+Error syncing Skimlinks merchants: B [Error]: Dynamic server usage: Route /api/skimlinks/merchants couldn't be rendered statically because it used `request.url`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at V (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+    at Object.get (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29465)
+    at m (/Users/jerry/finleybook/.next/server/app/api/skimlinks/merchants/route.js:1:2031)
+    at /Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /Users/jerry/finleybook/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/Users/jerry/finleybook/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/Users/jerry/finleybook/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NoopTracer.startActiveSpan (/Users/jerry/finleybook/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18093)
+    at ProxyTracer.startActiveSpan (/Users/jerry/finleybook/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18854)
+    at /Users/jerry/finleybook/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+  description: "Route /api/skimlinks/merchants couldn't be rendered statically because it used `request.url`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (38/76) 
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/email-test". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/_not-found". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/profile". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/debug-env". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/admin/reports". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/budget". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/debug". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/admin". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/blog". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/goals". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/shop". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/wallet". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/privacy". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/subscribe". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/terms". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/about". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/wealth". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/blog/2026-strategic-planning-guide". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/subscription". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+   Generating static pages (57/76) 
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/blog/manifestation-guide-2025". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/debug-config". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/blog/neuroscience-of-visualization". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/blog/personal-budget-mastery". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/blog/vision-board-mistakes". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/blog/behavioral-economics-hyperbolic-discounting". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/transactions". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/blog/compound-effect-micro-habits". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/settings". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/blog/digital-minimalism-finance". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/blog/smart-money-2025-asymmetric-bets". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/redeem". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/blog/ai-personal-finance-revolution". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/blog/stoicism-investing". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/refer". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+
+Error occurred prerendering page "/". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/dashboard". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  digest: '3870409687'
+}
+
+Error occurred prerendering page "/reports". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: useLanguage must be used within a LanguageProvider
+    at l (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:59660)
+    at c (/Users/jerry/finleybook/.next/server/chunks/5339.js:2:9302)
+    at nj (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nM (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61547)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+    at nD (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+    at nN (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+    at nB (/Users/jerry/finleybook/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+ ✓ Generating static pages (76/76)
+
+> Export encountered errors on following paths:
+	/_not-found/page: /_not-found
+	/about/page: /about
+	/admin/page: /admin
+	/admin/reports/page: /admin/reports
+	/blog/[slug]/page: /blog/2026-strategic-planning-guide
+	/blog/[slug]/page: /blog/ai-personal-finance-revolution
+	/blog/[slug]/page: /blog/behavioral-economics-hyperbolic-discounting
+	/blog/[slug]/page: /blog/compound-effect-micro-habits
+	/blog/[slug]/page: /blog/digital-minimalism-finance
+	/blog/[slug]/page: /blog/manifestation-guide-2025
+	/blog/[slug]/page: /blog/neuroscience-of-visualization
+	/blog/[slug]/page: /blog/personal-budget-mastery
+	/blog/[slug]/page: /blog/smart-money-2025-asymmetric-bets
+	/blog/[slug]/page: /blog/stoicism-investing
+	/blog/[slug]/page: /blog/vision-board-mistakes
+	/blog/page: /blog
+	/budget/page: /budget
+	/dashboard/page: /dashboard
+	/debug-config/page: /debug-config
+	/debug-env/page: /debug-env
+	/debug/page: /debug
+	/email-test/page: /email-test
+	/goals/page: /goals
+	/page: /
+	/privacy/page: /privacy
+	/profile/page: /profile
+	/redeem/page: /redeem
+	/refer/page: /refer
+	/reports/page: /reports
+	/settings/page: /settings
+	/shop/page: /shop
+	/subscribe/page: /subscribe
+	/subscription/page: /subscription
+	/terms/page: /terms
+	/transactions/page: /transactions
+	/wallet/page: /wallet
+	/wealth/page: /wealth

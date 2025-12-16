@@ -2,14 +2,16 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { StarIcon, ArrowUpIcon } from '@heroicons/react/24/outline'
+import { StarIcon, ArrowUpIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
 import { useSubscription } from './SubscriptionProvider'
+import { useAuth } from './AuthProvider'
 import { useLanguage } from './LanguageProvider'
 import { SUBSCRIPTION_PLANS } from '@/lib/stripe'
 import SubscriptionPage from './SubscriptionPage'
 
 export default function SubscriptionStatus() {
   const { subscription, isProMember } = useSubscription()
+  const { user } = useAuth()
   const { t } = useLanguage()
   const [showUpgrade, setShowUpgrade] = useState(false)
 
@@ -73,16 +75,41 @@ export default function SubscriptionStatus() {
               <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
               {t('subscription.features.pro.unlimited')}
             </div>
+            <div className="flex items-center text-sm text-blue-100 mt-1">
+              <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
+              Mobile Smart Alerts & Haptics 📱
+            </div>
             <button
-              onClick={() => {
-                if (confirm('Are you sure you want to cancel your subscription?')) {
-                  // In a real app, call API to cancel
-                  alert('Subscription cancellation request sent.');
+              onClick={async () => {
+                try {
+                  const token = await user?.getIdToken();
+                  if (!token) return;
+
+                  const res = await fetch('/api/stripe/create-portal-session', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                      returnUrl: window.location.href
+                    })
+                  });
+
+                  const data = await res.json();
+                  if (data.url) {
+                    window.location.href = data.url;
+                  } else {
+                    alert('Could not open subscription portal');
+                  }
+                } catch (e) {
+                  console.error(e);
+                  alert('Error opening portal');
                 }
               }}
-              className="text-xs text-blue-100 hover:text-white underline opacity-80 hover:opacity-100 transition-opacity"
+              className="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-xs font-semibold text-white transition-all flex items-center gap-2"
             >
-              {t('subscription.status.cancel')}
+              Manage Subscription <ArrowTopRightOnSquareIcon className="w-3 h-3" />
             </button>
           </div>
         </div>
