@@ -5,7 +5,7 @@ import { useLanguage } from '@/components/LanguageProvider'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { UserCircleIcon, TrophyIcon, BanknotesIcon, ChartBarIcon, ShieldCheckIcon, WalletIcon, InformationCircleIcon } from '@heroicons/react/24/outline'
+import { UserCircleIcon, TrophyIcon, BanknotesIcon, ChartBarIcon, ShieldCheckIcon, WalletIcon, InformationCircleIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 
 import SubscriptionStatus from '@/components/SubscriptionStatus'
@@ -15,7 +15,7 @@ import AIChatInput from '@/components/AIChatInput'
 import { SparklesIcon } from '@heroicons/react/24/solid'
 
 export default function ProfilePage() {
-    const { user, loading } = useAuth()
+    const { user, loading, logout } = useAuth()
     const { t } = useLanguage()
     const { formatAmount } = useCurrency()
     const router = useRouter()
@@ -78,9 +78,9 @@ export default function ProfilePage() {
                     <div className="absolute top-0 right-0 p-4">
                         <Link
                             href="/settings"
-                            className="text-sm font-medium text-gray-500 hover:text-gray-900 flex items-center gap-1"
+                            className="p-2 text-gray-400 hover:text-gray-900 transition-colors rounded-full hover:bg-gray-100"
                         >
-                            {t('profile.edit')} <span aria-hidden="true">&rarr;</span>
+                            <Cog6ToothIcon className="w-6 h-6" />
                         </Link>
                     </div>
 
@@ -199,74 +199,21 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* Referral Hub */}
-                <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-gray-100">
-                        <h3 className="text-lg font-bold text-gray-900">{t('profile.referral.title')}</h3>
-                        <p className="text-gray-500 text-sm">{t('profile.referral.desc')}</p>
-                    </div>
-                    <div className="p-6">
-                        <ReferralGiftCard code={referralStats.referralCode} />
-                    </div>
-                </div>
-
-                {/* Redeem Code Section */}
-                <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-gray-100">
-                        <h3 className="text-lg font-bold text-gray-900">{t('profile.redeem.title')}</h3>
-                        <p className="text-gray-500 text-sm">{t('profile.redeem.desc')}</p>
-                    </div>
-                    <div className="p-6">
-                        <div className="flex gap-2 max-w-md">
-                            <input
-                                type="text"
-                                value={redeemCode}
-                                onChange={(e) => setRedeemCode(e.target.value)}
-                                placeholder={t('profile.redeem.placeholder')}
-                                className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm p-2.5 border"
-                            />
-                            <button
-                                onClick={async () => {
-                                    if (!redeemCode) return;
-                                    setRedeeming(true);
-                                    setRedeemMessage(null);
-                                    try {
-                                        const token = await user?.getIdToken();
-                                        const res = await fetch('/api/referral/redeem', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'Authorization': `Bearer ${token}`
-                                            },
-                                            body: JSON.stringify({ code: redeemCode })
-                                        });
-                                        const data = await res.json();
-                                        if (res.ok) {
-                                            setRedeemMessage({ type: 'success', text: data.message });
-                                            setRedeemCode('');
-                                            await user?.getIdToken(true);
-                                        } else {
-                                            setRedeemMessage({ type: 'error', text: data.error });
-                                        }
-                                    } catch (e) {
-                                        setRedeemMessage({ type: 'error', text: t('profile.redeem.failed') });
-                                    } finally {
-                                        setRedeeming(false);
-                                    }
-                                }}
-                                disabled={redeeming || !redeemCode}
-                                className="inline-flex justify-center rounded-lg border border-transparent bg-primary-600 py-2.5 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
-                            >
-                                {redeeming ? '...' : t('profile.redeem.button')}
-                            </button>
-                        </div>
-                        {redeemMessage && (
-                            <p className={`mt-2 text-sm ${redeemMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                                {redeemMessage.text}
-                            </p>
-                        )}
-                    </div>
-                </div>
+                {/* Logout Button */}
+                <button
+                    onClick={async () => {
+                        try {
+                            await logout()
+                            router.push('/')
+                        } catch (error) {
+                            console.error('Logout failed', error)
+                        }
+                    }}
+                    className="w-full bg-white text-red-600 font-medium py-4 rounded-2xl shadow-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-2 border border-red-100"
+                >
+                    <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                    {t('nav.signOut')}
+                </button>
 
                 {/* Subscription Status */}
                 <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
