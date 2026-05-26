@@ -148,12 +148,13 @@ export default function BottomNavigation() {
                                     }}
                                     className="relative w-[60px] h-[60px] min-w-[60px] min-h-[60px] rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center border-4 border-white"
                                 >
-                                    {/* Ambient glow ring */}
+                                    {/* Ambient glow ring — easeInOut for symmetric breathing */}
                                     {allowRichMotion && (
                                         <motion.span
                                             className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 opacity-0"
-                                            animate={{ scale: [1, 1.5], opacity: [0.35, 0] }}
-                                            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut', repeatDelay: 2 }}
+                                            animate={{ scale: [1, 1.55], opacity: [0.38, 0] }}
+                                            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', repeatDelay: 2.2 }}
+                                            style={{ willChange: 'transform, opacity' }}
                                         />
                                     )}
                                     <PlusIcon className="w-8 h-8" />
@@ -180,13 +181,16 @@ export default function BottomNavigation() {
                             )}
                             aria-current={isActive ? 'page' : undefined}
                         >
-                            {/* Morphing Background Indicator */}
+                            {/* Morphing background — layoutId shared layout animation */}
                             {isActive && (
                                 <motion.div
                                     layoutId="activeTab"
                                     className="absolute inset-x-1.5 top-1 bottom-1 rounded-2xl z-0"
-                                    style={{ background: 'linear-gradient(135deg, rgba(237,233,254,1) 0%, rgba(224,231,255,1) 100%)' }}
-                                    transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                                    style={{
+                                        background: 'linear-gradient(135deg, rgba(237,233,254,1) 0%, rgba(224,231,255,1) 100%)',
+                                        willChange: 'transform',
+                                    }}
+                                    transition={{ type: 'spring', stiffness: 400, damping: 34 }}
                                 />
                             )}
 
@@ -196,16 +200,18 @@ export default function BottomNavigation() {
                                     scale: isActive ? 1.06 : 1,
                                     y: isActive ? -1 : 0,
                                 } : {
-                                    scale: isActive ? [1, 1.18, 1.08] : 1,
+                                    scale: isActive ? [1, 1.15, 1.07] : 1,
                                     y: isActive ? -2 : 0,
-                                    rotate: isActive ? [0, -5, 4, 0] : 0
+                                    rotate: isActive ? [0, -4, 3, 0] : 0,
                                 }}
                                 whileTap={{ scale: 0.88 }}
+                                style={{ willChange: 'transform' }}
                                 transition={{
                                     type: 'spring',
-                                    stiffness: 400,
-                                    damping: 22,
-                                    duration: reduceMotion ? 0.14 : 0.3
+                                    // was 400/22 — softened for less harsh tap rebound
+                                    stiffness: 360,
+                                    damping: 26,
+                                    duration: reduceMotion ? 0.14 : 0.28,
                                 }}
                             >
                                 <Icon className="w-6 h-6" />

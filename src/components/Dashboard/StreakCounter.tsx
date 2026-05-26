@@ -82,32 +82,21 @@ export default function StreakCounter({
                 }
             `}>
                 <div className="relative flex items-center justify-center w-10 h-10">
-                    {/* Glow Effect */}
+                    {/* Glow — scale+opacity only (GPU safe) */}
                     {isActive && (
                         <motion.div
-                            animate={{
-                                scale: [1, 1.2, 1],
-                                opacity: [0.3, 0.6, 0.3],
-                            }}
-                            transition={{
-                                duration: 2.5,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                            }}
+                            animate={{ scale: [1, 1.25, 1], opacity: [0.28, 0.55, 0.28] }}
+                            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
+                            style={{ willChange: 'transform, opacity' }}
                             className="absolute inset-0 bg-orange-500 rounded-full blur-lg"
                         />
                     )}
 
+                    {/* Flame bob — shorter duration feels more energetic */}
                     <motion.div
-                        animate={isActive ? {
-                            y: [0, -3, 0],
-                            scale: [1, 1.1, 1],
-                        } : {}}
-                        transition={{
-                            duration: 1.5,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                        }}
+                        animate={isActive ? { y: [0, -3, 0], scale: [1, 1.08, 1] } : {}}
+                        transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
+                        style={{ willChange: 'transform' }}
                         className="relative"
                     >
                         <Flame
@@ -153,15 +142,19 @@ export default function StreakCounter({
             {/* Weekly calendar */}
             <div className="px-4 py-3 border-t border-gray-100">
                 <div className="flex items-center justify-between gap-1">
-                    {weekCalendar.map(({ dateStr, label, isActive: dayActive, isToday }) => (
+                    {weekCalendar.map(({ dateStr, label, isActive: dayActive, isToday }, idx) => (
                         <div key={dateStr} className="flex flex-col items-center gap-1 flex-1">
                             <span className={`text-[9px] font-medium ${isToday ? 'text-orange-600' : 'text-gray-400'}`}>
                                 {label}
                             </span>
                             <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ delay: 0.1 }}
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                style={{ willChange: 'transform, opacity' }}
+                                transition={{
+                                    type: 'spring', stiffness: 380, damping: 22,
+                                    delay: 0.05 + idx * 0.04,  // cascade left→right
+                                }}
                                 className={`
                                     w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all
                                     ${dayActive
@@ -192,9 +185,10 @@ export default function StreakCounter({
                     </div>
                     <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progressToNext}%` }}
-                            transition={{ duration: 0.8, ease: 'easeOut' }}
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: progressToNext / 100 }}
+                            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+                            style={{ originX: 0, willChange: 'transform' }}
                             className="h-full bg-gradient-to-r from-orange-400 to-amber-500 rounded-full"
                         />
                     </div>

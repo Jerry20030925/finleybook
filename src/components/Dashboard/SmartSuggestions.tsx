@@ -225,7 +225,12 @@ const SmartSuggestions = memo(function SmartSuggestions({ transactions, monthlyB
     const Icon = activeSuggestion.icon
 
     return (
-        <div className="bg-white rounded-3xl p-6 border border-indigo-100 shadow-[0_0_20px_rgba(99,102,241,0.15)] h-full flex flex-col relative overflow-hidden group transition-all hover:shadow-[0_0_25px_rgba(99,102,241,0.25)] hover:scale-[1.01] duration-500">
+        <motion.div
+        whileHover={{ scale: 1.01, boxShadow: '0 0 28px rgba(99,102,241,0.25)' }}
+        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        style={{ willChange: 'transform' }}
+        className="bg-white rounded-3xl p-6 border border-indigo-100 shadow-[0_0_20px_rgba(99,102,241,0.15)] h-full flex flex-col relative overflow-hidden group"
+    >
             {/* Gradient Border Top */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
 
@@ -235,8 +240,16 @@ const SmartSuggestions = memo(function SmartSuggestions({ transactions, monthlyB
                         <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors duration-500">
                             <Sparkles size={20} className="text-indigo-600" />
                         </div>
-                        {/* Pulse Dot */}
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+                        {/* Pulse dot — Framer motion ring, smoother than CSS animate-pulse */}
+                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                            <motion.span
+                                className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60"
+                                animate={{ scale: [1, 1.9], opacity: [0.6, 0] }}
+                                transition={{ duration: 1.4, repeat: Infinity, ease: 'easeOut' }}
+                                style={{ willChange: 'transform, opacity' }}
+                            />
+                            <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
+                        </span>
                     </div>
                     <div>
                         <h3 className="font-bold text-gray-900 leading-none">Finley AI</h3>
@@ -276,8 +289,10 @@ const SmartSuggestions = memo(function SmartSuggestions({ transactions, monthlyB
                     ) : (
                         <motion.div
                             key={activeSuggestion.id}
-                            initial={{ opacity: 0, y: 5 }}
+                            initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                            style={{ willChange: 'transform, opacity' }}
                             className="w-full"
                         >
                             <div className={`p-4 rounded-2xl mb-2 flex items-start gap-4 ${activeSuggestion.type === 'warning' ? 'bg-red-50' :
@@ -321,7 +336,7 @@ const SmartSuggestions = memo(function SmartSuggestions({ transactions, monthlyB
                     Ask Finley <ArrowRight size={10} />
                 </Link>
             </div>
-        </div>
+        </motion.div>
     )
 })
 

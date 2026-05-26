@@ -20,37 +20,15 @@ interface OpportunityRadarProps {
 }
 
 const MOCK_OPPORTUNITIES: Opportunity[] = [
-    {
-        id: '1',
-        type: 'dupe',
-        title: '平替发现',
-        description: 'Aesop 洗手液 ($45) vs Thankyou ($8)',
-        savedAmount: 37,
-        originalPrice: 45,
-        newPrice: 8
-    },
-    {
-        id: '2',
-        type: 'sub',
-        title: '闲置订阅',
-        description: 'Disney+ 已闲置 25 天',
-        savedAmount: 14
-    },
-    {
-        id: '3',
-        type: 'deal',
-        title: '羊毛警报',
-        description: 'Coles 洗洁精半价',
-        savedAmount: 5
-    }
+    { id: '1', type: 'dupe', title: '平替发现', description: 'Aesop 洗手液 ($45) vs Thankyou ($8)', savedAmount: 37, originalPrice: 45, newPrice: 8 },
+    { id: '2', type: 'sub',  title: '闲置订阅', description: 'Disney+ 已闲置 25 天', savedAmount: 14 },
+    { id: '3', type: 'deal', title: '羊毛警报', description: 'Coles 洗洁精半价', savedAmount: 5 },
 ]
 
 const OpportunityRadar = memo(function OpportunityRadar({ onAccept, onReject }: OpportunityRadarProps) {
     const [cards, setCards] = useState(MOCK_OPPORTUNITIES)
 
-    const removeCard = (id: string) => {
-        setCards((prev) => prev.filter((c) => c.id !== id))
-    }
+    const removeCard = (id: string) => setCards((prev) => prev.filter((c) => c.id !== id))
 
     return (
         <div className="relative w-full max-w-sm mx-auto h-64 mt-8">
@@ -67,9 +45,14 @@ const OpportunityRadar = memo(function OpportunityRadar({ onAccept, onReject }: 
                 />
             ))}
             {cards.length === 0 && (
-                <div className="flex items-center justify-center h-full text-gray-400 text-sm bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex items-center justify-center h-full text-gray-400 text-sm bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200"
+                >
                     暂无新机会，明天再来！
-                </div>
+                </motion.div>
             )}
         </div>
     )
@@ -77,41 +60,48 @@ const OpportunityRadar = memo(function OpportunityRadar({ onAccept, onReject }: 
 
 export default OpportunityRadar
 
-function Card({ card, active, onSwipe }: { card: Opportunity, active: boolean, onSwipe: (dir: 'left' | 'right') => void }) {
+function Card({ card, active, onSwipe }: { card: Opportunity; active: boolean; onSwipe: (dir: 'left' | 'right') => void }) {
     const x = useMotionValue(0)
-    const rotate = useTransform(x, [-200, 200], [-30, 30])
-    const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0])
+
+    // Tighter rotate ±18° (was ±30°) — less distracting tilt
+    const rotate = useTransform(x, [-200, 200], [-18, 18])
+
+    // Symmetric fade: full opacity at center, fades on both edges
+    const opacity = useTransform(x, [-180, -60, 0, 60, 180], [0, 1, 1, 1, 0])
+
     const background = useTransform(
         x,
         [-200, 0, 200],
-        ['rgb(254, 202, 202)', 'rgb(255, 255, 255)', 'rgb(167, 243, 208)']
+        ['rgb(254,202,202)', 'rgb(255,255,255)', 'rgb(167,243,208)']
     )
 
-    const handleDragEnd = (event: any, info: PanInfo) => {
-        if (info.offset.x > 100) {
-            onSwipe('right')
-        } else if (info.offset.x < -100) {
-            onSwipe('left')
-        }
+    const handleDragEnd = (_: any, info: PanInfo) => {
+        if (info.offset.x > 90)       onSwipe('right')
+        else if (info.offset.x < -90) onSwipe('left')
     }
 
     if (!active) return null
 
     return (
         <motion.div
-            style={{ x, rotate, opacity, background }}
+            style={{ x, rotate, opacity, background, willChange: 'transform' }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.12}          // gentle bounce-back on release
+            dragMomentum={false}        // prevent drift after finger lift
             onDragEnd={handleDragEnd}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 340, damping: 26 }}
             className="absolute inset-0 rounded-2xl shadow-xl border border-gray-100 p-6 flex flex-col justify-between cursor-grab active:cursor-grabbing"
         >
             <div className="flex items-center gap-3 mb-4">
-                <div className={`p-3 rounded-full ${card.type === 'dupe' ? 'bg-purple-100 text-purple-600' :
-                    card.type === 'sub' ? 'bg-red-100 text-red-600' :
-                        'bg-amber-100 text-amber-600'
-                    }`}>
+                <div className={`p-3 rounded-full ${
+                    card.type === 'dupe' ? 'bg-purple-100 text-purple-600' :
+                    card.type === 'sub'  ? 'bg-red-100 text-red-600' :
+                                          'bg-amber-100 text-amber-600'
+                }`}>
                     {card.type === 'dupe' && <ShoppingBag size={20} />}
-                    {card.type === 'sub' && <AlertCircle size={20} />}
+                    {card.type === 'sub'  && <AlertCircle size={20} />}
                     {card.type === 'deal' && <Tag size={20} />}
                 </div>
                 <div>
@@ -121,18 +111,12 @@ function Card({ card, active, onSwipe }: { card: Opportunity, active: boolean, o
             </div>
 
             <div className="flex-1 flex items-center justify-center text-center">
-                <p className="text-gray-700 font-medium text-lg leading-relaxed">
-                    {card.description}
-                </p>
+                <p className="text-gray-700 font-medium text-lg leading-relaxed">{card.description}</p>
             </div>
 
             <div className="flex justify-between mt-4 text-sm font-bold">
-                <div className="text-red-400 flex items-center gap-1">
-                    <X size={16} /> 忽略
-                </div>
-                <div className="text-emerald-500 flex items-center gap-1">
-                    执行 <Check size={16} />
-                </div>
+                <span className="text-red-400 flex items-center gap-1"><X size={16} /> 忽略</span>
+                <span className="text-emerald-500 flex items-center gap-1">执行 <Check size={16} /></span>
             </div>
         </motion.div>
     )

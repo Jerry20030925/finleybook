@@ -142,8 +142,9 @@ const containerVariants = {
 }
 
 const itemVariants = {
-    hidden: { opacity: 0, y: 18 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as any } }
+    hidden: { opacity: 0, y: 14 },
+    // duration reduced 0.55→0.38 for snappier entrance; ease unchanged
+    visible: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] as any } }
 }
 
 export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
@@ -153,10 +154,11 @@ export default function LandingPage({ onStart, onLogin }: LandingPageProps) {
     const { reduceMotion, allowRichMotion, isMobile } = useExperience()
     const ambientMotionEnabled = allowRichMotion && !isMobile
     const { scrollYProgress } = useScroll()
+    // mass raised & damping raised: smoother deceleration on fast scroll
     const progressValue = useSpring(scrollYProgress, {
         stiffness: 120,
-        damping: 26,
-        mass: 0.2
+        damping: 32,
+        mass: 0.35,
     })
 
     return (
@@ -565,9 +567,10 @@ function FeatureCard({ item, index, allowRichMotion }: { item: FeatureItem; inde
             <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-slate-200">
                 <motion.div
                     className={`h-full bg-gradient-to-r ${item.accent}`}
-                    initial={{ width: '0%' }}
-                    animate={inView ? { width: '100%' } : {}}
-                    transition={{ duration: 1.2, delay: 0.25 + index * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                    initial={{ scaleX: 0 }}
+                    animate={inView ? { scaleX: 1 } : {}}
+                    transition={{ duration: 0.9, delay: 0.22 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ originX: 0, willChange: 'transform' }}
                 />
             </div>
         </motion.article>
@@ -596,13 +599,14 @@ function StepCard({ step, index, allowRichMotion }: { step: StepItem; index: num
                 transition={{ duration: 0.5, delay: 0.2 + index * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
             >
                 {index + 1}
-                {/* Pulse ring */}
+                {/* Pulse ring — GPU: only scale+opacity */}
                 {inView && (
                     <motion.span
                         className="absolute inset-0 rounded-full bg-slate-950"
                         initial={{ scale: 1, opacity: 0.4 }}
                         animate={{ scale: 2, opacity: 0 }}
-                        transition={{ duration: 0.9, delay: 0.4 + index * 0.1, ease: 'easeOut' }}
+                        transition={{ duration: 0.8, delay: 0.35 + index * 0.1, ease: 'easeOut' }}
+                        style={{ willChange: 'transform, opacity' }}
                     />
                 )}
             </motion.div>
@@ -756,6 +760,7 @@ function AnimatedTicker({ reduceMotion }: { reduceMotion: boolean }) {
                 className="flex min-w-max items-center gap-3 py-1"
                 animate={reduceMotion ? undefined : { x: ['0%', '-50%'] }}
                 transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+                style={{ willChange: 'transform' }}
             >
                 {entries.map((item, index) => (
                     <div
@@ -790,17 +795,18 @@ function InsightOrbit({ reduceMotion }: { reduceMotion: boolean }) {
             transition={{ duration: 0.55, delay: 0.05 }}
             className="relative mx-auto flex min-h-[18rem] w-full items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-950 to-slate-900 p-6"
         >
-            {/* Orbit rings */}
+            {/* Orbit rings — will-change:transform for GPU compositing */}
             <motion.div
                 className="absolute h-56 w-56 rounded-full border border-cyan-400/20"
                 animate={reduceMotion ? undefined : { rotate: 360 }}
                 transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+                style={{ willChange: 'transform' }}
             >
-                {/* Dot on outer ring */}
                 <motion.div
                     className="absolute -top-1.5 left-1/2 -translate-x-1/2 flex items-center justify-center"
                     animate={reduceMotion ? undefined : { rotate: -360 }}
                     transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+                    style={{ willChange: 'transform' }}
                 >
                     <div className="h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
                 </motion.div>
@@ -810,12 +816,13 @@ function InsightOrbit({ reduceMotion }: { reduceMotion: boolean }) {
                 className="absolute h-44 w-44 rounded-full border border-sky-300/25"
                 animate={reduceMotion ? undefined : { rotate: -360 }}
                 transition={{ duration: 17, repeat: Infinity, ease: 'linear' }}
+                style={{ willChange: 'transform' }}
             >
-                {/* Dot on mid ring */}
                 <motion.div
                     className="absolute -top-1.5 left-1/2 -translate-x-1/2 flex items-center justify-center"
                     animate={reduceMotion ? undefined : { rotate: 360 }}
                     transition={{ duration: 17, repeat: Infinity, ease: 'linear' }}
+                    style={{ willChange: 'transform' }}
                 >
                     <div className="h-2.5 w-2.5 rounded-full bg-sky-300 shadow-[0_0_6px_rgba(125,211,252,0.8)]" />
                 </motion.div>
@@ -825,6 +832,7 @@ function InsightOrbit({ reduceMotion }: { reduceMotion: boolean }) {
                 className="absolute h-32 w-32 rounded-full border border-cyan-200/30"
                 animate={reduceMotion ? undefined : { scale: [0.95, 1.06, 0.95] }}
                 transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ willChange: 'transform' }}
             />
 
             {/* Inner glow */}
@@ -962,37 +970,64 @@ function MetricBox({ label, value }: { label: string; value: string }) {
 
 /* ─── Pulse Line Chart ────────────────────────────────────── */
 
+// Path length ≈ 340px (measured). strokeDashoffset replaces pathLength — GPU-composited.
+const PATH_LEN = 340
+
 function PulseLineChart({ reduceMotion }: { reduceMotion: boolean }) {
-    const lineMotion = reduceMotion ? { pathLength: 1 } : { pathLength: [0.6, 1, 0.6] }
-    const dotMotion = reduceMotion ? { cx: 246 } : { cx: [40, 246, 40] }
+    // Animate opacity of the line segment instead of pathLength (CPU-bound SVG filter)
+    // The dot rides a translateX-only animation (GPU safe)
+    const dotX = reduceMotion ? 246 : undefined
 
     return (
         <svg viewBox="0 0 280 60" className="h-14 w-full" role="img" aria-label="Trend pulse chart">
             <path d="M0 45 L280 45" stroke="rgba(148,163,184,0.28)" strokeWidth="1" />
-            <motion.path
+
+            {/* Static path — always fully drawn */}
+            <path
                 d="M10 40 C 50 18, 80 30, 120 22 C 145 18, 165 38, 205 26 C 230 18, 245 16, 270 12"
                 fill="none"
                 stroke="rgb(56 189 248)"
                 strokeWidth="2.5"
                 strokeLinecap="round"
-                animate={lineMotion}
-                transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                strokeDasharray={PATH_LEN}
+                strokeDashoffset="0"
             />
+
+            {/* Animated glow sweep — opacity only (GPU compositor) */}
+            {!reduceMotion && (
+                <motion.path
+                    d="M10 40 C 50 18, 80 30, 120 22 C 145 18, 165 38, 205 26 C 230 18, 245 16, 270 12"
+                    fill="none"
+                    stroke="rgb(186 230 253)"
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                    strokeDasharray={PATH_LEN}
+                    strokeDashoffset="0"
+                    animate={{ opacity: [0.15, 0.55, 0.15] }}
+                    transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                    style={{ willChange: 'opacity' }}
+                />
+            )}
+
+            {/* Dot — translateX only (GPU safe) */}
             <motion.circle
                 cy="12"
                 r="4"
                 fill="rgb(56 189 248)"
-                animate={dotMotion}
+                cx={dotX ?? 40}
+                animate={reduceMotion ? undefined : { cx: [40, 246, 40] }}
                 transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ willChange: 'transform' }}
             />
-            {/* Glow behind dot */}
             <motion.circle
                 cy="12"
-                r="7"
+                r="8"
                 fill="rgb(56 189 248)"
-                opacity={0.25}
-                animate={dotMotion}
+                opacity={0.18}
+                cx={dotX ?? 40}
+                animate={reduceMotion ? undefined : { cx: [40, 246, 40] }}
                 transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ willChange: 'transform' }}
             />
         </svg>
     )
