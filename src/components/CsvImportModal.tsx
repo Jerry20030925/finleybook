@@ -38,6 +38,7 @@ interface MappedTransaction {
     date: string
     description: string
     amount: number
+    type: 'income' | 'expense'
     category: string
     originalRow: ParsedRow
     isDuplicate: boolean
@@ -225,13 +226,22 @@ export default function CsvImportModal({ isOpen, onClose, onSuccess }: CsvImport
             const rawDate = row[mapping.date]
             const rawDesc = row[mapping.description]
             const rawAmount = row[mapping.amount]
+            const amountHeader = mapping.amount.toLowerCase()
 
             // Parse Amount
-            let amount = parseFloat(rawAmount?.replace(/[^0-9.-]/g, '') || '0')
-            // Handle "Debit" columns where positive numbers are expenses (negative in our system)
-            // For now, let's assume standard bank export: negative = expense, positive = income.
-            // Some banks use "Debit" column (positive) and "Credit" column. This simple mapper assumes one Amount column.
-            // Advanced: If amount is NaN, check if it's in (brackets)
+            const isBracketNegative = /^\s*\(.*\)\s*$/.test(rawAmount || '')
+            let parsedAmount = parseFloat(rawAmount?.replace(/[^0-9.-]/g, '') || '0')
+            if (isBracketNegative) {
+                parsedAmount = -Math.abs(parsedAmount)
+            }
+
+            let type: 'income' | 'expense' = parsedAmount < 0 ? 'expense' : 'income'
+            if (amountHeader.includes('debit') || amountHeader.includes('withdrawal') || amountHeader.includes('expense')) {
+                type = 'expense'
+            } else if (amountHeader.includes('credit') || amountHeader.includes('deposit') || amountHeader.includes('income')) {
+                type = 'income'
+            }
+            const amount = Math.abs(parsedAmount)
 
             // Parse Date with Robust Handling
             // Support: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
@@ -259,7 +269,7 @@ export default function CsvImportModal({ isOpen, onClose, onSuccess }: CsvImport
 
             const isValidDate = !isNaN(parsedDate.getTime())
 
-            const isValid = !isNaN(amount) && !!rawDate && isValidDate
+            const isValid = !isNaN(parsedAmount) && amount > 0 && !!rawDate && isValidDate
 
             // Auto-categorize
             let category = 'Uncategorized'
@@ -276,14 +286,14 @@ export default function CsvImportModal({ isOpen, onClose, onSuccess }: CsvImport
                 else if (descLower.includes('uber') || descLower.includes('transport') || descLower.includes('opal')) category = 'Transport'
                 else if (descLower.includes('netflix') || descLower.includes('spotify')) category = 'Entertainment'
                 else if (descLower.includes('cafe') || descLower.includes('coffee') || descLower.includes('restaurant')) category = 'Food'
-                else if (amount > 0) category = 'Income'
+                else if (type === 'income') category = 'Income'
             }
 
             // Deduplication Check
             // Simple check: Date (string match) + Amount + Description (fuzzy)
             // Ideally we compare parsed dates, but string match is a safe first pass for exact dupes
             const isDuplicate = existingTransactions.some(t =>
-                Math.abs(t.amount - amount) < 0.01 &&
+                Math.abs(Math.abs(t.amount) - amount) < 0.01 &&
                 t.description.toLowerCase() === rawDesc?.toLowerCase()
                 // Date comparison omitted for simplicity in client-side fuzzy match, 
                 // as parsing formats vary wildly.
@@ -293,6 +303,7 @@ export default function CsvImportModal({ isOpen, onClose, onSuccess }: CsvImport
                 date: rawDate,
                 description: rawDesc,
                 amount,
+                type,
                 category,
                 originalRow: row,
                 isDuplicate,
@@ -324,7 +335,7 @@ export default function CsvImportModal({ isOpen, onClose, onSuccess }: CsvImport
                 category: t.category,
                 description: t.description,
                 date: new Date(t.date), // Note: This might need robust parsing library
-                type: t.amount >= 0 ? 'income' as const : 'expense' as const
+                type: t.type
             }))
 
             await addTransactionsBatch(transactionsToSave)
@@ -545,8 +556,8 @@ export default function CsvImportModal({ isOpen, onClose, onSuccess }: CsvImport
                                                                     {row.category}
                                                                 </span>
                                                             </td>
-                                                            <td className={`px-4 py-3 text-sm text-right font-medium ${row.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                                {row.amount.toFixed(2)}
+                                                            <td className={`px-4 py-3 text-sm text-right font-medium ${row.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                                                                {row.type === 'income' ? '+' : '-'}{row.amount.toFixed(2)}
                                                             </td>
                                                             <td className="px-4 py-3 text-center">
                                                                 {row.isDuplicate ? (

@@ -7,6 +7,14 @@
     {
       "path": "/api/cron/reengagement",
       "schedule": "0 10 * * 1"
+    },
+    {
+      "path": "/api/cron/streak-reminder",
+      "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/cron/drip-campaign",
+      "schedule": "0 9 * * *"
     }
   ]
 }

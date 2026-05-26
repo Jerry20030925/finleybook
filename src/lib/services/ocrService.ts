@@ -1,4 +1,3 @@
-import Tesseract from 'tesseract.js';
 import { Transaction, TransactionSource, TaxDocument, TaxDocumentType } from '@/types';
 import { storage } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -33,7 +32,7 @@ export interface ReceiptData {
 
 export class OCRService {
   private static instance: OCRService;
-  
+
   public static getInstance(): OCRService {
     if (!OCRService.instance) {
       OCRService.instance = new OCRService();
@@ -49,16 +48,16 @@ export class OCRService {
     try {
       // Upload image to Firebase Storage
       const imageUrl = await this.uploadImage(userId, file);
-      
+
       // Extract text using Tesseract.js
       const extractedText = await this.extractTextFromImage(file);
-      
+
       // Parse receipt data using AI
       const receiptData = await this.parseReceiptData(extractedText);
-      
+
       // Create transaction from receipt data
       const transaction = await this.createTransactionFromReceipt(userId, receiptData, imageUrl);
-      
+
       // Create tax document record
       const taxDocument = await this.createTaxDocument(
         userId,
@@ -67,7 +66,7 @@ export class OCRService {
         documentType,
         receiptData
       );
-      
+
       return { transaction, document: taxDocument };
     } catch (error) {
       console.error('OCR processing error:', error);
@@ -80,7 +79,7 @@ export class OCRService {
       const imageUrl = await this.uploadImage(userId, file);
       const extractedText = await this.extractTextFromImage(file);
       const invoiceData = await this.parseInvoiceData(extractedText);
-      
+
       return await this.createTaxDocument(
         userId,
         file,
@@ -101,41 +100,41 @@ export class OCRService {
   }> {
     const issues: string[] = [];
     let confidence = 1.0;
-    
+
     // Check for required fields
     if (!receiptData.merchantName) {
       issues.push('Missing merchant name');
       confidence -= 0.3;
     }
-    
+
     if (!receiptData.totalAmount || receiptData.totalAmount <= 0) {
       issues.push('Invalid total amount');
       confidence -= 0.4;
     }
-    
+
     if (!receiptData.date) {
       issues.push('Missing date');
       confidence -= 0.2;
     }
-    
+
     // Check for suspicious patterns
     if (receiptData.date && receiptData.date > new Date()) {
       issues.push('Future date detected');
       confidence -= 0.5;
     }
-    
+
     // Validate tax calculation if present
     if (receiptData.taxAmount && receiptData.items) {
       const itemsTotal = receiptData.items.reduce((sum, item) => sum + item.amount, 0);
       const expectedTotal = itemsTotal + receiptData.taxAmount;
       const difference = Math.abs(expectedTotal - (receiptData.totalAmount || 0));
-      
+
       if (difference > 0.1) {
         issues.push('Tax calculation mismatch');
         confidence -= 0.3;
       }
     }
-    
+
     return {
       isValid: confidence > 0.6,
       confidence: Math.max(0, confidence),
@@ -147,16 +146,17 @@ export class OCRService {
     const timestamp = new Date().getTime();
     const fileName = `receipts/${userId}/${timestamp}_${file.name}`;
     const storageRef = ref(storage, fileName);
-    
+
     await uploadBytes(storageRef, file);
     return await getDownloadURL(storageRef);
   }
 
   private async extractTextFromImage(file: File): Promise<string> {
+    const Tesseract = (await import('tesseract.js')).default;
     const { data: { text } } = await Tesseract.recognize(file, 'eng', {
       logger: m => console.log(m)
     });
-    
+
     return text;
   }
 
@@ -195,14 +195,14 @@ export class OCRService {
 
       const content = response.choices[0].message.content;
       if (!content) throw new Error('No response from AI');
-      
+
       const parsedData = JSON.parse(content);
-      
+
       // Convert date string to Date object
       if (parsedData.date) {
         parsedData.date = new Date(parsedData.date);
       }
-      
+
       return parsedData as ReceiptData;
     } catch (error) {
       console.error('Receipt parsing error:', error);
@@ -298,11 +298,11 @@ export class OCRService {
     // This would check against existing receipts in the database
     // Implementation would involve querying Firestore for similar receipts
     // based on merchant name, amount, and date proximity
-    
+
     try {
       // Query existing receipts with similar characteristics
       const similarReceipts = await this.findSimilarReceipts(userId, receiptData);
-      
+
       return similarReceipts.length > 0;
     } catch (error) {
       console.error('Duplicate detection error:', error);
@@ -316,7 +316,7 @@ export class OCRService {
     // - Similar amount (within 5%)
     // - Date within 3 days
     // - Same receipt number (if available)
-    
+
     // For now, returning empty array as placeholder
     return [];
   }
@@ -344,7 +344,7 @@ export class OCRService {
       });
 
       const enhancedData = JSON.parse(response.choices[0].message.content || '{}');
-      
+
       return {
         ...receiptData,
         ...enhancedData,

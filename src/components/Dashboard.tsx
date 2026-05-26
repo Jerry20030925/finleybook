@@ -1,37 +1,62 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, lazy, Suspense, useMemo, useRef, useDeferredValue, startTransition, type ReactNode } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
+import { motion, useInView } from 'framer-motion'
 import { useAuth } from './AuthProvider'
-import { isMobileApp } from '@/lib/mobileUtils'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import PageLoader from './PageLoader'
 import FinancialOverview from './FinancialOverview'
 import RecentTransactions from './RecentTransactions'
-import NanoBanana from './NanoBanana'
 import SmartSuggestions from './Dashboard/SmartSuggestions'
 import QuickActions from './QuickActions'
 import TouchableScale from './TouchableScale'
-import FinancialGarden from './Dashboard/FinancialGarden'
-import CashbackCard from './Dashboard/CashbackCard'
 import VisionBoard from './VisionBoard'
-import { getUserTransactions, Transaction, addTransaction, getGoals, Goal, getBudgets } from '@/lib/dataService'
-import { collection, query, where, orderBy, limit, onSnapshot, addDoc, doc } from 'firebase/firestore'
+import { getUserTransactions, Transaction, getBudgets, Goal } from '@/lib/dataService'
+import { collection, query, where, onSnapshot, doc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useLanguage } from './LanguageProvider'
 import { getUserDisplayName } from '@/lib/userUtils'
 import toast from 'react-hot-toast'
 import InviteFriendModal from './Dashboard/InviteFriendModal'
 import GettingStartedGuide from './Dashboard/GettingStartedGuide'
-import TransactionModal from './TransactionModal'
-import ReceiptUploadModal from './ReceiptUploadModal'
-import CsvImportModal from './CsvImportModal'
+
 import { useRouter } from 'next/navigation'
 import StreakCounter from './Dashboard/StreakCounter'
 import PullToRefresh from '@/components/Mobile/PullToRefresh'
+import DashboardBackground from './Dashboard/DashboardBackground'
+import PlanValueCard from './Dashboard/PlanValueCard'
+import MobileShortcutBar from './Dashboard/MobileShortcutBar'
+import BackToTop from './BackToTop'
+import { useConfetti } from '@/hooks/useConfetti'
+import AuthModal from './AuthModal'
+import ReferralStatsCard from './Referral/ReferralStats'
+import { useExperience } from '@/components/ExperienceProvider'
+
+// Lazy Load Heavy Components
+const WealthAnalytics = lazy(() => import('./WealthAnalytics'))
+const TransactionModal = lazy(() => import('./TransactionModal'))
+const ReceiptUploadModal = lazy(() => import('./ReceiptUploadModal'))
+const CsvImportModal = lazy(() => import('./CsvImportModal'))
+const AIChatInput = dynamic(() => import('./AIChatInput'), { ssr: false })
+
+function SkeletonLine({ className = '' }: { className?: string }) {
+  return <div className={`rounded bg-slate-100 animate-pulse ${className}`} />
+}
+
+function PanelSkeleton({ className = '', children }: { className?: string, children?: ReactNode }) {
+  return (
+    <div className={`rounded-2xl border border-slate-100 bg-white/70 shadow-sm p-4 ${className}`}>
+      {children}
+    </div>
+  )
+}
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth()
   const { t } = useLanguage()
   const router = useRouter()
+  const isMobile = useIsMobile() // Correct usage for hydration safety
+  const { reduceMotion, allowRichMotion, lowPowerDevice } = useExperience()
 
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
@@ -42,23 +67,204 @@ export default function Dashboard() {
 
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [activeModal, setActiveModal] = useState<string | null>(null)
+  const [isAiOpen, setIsAiOpen] = useState(false)
+  const [aiPrefill, setAiPrefill] = useState('')
+  const [aiPrefillKey, setAiPrefillKey] = useState(0)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [shouldMountAI, setShouldMountAI] = useState(false)
+  const [shouldMountBackground, setShouldMountBackground] = useState(false)
+  const [shouldMountQuickActions, setShouldMountQuickActions] = useState(false)
+  const [shouldMountSecondaryChrome, setShouldMountSecondaryChrome] = useState(false)
+  const [shouldMountBackToTop, setShouldMountBackToTop] = useState(false)
+  const { fire: fireConfetti } = useConfetti()
+  const loadedUserIdRef = useRef<string | null>(null)
+  const inFlightTransactionsFetchRef = useRef<{ userId: string | null, promise: Promise<Transaction[]> | null, key: symbol | null }>({ userId: null, promise: null, key: null })
+  const analyticsRef = useRef<HTMLDivElement | null>(null)
+  const analyticsInView = useInView(analyticsRef, { once: true, margin: '220px' })
+  const [shouldRenderAnalytics, setShouldRenderAnalytics] = useState(false)
+  const smartSuggestionsRef = useRef<HTMLDivElement | null>(null)
+  const smartSuggestionsInView = useInView(smartSuggestionsRef, { once: true, margin: '220px' })
+  const [shouldRenderSmartSuggestions, setShouldRenderSmartSuggestions] = useState(false)
+  const rightWidgetsRef = useRef<HTMLDivElement | null>(null)
+  const rightWidgetsInView = useInView(rightWidgetsRef, { once: true, margin: '220px' })
+  const [shouldRenderRightWidgets, setShouldRenderRightWidgets] = useState(false)
+  const enableScrollAnimations = !isMobile && allowRichMotion
+  const showAnimatedBackground = !isMobile && allowRichMotion && !lowPowerDevice
+  const deferredTransactions = useDeferredValue(transactions)
+  const deferredMonthlyBudget = useDeferredValue(monthlyBudget)
+
+  const sectionRevealProps = enableScrollAnimations ? {
+    initial: { opacity: 1, y: isMobile ? 8 : 12 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, amount: 0.18 },
+    transition: { duration: 0.28, ease: 'easeOut' }
+  } : {}
+  const cardHoverProps = !isMobile && !reduceMotion
+    ? { whileHover: { y: -4, transition: { duration: 0.2 } } }
+    : {}
 
   // Real streak from userProfile
   const currentStreak = userProfile?.streak || 0
-  const lastLogin = userProfile?.lastLogin?.toDate() || new Date() // Fallback to now if missing to prevent crash
+  const longestStreak = userProfile?.longestStreak || 0
+  const streakMilestones = userProfile?.streakMilestones || []
+  const activeDays = userProfile?.loginDates || []
+  const { fire: triggerConfetti } = useConfetti()
 
-  // Calculate if streak is "active" (logged in today or yesterday) for UI purposes
-  // Actually, we can just use the streak value. If it's > 0, it's effectively active.
-  // The only edge case is if they haven't logged in today (flame might look different?)
-  // For now, let's pass a calculated "isActive" boolean based on lastLogin
-  const isStreakActive = (() => {
-    if (!userProfile?.lastLogin) return true // New user assumption or just logged in
-    const now = new Date()
-    const last = userProfile.lastLogin.toDate()
-    const diff = now.getTime() - last.getTime()
-    const hours = diff / (1000 * 60 * 60)
-    return hours < 48 // lenient check for UI visual
-  })()
+  const isStreakActive = useMemo(() => {
+    try {
+      if (!userProfile?.lastLogin) return true
+      const now = new Date()
+      const last = typeof userProfile.lastLogin.toDate === 'function'
+        ? userProfile.lastLogin.toDate()
+        : new Date(userProfile.lastLogin)
+      const diff = now.getTime() - last.getTime()
+      const hours = diff / (1000 * 60 * 60)
+      return hours < 48
+    } catch (e) {
+      return true
+    }
+  }, [userProfile?.lastLogin])
+
+  // Celebrate new streak milestones
+  useEffect(() => {
+    const newMilestone = userProfile?.newMilestone
+    if (newMilestone && typeof newMilestone === 'number') {
+      const labels: Record<number, string> = { 7: '1 Week', 30: '1 Month', 100: '100 Days', 365: '1 Year' }
+      triggerConfetti()
+      toast.success(`🏆 Streak milestone: ${labels[newMilestone] || newMilestone + ' days'}!`, { duration: 5000 })
+    }
+  }, [userProfile?.newMilestone, triggerConfetti])
+
+  const displayName = useMemo(() => getUserDisplayName(user), [user])
+  const hasReportReady = deferredTransactions.length > 0
+
+  useEffect(() => {
+    if (!enableScrollAnimations || analyticsInView) {
+      setShouldRenderAnalytics(true)
+    }
+  }, [analyticsInView, enableScrollAnimations])
+
+  useEffect(() => {
+    if (!enableScrollAnimations || smartSuggestionsInView) {
+      setShouldRenderSmartSuggestions(true)
+    }
+  }, [enableScrollAnimations, smartSuggestionsInView])
+
+  useEffect(() => {
+    if (!enableScrollAnimations || rightWidgetsInView) {
+      setShouldRenderRightWidgets(true)
+    }
+  }, [enableScrollAnimations, rightWidgetsInView])
+
+  useEffect(() => {
+    if (!showAnimatedBackground) {
+      setShouldMountBackground(false)
+      return
+    }
+    if (typeof window === 'undefined') {
+      setShouldMountBackground(true)
+      return
+    }
+
+    let timeoutId: number | undefined
+    let idleId: number | undefined
+    const mount = () => setShouldMountBackground(true)
+
+    if (typeof window.requestIdleCallback === 'function') {
+      idleId = window.requestIdleCallback(mount, { timeout: 1200 })
+    } else {
+      timeoutId = window.setTimeout(mount, 500)
+    }
+
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId)
+      if (idleId && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleId)
+      }
+    }
+  }, [showAnimatedBackground])
+
+  useEffect(() => {
+    if (isAiOpen) {
+      setShouldMountAI(true)
+      return
+    }
+
+    if (typeof window === 'undefined') return
+
+    let timeoutId: number | undefined
+    let idleId: number | undefined
+    const enableMount = () => setShouldMountAI(true)
+
+    if (typeof window.requestIdleCallback === 'function') {
+      idleId = window.requestIdleCallback(enableMount, { timeout: 1500 })
+    } else {
+      timeoutId = window.setTimeout(enableMount, 900)
+    }
+
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId)
+      if (idleId && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleId)
+      }
+    }
+  }, [isAiOpen])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      setShouldMountQuickActions(true)
+      return
+    }
+
+    let timeoutId: number | undefined
+    let idleId: number | undefined
+    const mount = () => setShouldMountQuickActions(true)
+
+    if (typeof window.requestIdleCallback === 'function') {
+      idleId = window.requestIdleCallback(mount, { timeout: 900 })
+    } else {
+      timeoutId = window.setTimeout(mount, 180)
+    }
+
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId)
+      if (idleId && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleId)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      setShouldMountSecondaryChrome(true)
+      setShouldMountBackToTop(true)
+      return
+    }
+
+    let rafId: number | undefined
+    let timeoutId: number | undefined
+    let idleId: number | undefined
+    let backToTopTimeoutId: number | undefined
+
+    rafId = window.requestAnimationFrame(() => {
+      timeoutId = window.setTimeout(() => setShouldMountSecondaryChrome(true), 140)
+    })
+
+    if (typeof window.requestIdleCallback === 'function') {
+      idleId = window.requestIdleCallback(() => setShouldMountBackToTop(true), { timeout: 1200 })
+    } else {
+      backToTopTimeoutId = window.setTimeout(() => setShouldMountBackToTop(true), 420)
+    }
+
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId)
+      if (timeoutId) window.clearTimeout(timeoutId)
+      if (backToTopTimeoutId) window.clearTimeout(backToTopTimeoutId)
+      if (idleId && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleId)
+      }
+    }
+  }, [])
 
   // Hydration fix
   const [isMounted, setIsMounted] = useState(false)
@@ -68,281 +274,416 @@ export default function Dashboard() {
 
   // Hydration safe user check
   useEffect(() => {
-    if (user?.metadata.creationTime) {
+    if (user?.metadata?.creationTime) {
       const created = new Date(user.metadata.creationTime).getTime()
       const now = new Date().getTime()
       setIsNewUser((now - created) < 7 * 24 * 60 * 60 * 1000)
     }
-  }, [user])
+  }, [user?.metadata?.creationTime])
 
-  const fetchTransactions = useCallback(async () => {
-    if (!user) return
-    try {
-      const txs = await getUserTransactions(user.uid)
-      setTransactions(txs)
-    } catch (error) {
-      console.error("Failed to fetch transactions:", error)
+  const fetchTransactions = useCallback(async (userId: string) => {
+    const currentInFlight = inFlightTransactionsFetchRef.current
+    if (currentInFlight.userId === userId && currentInFlight.promise) {
+      return currentInFlight.promise
     }
-  }, [user])
+
+    const requestKey = Symbol('transactions-fetch')
+    const requestPromise = (async () => {
+      try {
+        // Fetch more for comprehensive stats and "Show More" in RecentTransactions
+        const txs = await getUserTransactions(userId, 200)
+        startTransition(() => {
+          setTransactions(txs)
+        })
+        return txs
+      } catch (error) {
+        console.error("Failed to fetch transactions:", error)
+        return [] as Transaction[]
+      } finally {
+        if (inFlightTransactionsFetchRef.current.key === requestKey) {
+          inFlightTransactionsFetchRef.current = { userId: null, promise: null, key: null }
+        }
+      }
+    })()
+
+    inFlightTransactionsFetchRef.current = { userId, promise: requestPromise, key: requestKey }
+    return requestPromise
+  }, [])
+
+  // Failsafe Timeout to prevent infinite blank screen
+  useEffect(() => {
+    if (loading && user?.uid) {
+      const timeoutId = setTimeout(() => {
+        console.warn('[Dashboard] Loading timed out (3s). Forcing content display.')
+        setLoading(false)
+      }, 3000)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [loading, user?.uid])
 
   // Data Fetching Effect
   useEffect(() => {
-    let unsubscribeProfile: () => void
-    let unsubscribeGoals: () => void
+    let unsubscribeProfile: (() => void) | undefined
+    let unsubscribeGoals: (() => void) | undefined
+    let isCancelled = false
 
     const fetchData = async () => {
-      if (!user) return
+      if (!user?.uid) return
+
+      const isInitialLoad = loadedUserIdRef.current !== user.uid
 
       try {
-        setLoading(true)
-        // 1. Fetch Transactions
-        await fetchTransactions()
+        if (isInitialLoad) {
+          setLoading(true)
+        }
 
-        // 2. Fetch User Profile
         const userRef = doc(db, 'users', user.uid)
-        unsubscribeProfile = onSnapshot(userRef, (doc) => {
-          if (doc.exists()) {
-            setUserProfile(doc.data())
+        unsubscribeProfile = onSnapshot(userRef, (snapshot) => {
+          if (isCancelled) return
+          if (snapshot.exists()) {
+            startTransition(() => {
+              setUserProfile(snapshot.data())
+            })
           }
         })
 
-        // 3. Fetch Goals (Realtime)
         const goalsQuery = query(collection(db, 'goals'), where('userId', '==', user.uid))
         unsubscribeGoals = onSnapshot(goalsQuery, (snapshot) => {
+          if (isCancelled) return
           const goals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Goal))
-          if (goals.length > 0) {
-            setPrimaryGoal(goals[0])
-          }
+          startTransition(() => {
+            setPrimaryGoal(goals.length > 0 ? goals[0] : null)
+          })
         })
 
-        // 4. Fetch Budgets for Total Monthly Spend Limit
-        const budgets = await getBudgets(user.uid)
+        const [, budgets] = await Promise.all([
+          fetchTransactions(user.uid),
+          getBudgets(user.uid)
+        ])
+        if (isCancelled) return
+
         const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0)
-        setMonthlyBudget(totalBudget)
+        startTransition(() => {
+          setMonthlyBudget(totalBudget)
+        })
+        loadedUserIdRef.current = user.uid
 
       } catch (error) {
-        console.error("Failed to fetch dashboard data:", error)
+        if (isCancelled) return
+        console.error("[Dashboard] Failed to fetch data:", error)
         toast.error(t('common.errorLoading'))
       } finally {
-        setLoading(false)
+        if (!isCancelled) {
+          setLoading(false)
+        }
       }
     }
 
-    if (!authLoading && user) {
+    if (!authLoading && user?.uid) {
       fetchData()
     } else if (!authLoading && !user) {
+      loadedUserIdRef.current = null
       setLoading(false)
     }
 
     return () => {
+      isCancelled = true
       if (unsubscribeProfile) unsubscribeProfile()
       if (unsubscribeGoals) unsubscribeGoals()
     }
-  }, [user, authLoading, t, fetchTransactions])
+  }, [user?.uid, authLoading, t, fetchTransactions])
 
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/')
+      router.replace('/')
     }
   }, [authLoading, user, router])
 
-  // Wrap loadData in a compatible Promise returning function
-  const handleRefresh = async () => {
-    // Wait for data load
-    await fetchTransactions()
-    // Add a small artificial delay so the user feels the refresh happened
+  // Fix: create a stable wrapper for child components that don't know userId
+  const handleDataRefresh = useCallback(async () => {
+    if (user?.uid) {
+      await fetchTransactions(user.uid)
+    }
+  }, [user?.uid, fetchTransactions])
+
+
+  const handleRefresh = useCallback(async () => {
+    if (user?.uid) {
+      await fetchTransactions(user.uid)
+    }
     await new Promise(resolve => setTimeout(resolve, 800))
-  }
+  }, [user?.uid, fetchTransactions])
+
+  const openAiCoach = useCallback((prompt: string) => {
+    setAiPrefill(prompt)
+    setAiPrefillKey((prev) => prev + 1)
+    setIsAiOpen(true)
+  }, [])
 
   const isGuest = user?.isAnonymous
 
+  const shouldShowLoader = !isMounted || authLoading || loading || !user?.uid
+
   return (
     <>
-      {(!isMounted || loading) ? (
+      {shouldShowLoader ? (
         <PageLoader />
       ) : (
         <PullToRefresh onRefresh={handleRefresh}>
-          <div className="min-h-screen bg-gray-50 pb-24">
+          <div className="min-h-[100dvh] bg-[#F8FAFC] pb-24 transition-colors duration-500 relative overflow-x-hidden">
+            {/* Memoized Background */}
+            {showAnimatedBackground && shouldMountBackground && (
+              <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                <DashboardBackground />
+              </div>
+            )}
+
             {/* GUEST BANNER */}
             {isGuest && (
-              <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white p-3 shadow-md relative z-50">
-                <div className="max-w-7xl mx-auto px-4 flex justify-between items-center text-sm font-medium">
-                  <div className="flex items-center gap-2">
-                    <span>👻 You are in <strong>Guest Mode</strong>. Data is saved locally but will be lost if you clear cookies.</span>
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white/80 backdrop-blur-md border-b border-orange-100 shadow-sm relative z-50 px-4 py-3"
+              >
+                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 text-sm">
+                  <div className="flex items-center gap-2 text-orange-800">
+                    <span className="text-xl">👻</span>
+                    <span>You are currently in <strong>Guest Mode</strong>. Your data is saved locally but will be lost if you clear cookies.</span>
                   </div>
                   <button
-                    onClick={() => {
-                      alert("To save forever, please logout and Sign Up!")
-                    }}
-                    className="bg-white text-orange-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-orange-50 transition-colors"
+                    onClick={() => setShowAuthModal(true)}
+                    className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-1.5 rounded-full text-xs font-bold hover:shadow-lg hover:scale-105 transition-all duration-200 shadow-orange-500/20"
                   >
                     Sign Up to Save
                   </button>
                 </div>
-              </div>
+              </motion.div>
             )}
 
             <motion.main
-              className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6"
-              initial="hidden"
-              animate="show"
-              variants={{
-                hidden: { opacity: 0 },
-                show: {
-                  opacity: 1,
-                  transition: {
-                    staggerChildren: 0.15,
-                    delayChildren: 0.15
-                  }
-                }
-              }}
+              className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6 relative z-10"
+              initial={false}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.24, ease: 'easeOut' }}
             >
               {/* Header */}
-              <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-2">
-                <motion.div
-                  variants={{
-                    hidden: { opacity: 0, x: -20 },
-                    show: { opacity: 1, x: 0 }
-                  }}
-                  className="text-left"
-                >
-                  <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">
-                    {t('dashboard.welcomeBack', { name: getUserDisplayName(user) })}
+              <motion.div
+                className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-2 relative z-10"
+                initial={false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.24, ease: 'easeOut' }}
+              >
+                <div className="text-left">
+                  <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900">
+                    {t('dashboard.welcomeBack', { name: displayName })}
                   </h1>
-                  <p className="text-sm md:text-base text-gray-500 font-medium mt-1">
+                  <p className="text-base md:text-lg text-slate-500 font-medium mt-2 flex items-center gap-2">
+                    <span className="w-8 h-px bg-slate-200"></span>
                     {t('dashboard.wealthCommandCenter')}
                   </p>
-                </motion.div>
+                </div>
 
-                <motion.div
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.9 },
-                    show: { opacity: 1, scale: 1 }
-                  }}
-                  className="self-start md:self-auto"
-                >
-                  <StreakCounter streak={currentStreak} isActive={isStreakActive} />
-                </motion.div>
-              </div>
+                <div className="self-start md:self-auto">
+                  <StreakCounter streak={currentStreak} isActive={isStreakActive} longestStreak={longestStreak} milestones={streakMilestones} activeDays={activeDays} />
+                </div>
+              </motion.div>
 
               {/* Getting Started Guide */}
-              <GettingStartedGuide
-                hasTransactions={transactions.length > 0}
-                hasBudget={monthlyBudget > 0}
-                hasCashback={transactions.some(t => t.type === 'cashback')}
-                hasProfile={!!user?.displayName || !!userProfile?.displayName}
-                onAddTransaction={() => setActiveModal('transaction')}
-                onImportCsv={() => setActiveModal('csv')}
-                isNewUser={isNewUser}
-              />
+              {/* Getting Started Guide */}
+              <motion.div
+                className="relative z-10 content-auto"
+                {...sectionRevealProps}
+              >
+                <GettingStartedGuide
+                  hasTransactions={deferredTransactions.length > 0}
+                  hasBudget={deferredMonthlyBudget > 0}
+                  hasReportReady={hasReportReady}
+                  hasProfile={!!user?.displayName || !!userProfile?.displayName}
+                  onAddTransaction={() => setActiveModal('transaction')}
+                  onImportCsv={() => setActiveModal('csv')}
+                  isNewUser={isNewUser}
+                />
+              </motion.div>
 
               {/* 1. HERO: Financial Overview (Top Anchor) */}
-              <TouchableScale
-                className="mb-8 block"
-                scale={0.98}
+              {/* 1. HERO: Financial Overview (Top Anchor) */}
+              <motion.div
+                className="relative z-10 content-auto"
+                {...sectionRevealProps}
               >
-                <FinancialOverview transactions={transactions} />
-              </TouchableScale>
+                <TouchableScale
+                  className="mb-8 block"
+                  scale={0.98}
+                >
+                  <FinancialOverview
+                    transactions={deferredTransactions}
+                    monthlyBudget={deferredMonthlyBudget}
+                    onAskAI={openAiCoach}
+                  />
+                </TouchableScale>
+              </motion.div>
 
               {/* Main Grid Layout (66% Left / 33% Right) */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
+              <motion.div
+                className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 relative z-10 content-auto"
+                {...sectionRevealProps}
+              >
                 {/* Left Column (66% -> col-span-8) - DATA HEAVY */}
                 <div className="lg:col-span-8 space-y-4 md:space-y-8">
 
                   {/* 2. Quick Actions (Prioritized for Mobile) */}
-                  <motion.div
-                    variants={{
-                      hidden: { opacity: 0, y: 20 },
-                      show: { opacity: 1, y: 0 }
-                    }}
-                    className="mb-2"
-                  >
-                    <QuickActions onInvite={() => setShowInviteModal(true)} onDataRefresh={fetchTransactions} />
+                  <motion.div className="lg:hidden content-auto" {...sectionRevealProps}>
+                    {shouldMountSecondaryChrome ? (
+                      <PlanValueCard />
+                    ) : (
+                      <PanelSkeleton className="h-[116px]">
+                        <SkeletonLine className="h-4 w-36" />
+                        <SkeletonLine className="mt-3 h-6 w-2/3" />
+                        <SkeletonLine className="mt-4 h-9 w-full rounded-xl" />
+                      </PanelSkeleton>
+                    )}
+                  </motion.div>
+
+                  <motion.div className="lg:hidden content-auto" {...sectionRevealProps}>
+                    {shouldMountSecondaryChrome ? (
+                      <MobileShortcutBar />
+                    ) : (
+                      <PanelSkeleton className="h-[78px] p-3">
+                        <div className="grid grid-cols-4 gap-2">
+                          {Array.from({ length: 4 }).map((_, idx) => (
+                            <SkeletonLine key={idx} className="h-12 rounded-xl" />
+                          ))}
+                        </div>
+                      </PanelSkeleton>
+                    )}
+                  </motion.div>
+
+                  <motion.div className="mb-2 content-auto" {...sectionRevealProps}>
+                    {shouldMountQuickActions ? (
+                      <QuickActions onInvite={() => setShowInviteModal(true)} onDataRefresh={handleDataRefresh} />
+                    ) : (
+                      <PanelSkeleton className="p-3">
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                          {Array.from({ length: 6 }).map((_, idx) => (
+                            <SkeletonLine key={idx} className="h-12 rounded-xl" />
+                          ))}
+                        </div>
+                      </PanelSkeleton>
+                    )}
                   </motion.div>
 
                   {/* 3. Recent Transactions (High Usage) */}
-                  <TouchableScale
-                    scale={0.99}
-                    onClick={() => router.push('/transactions')}
-                  >
-                    <RecentTransactions />
-                  </TouchableScale>
+                  <motion.div {...sectionRevealProps} {...cardHoverProps}>
+                    <TouchableScale
+                      scale={0.99}
+                    // Note: We don't need router.push anymore because RecentTransactions handles its own display
+                    // onClick={() => router.push('/transactions')} 
+                    >
+                      <RecentTransactions
+                        transactions={deferredTransactions}
+                        onTransactionUpdate={handleDataRefresh}
+                      />
+                    </TouchableScale>
+                  </motion.div>
 
-                  {/* 4. Charts (Secondary) */}
-                  <TouchableScale
-                    scale={0.99}
-                  >
-                    <NanoBanana transactions={transactions} />
-                  </TouchableScale>
+                  {/* 4. Charts (Secondary) - Deferred Loading */}
+                  <motion.div ref={analyticsRef} {...sectionRevealProps} {...cardHoverProps}>
+                    <Suspense fallback={
+                      <PanelSkeleton className="h-[300px]">
+                        <SkeletonLine className="h-4 w-36" />
+                        <SkeletonLine className="h-3 w-24 mt-2" />
+                        <div className="mt-6 h-[220px] rounded-xl bg-slate-50 animate-pulse" />
+                      </PanelSkeleton>
+                    }>
+                      {shouldRenderAnalytics ? (
+                        <TouchableScale scale={0.99}>
+                          <WealthAnalytics transactions={deferredTransactions} />
+                        </TouchableScale>
+                      ) : (
+                        <PanelSkeleton className="h-[300px]">
+                          <SkeletonLine className="h-4 w-36" />
+                          <SkeletonLine className="h-3 w-24 mt-2" />
+                          <div className="mt-6 h-[220px] rounded-xl bg-slate-50 animate-pulse" />
+                        </PanelSkeleton>
+                      )}
+                    </Suspense>
+                  </motion.div>
                 </div>
 
                 {/* Right Column (33% -> col-span-4) - ACTION & INSIGHTS */}
                 <div className="lg:col-span-4 space-y-4 md:space-y-6">
-
-                  {/* 1. Cashback Center (Visual Anchor - Dark Mode) - HIDDEN ON MOBILE APP */}
-                  {!isMobileApp() && (
-                    <motion.div
-                      variants={{
-                        hidden: { opacity: 0, x: 20 },
-                        show: { opacity: 1, x: 0 }
-                      }}
-                      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-                    >
-                      <CashbackCard
-                        pendingAmount={transactions.filter(t => t.type === 'cashback' && t.status === 'pending').reduce((acc, t) => acc + t.amount, 0)}
-                        potentialAmount={50.00}
-                        lifeTimeEarned={transactions.filter(t => t.type === 'cashback').reduce((acc, t) => acc + t.amount, 0)}
-                      />
-                    </motion.div>
-                  )}
-
-                  {/* 2. Finley AI (Insights First) */}
-                  <motion.div
-                    variants={{
-                      hidden: { opacity: 0, x: 20 },
-                      show: { opacity: 1, x: 0 }
-                    }}
-                    className="min-h-[180px]"
-                    whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-                  >
-                    <SmartSuggestions transactions={transactions} monthlyBudget={monthlyBudget} />
+                  <motion.div className="hidden lg:block content-auto" {...sectionRevealProps} {...cardHoverProps}>
+                    {shouldMountSecondaryChrome ? (
+                      <PlanValueCard />
+                    ) : (
+                      <PanelSkeleton className="h-[132px]">
+                        <SkeletonLine className="h-4 w-40" />
+                        <SkeletonLine className="mt-3 h-7 w-3/4" />
+                        <SkeletonLine className="mt-4 h-10 w-full rounded-xl" />
+                      </PanelSkeleton>
+                    )}
                   </motion.div>
 
-                  {/* 3. Financial Garden (Retention) - HIDDEN ON MOBILE APP */}
-                  {!isMobileApp() && (
-                    <motion.div
-                      variants={{
-                        hidden: { opacity: 0, x: 20 },
-                        show: { opacity: 1, x: 0 }
-                      }}
-                      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-                      whileTap={{ scale: 0.98 }}
-                      className="min-h-[240px]"
-                    >
-                      <Link href="/wealth">
-                        <FinancialGarden />
-                      </Link>
-                    </motion.div>
-                  )}
+                  {/* 2. Finley AI (Insights First) */}
+                  <motion.div ref={smartSuggestionsRef} className="min-h-[180px]" {...sectionRevealProps} {...cardHoverProps}>
+                    {shouldRenderSmartSuggestions ? (
+                      <SmartSuggestions transactions={deferredTransactions} monthlyBudget={deferredMonthlyBudget} />
+                    ) : (
+                      <PanelSkeleton className="h-[180px]">
+                        <SkeletonLine className="h-4 w-40" />
+                        <SkeletonLine className="mt-3 h-3 w-5/6" />
+                        <SkeletonLine className="mt-2 h-3 w-2/3" />
+                        <div className="mt-5 grid grid-cols-2 gap-2">
+                          <SkeletonLine className="h-10 rounded-xl" />
+                          <SkeletonLine className="h-10 rounded-xl" />
+                        </div>
+                      </PanelSkeleton>
+                    )}
+                  </motion.div>
 
-                  {/* 4. Compact Vision Board (Progress Tracker) */}
-                  <motion.div
-                    variants={{
-                      hidden: { opacity: 0, x: 20 },
-                      show: { opacity: 1, x: 0 }
-                    }}
-                    whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Link href="/goals">
-                      <VisionBoard primaryGoal={primaryGoal} compact={true} />
+                  {/* 3. Intelligence Hub */}
+                  <motion.div className="content-auto" {...sectionRevealProps} {...cardHoverProps}>
+                    <Link href="/reports" className="block">
+                      <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 p-6 text-white shadow-xl">
+                        <p className="text-xs uppercase tracking-[0.2em] text-indigo-200 mb-2">Finley Intelligence</p>
+                        <h3 className="text-xl font-bold mb-2">Monthly Wealth Brief</h3>
+                        <p className="text-sm text-slate-200 leading-relaxed">
+                          Open your executive financial report with trend diagnostics, category signals, and action priorities.
+                        </p>
+                      </div>
                     </Link>
                   </motion.div>
 
-                  {/* 5. Quick Actions - MOVED UP */}
+                  {/* 4. Compact Vision Board (Progress Tracker) */}
+                  <motion.div ref={rightWidgetsRef} {...sectionRevealProps} {...cardHoverProps}>
+                    {shouldRenderRightWidgets ? (
+                      <Link href="/goals">
+                        <VisionBoard primaryGoal={primaryGoal} compact={true} />
+                      </Link>
+                    ) : (
+                      <PanelSkeleton className="p-5">
+                        <SkeletonLine className="h-4 w-32" />
+                        <SkeletonLine className="mt-3 h-20 rounded-xl" />
+                      </PanelSkeleton>
+                    )}
+                  </motion.div>
+
+                  {/* 5. Referral Progress */}
+                  {user && (
+                    <motion.div {...sectionRevealProps} {...cardHoverProps}>
+                      {shouldRenderRightWidgets ? (
+                        <ReferralStatsCard />
+                      ) : (
+                        <PanelSkeleton className="p-5">
+                          <SkeletonLine className="h-4 w-36" />
+                          <SkeletonLine className="mt-3 h-16 rounded-xl" />
+                        </PanelSkeleton>
+                      )}
+                    </motion.div>
+                  )}
                 </div>
-              </div>
+              </motion.div>
             </motion.main>
 
             <InviteFriendModal
@@ -350,32 +691,68 @@ export default function Dashboard() {
               onClose={() => setShowInviteModal(false)}
             />
 
-            <TransactionModal
-              isOpen={activeModal === 'transaction'}
-              onClose={() => setActiveModal(null)}
-              onSuccess={() => {
-                setActiveModal(null)
-                fetchTransactions()
-              }}
-            />
+            {/* Lazy Loaded Modals with Suspense */}
+            <Suspense fallback={null}>
+              {activeModal === 'transaction' && (
+                <TransactionModal
+                  isOpen={true}
+                  onClose={() => setActiveModal(null)}
+                  onSuccess={() => {
+                    setActiveModal(null)
+                    handleDataRefresh()
+                    fireConfetti()
+                  }}
+                />
+              )}
 
-            {activeModal === 'receipt' && (
-              <ReceiptUploadModal
-                onClose={() => setActiveModal(null)}
-              />
-            )}
+              {activeModal === 'receipt' && (
+                <ReceiptUploadModal
+                  onClose={() => setActiveModal(null)}
+                />
+              )}
 
-            <CsvImportModal
-              isOpen={activeModal === 'csv'}
-              onClose={() => setActiveModal(null)}
-              onSuccess={() => {
-                setActiveModal(null)
-                fetchTransactions()
-              }}
-            />
+              {activeModal === 'csv' && (
+                <CsvImportModal
+                  isOpen={true}
+                  onClose={() => setActiveModal(null)}
+                  onSuccess={() => {
+                    setActiveModal(null)
+                    handleDataRefresh()
+                  }}
+                />
+              )}
+            </Suspense>
+
           </div>
+
+          {shouldMountBackToTop && <BackToTop />}
+
+          {shouldMountAI && (
+            <AIChatInput
+              isOpen={isAiOpen}
+              onOpenChange={setIsAiOpen}
+              prefillText={aiPrefill}
+              prefillKey={aiPrefillKey}
+              welcomeTitle="Ask Finley AI to explain your next move and bookkeeping strategy"
+              placeholder="Ask: what should I do today to improve my finances?"
+              suggestions={[
+                { icon: '🎯', text: 'Explain my next move', action: 'Explain my highest impact action this week and why.' },
+                { icon: '🧾', text: 'Bookkeeping help', action: 'Teach me a simple daily bookkeeping workflow in FinleyBook.', highlight: true },
+                { icon: '📊', text: 'Budget optimization', action: 'How do I optimize my monthly budget with current spending?' },
+                { icon: '📄', text: 'Report routine', action: 'Give me a professional monthly report review checklist.' }
+              ]}
+            />
+          )}
+
+          {showAuthModal && (
+            <AuthModal
+              mode="signup"
+              onClose={() => setShowAuthModal(false)}
+            />
+          )}
         </PullToRefresh>
       )}
     </>
   )
+
 }

@@ -1,82 +1,146 @@
-'use client'
-
-import { Fragment, useState, useEffect } from 'react'
+import { Fragment, useState, useEffect, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon, MicrophoneIcon, StopIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
+import { useAuth } from '@/components/AuthProvider'
+import { addTransaction } from '@/lib/dataService'
 
 interface VoiceInputModalProps {
   onClose: () => void
+  onSuccess?: (data: any) => void
 }
 
-export default function VoiceInputModal({ onClose }: VoiceInputModalProps) {
+export default function VoiceInputModal({ onClose, onSuccess }: VoiceInputModalProps) {
+  const { user } = useAuth()
   const [isRecording, setIsRecording] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [processing, setProcessing] = useState(false)
   const [parsedData, setParsedData] = useState<any>(null)
 
-  const startRecording = () => {
-    setIsRecording(true)
-    setTranscript('')
-    
-    // Simulate voice recording and transcription
-    setTimeout(() => {
-      setTranscript('今天在星巴克买了一杯咖啡，花了45元')
-      setIsRecording(false)
-    }, 3000)
-  }
+  const recognitionRef = useRef<any>(null)
 
-  const stopRecording = () => {
-    setIsRecording(false)
-  }
+  const confirmTransaction = async () => {
+    if (!parsedData || !user) return
 
-  const processTranscript = async () => {
-    if (!transcript) return
-    
-    setProcessing(true)
-    
     try {
-      // Simulate AI processing of natural language
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      setParsedData({
-        amount: 45,
-        description: '星巴克咖啡',
-        category: '餐饮',
-        type: 'expense',
-        date: new Date().toISOString().split('T')[0],
-        merchantName: '星巴克'
+      setProcessing(true) // Reuse processing state for saving feedback
+
+      await addTransaction({
+        userId: user.uid,
+        amount: parsedData.amount,
+        category: parsedData.category,
+        description: parsedData.description,
+        date: new Date(parsedData.date),
+        type: parsedData.type || 'expense',
+        merchantName: parsedData.merchantName,
+        emotionalTag: parsedData.emotional_context
       })
-      
-      toast.success('语音识别并解析成功!')
+
+      toast.success('交易保存成功!')
+      if (onSuccess) onSuccess(parsedData)
+      onClose()
     } catch (error) {
-      console.error('Processing error:', error)
-      toast.error('语音解析失败')
+      console.error('Save error:', error)
+      toast.error('保存失败')
     } finally {
       setProcessing(false)
     }
   }
 
-  const confirmTransaction = async () => {
-    if (!parsedData) return
-    
-    try {
-      // Here you would save the transaction
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      toast.success('交易记录添加成功!')
-      onClose()
-    } catch (error) {
-      console.error('Save error:', error)
-      toast.error('保存失败')
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+      recognitionRef.current = new SpeechRecognition()
+      recognitionRef.current.continuous = true
+      recognitionRef.current.interimResults = true
+      recognitionRef.current.lang = 'zh-CN' // Default to Chinese as per original demo, or make dynamic
+
+      recognitionRef.current.onresult = (event: any) => {
+        let finalTranscript = ''
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript
+          }
+        }
+        if (finalTranscript) {
+          setTranscript(prev => prev + finalTranscript)
+        }
+      }
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error', event.error)
+        setIsRecording(false)
+        if (event.error === 'not-allowed') {
+          toast.error('请允许麦克风权限以使用语音记账')
+        }
+      }
+
+      recognitionRef.current.onend = () => {
+        setIsRecording(false)
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+      }
+    }
+  }, [])
+
+  const startRecording = () => {
+    if (!recognitionRef.current) {
+      toast.error('您的浏览器不支持语音识别')
+      return
+    }
+    setTranscript('')
+    setParsedData(null)
+    setIsRecording(true)
+    recognitionRef.current.start()
+  }
+
+  const stopRecording = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop()
+      setIsRecording(false)
     }
   }
 
-  useEffect(() => {
-    if (transcript && !processing && !parsedData) {
-      processTranscript()
+  const processTranscript = async () => {
+    if (!transcript.trim()) return
+
+    setProcessing(true)
+
+    try {
+      const token = await user?.getIdToken()
+      if (!token) throw new Error('Not authenticated')
+
+      const response = await fetch('/api/ai/parse-transaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          input: transcript,
+          currency: 'CNY' // Context dependent
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || '解析失败')
+      }
+
+      setParsedData(data.data)
+      toast.success('AI 解析成功!')
+    } catch (error: any) {
+      console.error('Processing error:', error)
+      toast.error(error.message || '语音解析失败，请重试')
+    } finally {
+      setProcessing(false)
     }
-  }, [transcript])
+  }
 
   return (
     <Transition.Root show={true} as={Fragment}>
@@ -126,11 +190,10 @@ export default function VoiceInputModal({ onClose }: VoiceInputModalProps) {
                       <button
                         onClick={isRecording ? stopRecording : startRecording}
                         disabled={processing}
-                        className={`flex items-center justify-center w-24 h-24 rounded-full transition-all ${
-                          isRecording 
-                            ? 'bg-danger-600 hover:bg-danger-700 animate-pulse' 
-                            : 'bg-primary-600 hover:bg-primary-700'
-                        } text-white disabled:opacity-50`}
+                        className={`flex items-center justify-center w-24 h-24 rounded-full transition-all ${isRecording
+                          ? 'bg-danger-600 hover:bg-danger-700 animate-pulse'
+                          : 'bg-primary-600 hover:bg-primary-700'
+                          } text-white disabled:opacity-50`}
                       >
                         {isRecording ? (
                           <StopIcon className="h-8 w-8" />
@@ -138,11 +201,11 @@ export default function VoiceInputModal({ onClose }: VoiceInputModalProps) {
                           <MicrophoneIcon className="h-8 w-8" />
                         )}
                       </button>
-                      
+
                       <p className="text-sm text-gray-600 text-center">
                         {isRecording ? '正在录音...' : '点击开始语音记账'}
                       </p>
-                      
+
                       {isRecording && (
                         <div className="text-xs text-gray-500">
                           说出您的交易信息，例如："今天在星巴克买咖啡花了45元"
@@ -211,7 +274,7 @@ export default function VoiceInputModal({ onClose }: VoiceInputModalProps) {
                           确认添加交易
                         </button>
                       )}
-                      
+
                       {!isRecording && !processing && !parsedData && (
                         <div className="text-center text-sm text-gray-500">
                           <p className="mb-2">使用语音快速记账：</p>
@@ -222,7 +285,7 @@ export default function VoiceInputModal({ onClose }: VoiceInputModalProps) {
                           </ul>
                         </div>
                       )}
-                      
+
                       <button
                         onClick={onClose}
                         className="btn-secondary w-full"

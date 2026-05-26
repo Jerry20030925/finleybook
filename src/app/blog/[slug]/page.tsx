@@ -16,16 +16,23 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     const post = blogPosts.find((p) => p.id === params.slug)
     if (!post) return {}
 
+    const baseUrl = 'https://finleybook.com'
+
     return {
-        title: `${post.title} | FinleyBook Blog`,
+        title: `${post.title} | FinleyBook Financial Insights`,
         description: post.excerpt,
+        keywords: [...post.tags, 'FinleyBook Blog', 'wealth management tips Australia'],
         openGraph: {
             title: post.title,
             description: post.excerpt,
             images: [post.image],
+            url: `${baseUrl}/blog/${post.id}`,
+            type: 'article',
+            publishedTime: post.publishDate,
+            authors: [post.author],
         },
         alternates: {
-            canonical: `/blog/${post.id}`,
+            canonical: `${baseUrl}/blog/${post.id}`,
         },
     }
 }

@@ -8,6 +8,13 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
+const asSafeResetDate = (raw: any) => {
+    if (!raw) return new Date(0);
+    if (typeof raw?.toDate === 'function') return raw.toDate();
+    const parsed = new Date(String(raw));
+    return Number.isNaN(parsed.getTime()) ? new Date(0) : parsed;
+};
+
 export async function POST(req: Request) {
     try {
         const { input, currency = 'AUD' } = await req.json();
@@ -15,7 +22,7 @@ export async function POST(req: Request) {
         // 1. Authentication
         const authHeader = req.headers.get('Authorization');
         if (!authHeader?.startsWith('Bearer ')) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ error: 'Unauthorized', errorCode: 'UNAUTHORIZED' }, { status: 401 });
         }
         const token = authHeader.split('Bearer ')[1];
         const decodedToken = await getAdminAuth().verifyIdToken(token);
@@ -27,27 +34,36 @@ export async function POST(req: Request) {
         const userDoc = await userRef.get();
         const userData = userDoc.data();
 
+        if (!userDoc.exists) {
+            await userRef.set({
+                uid,
+                email: decodedToken.email || '',
+                aiMonthlyUsage: 0,
+                aiUsageResetDate: FieldValue.serverTimestamp()
+            }, { merge: true });
+        }
+
         // Determine Pro Status (Mirroring SubscriptionProvider logic)
         const isProMember = userData?.subscription?.planKey !== 'FREE' && userData?.subscription?.status === 'active';
 
         // Check limits for Free users
         if (!isProMember) {
             const now = new Date();
-            const lastReset = userData?.aiUsageResetDate ? userData.aiUsageResetDate.toDate() : new Date(0);
+            const lastReset = asSafeResetDate(userData?.aiUsageResetDate);
             let currentUsage = userData?.aiMonthlyUsage || 0;
 
             // Check if we need to reset (new month)
             if (now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear()) {
                 currentUsage = 0;
-                await userRef.update({
+                await userRef.set({
                     aiMonthlyUsage: 0,
                     aiUsageResetDate: FieldValue.serverTimestamp()
-                });
+                }, { merge: true });
             }
 
             if (currentUsage >= 3) {
                 return NextResponse.json(
-                    { error: 'Monthly AI limit reached. Upgrade to Pro for unlimited access.' },
+                    { error: 'Monthly AI limit reached. Upgrade to Pro for unlimited access.', errorCode: 'AI_LIMIT_REACHED' },
                     { status: 403 }
                 );
             }
@@ -55,14 +71,14 @@ export async function POST(req: Request) {
 
         if (!input) {
             return NextResponse.json(
-                { error: 'Input text is required' },
+                { error: 'Input text is required', errorCode: 'INVALID_INPUT' },
                 { status: 400 }
             );
         }
 
         if (!process.env.OPENAI_API_KEY) {
             return NextResponse.json(
-                { error: 'OpenAI API key not configured' },
+                { error: 'OpenAI API key not configured', errorCode: 'AI_NOT_CONFIGURED' },
                 { status: 500 }
             );
         }
@@ -102,12 +118,17 @@ export async function POST(req: Request) {
 
         const parsedData = JSON.parse(content);
 
-        // 3. Increment Usage if successful
-        // We track usage for everyone, but only enforce for free
-        await userRef.update({
-            aiMonthlyUsage: FieldValue.increment(1),
-            lastAIInteraction: FieldValue.serverTimestamp()
-        });
+        // 3. Increment usage only when we actually parsed a transaction.
+        if (!parsedData?.error) {
+            try {
+                await userRef.set({
+                    aiMonthlyUsage: FieldValue.increment(1),
+                    lastAIInteraction: FieldValue.serverTimestamp()
+                }, { merge: true });
+            } catch (usageError) {
+                console.error('Failed to persist transaction AI usage metadata:', usageError);
+            }
+        }
 
         return NextResponse.json({ data: parsedData });
 
@@ -115,10 +136,10 @@ export async function POST(req: Request) {
         console.error('Error parsing transaction with AI:', error);
         // Handle Token Expired or Invalid
         if (error.code === 'auth/id-token-expired' || error.code === 'auth/argument-error') {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ error: 'Unauthorized', errorCode: 'UNAUTHORIZED' }, { status: 401 });
         }
         return NextResponse.json(
-            { error: error.message || 'Failed to parse transaction' },
+            { error: error.message || 'Failed to parse transaction', errorCode: 'AI_PARSE_FAILED' },
             { status: 500 }
         );
     }

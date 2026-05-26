@@ -1,9 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Wallet, Sparkles, ArrowRight, TrendingUp } from 'lucide-react'
+import { Wallet, Sparkles, ArrowRight, TrendingUp, Zap } from 'lucide-react'
 import { useCurrency } from '../CurrencyProvider'
 import Link from 'next/link'
+import CountUp from '../CountUp'
 
 interface CashbackCardProps {
     pendingAmount?: number
@@ -12,7 +13,7 @@ interface CashbackCardProps {
 }
 
 export default function CashbackCard({ pendingAmount = 12.00, potentialAmount = 50.00, lifeTimeEarned = 145.50 }: CashbackCardProps) {
-    const { formatAmount } = useCurrency()
+    const { formatAmount, country } = useCurrency()
 
     return (
         <motion.div
@@ -29,30 +30,62 @@ export default function CashbackCard({ pendingAmount = 12.00, potentialAmount = 
             {/* Header */}
             <div className="relative z-10 flex justify-between items-start">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-md border border-white/10">
+                    <motion.div
+                        className="p-2.5 bg-white/10 rounded-xl backdrop-blur-md border border-white/10"
+                        whileHover={{ rotate: [0, -10, 8, 0], scale: 1.08 }}
+                        transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+                    >
                         <Sparkles className="w-5 h-5 text-yellow-300" />
-                    </div>
+                    </motion.div>
                     <div>
                         <h3 className="font-bold text-lg leading-tight">Cashback Rewards</h3>
                         <p className="text-xs text-gray-400">Your shopping pays you back</p>
                     </div>
                 </div>
-                <div className="px-2 py-1 bg-green-500/20 rounded-lg border border-green-500/30 flex items-center gap-1.5 cursor-pointer hover:bg-green-500/30 transition-colors group/boost">
-                    <TrendingUp size={12} className="text-green-400 group-hover/boost:animate-bounce" />
+                <motion.div
+                    className="px-2 py-1 bg-green-500/20 rounded-lg border border-green-500/30 flex items-center gap-1.5 cursor-pointer hover:bg-green-500/30 transition-colors group/boost"
+                    whileHover={{ scale: 1.04 }}
+                >
+                    <motion.span
+                        animate={{ y: [0, -2, 0] }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                    >
+                        <TrendingUp size={12} className="text-green-400" />
+                    </motion.span>
                     <span className="text-xs font-bold text-green-400">Boost Active</span>
-                </div>
+                </motion.div>
             </div>
 
             {/* Daily Deal Ticker */}
             <div className="relative z-10 mt-3 px-3 py-1.5 bg-white/5 rounded-lg border border-white/5 inline-flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-[10px] text-gray-300 font-medium">Daily Deal: <span className="text-white font-bold">Amazon 5% Cashback</span> 🔥</span>
+                {/* Pulsing ring dot */}
+                <span className="relative inline-flex h-2 w-2 flex-shrink-0">
+                    <motion.span
+                        className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-60"
+                        animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
+                        transition={{ duration: 1.4, repeat: Infinity, ease: 'easeOut' }}
+                    />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+                </span>
+                <span className="text-[10px] text-gray-300 font-medium">
+                    Daily Deal: <span className="text-white font-bold">Amazon 5% Cashback</span> 🔥
+                </span>
             </div>
 
             {/* Main Value */}
             <div className="relative z-10 mt-6 mb-4">
                 <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black tracking-tight">{formatAmount(pendingAmount)}</span>
+                    <motion.span
+                        className="text-4xl font-black tracking-tight"
+                        animate={{ textShadow: ['0 0 0px rgba(165,180,252,0)', '0 0 16px rgba(165,180,252,0.45)', '0 0 0px rgba(165,180,252,0)'] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                    >
+                        <CountUp
+                            value={pendingAmount}
+                            prefix={country.symbol}
+                            decimals={2}
+                        />
+                    </motion.span>
                     <span className="text-sm font-medium text-gray-400">pending</span>
                 </div>
                 <div className="mt-2 flex items-center gap-2 text-xs text-indigo-200 bg-white/5 rounded-lg p-2 max-w-fit border border-white/5">
@@ -64,15 +97,29 @@ export default function CashbackCard({ pendingAmount = 12.00, potentialAmount = 
             {/* Actions */}
             <div className="relative z-10 grid grid-cols-2 gap-3 mt-auto">
                 <Link href="/wallet" className="col-span-1">
-                    <button className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition-all border border-white/10 flex items-center justify-center gap-2">
+                    <motion.button
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition-all border border-white/10 flex items-center justify-center gap-2"
+                    >
+                        <Wallet size={13} />
                         Withdraw
-                    </button>
+                    </motion.button>
                 </Link>
                 <Link href="/wealth" className="col-span-1">
-                    <button className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all flex items-center justify-center gap-2 group/btn">
+                    <motion.button
+                        whileHover={{ scale: 1.04, boxShadow: '0 8px 20px -4px rgba(99,102,241,0.55)' }}
+                        whileTap={{ scale: 0.97 }}
+                        className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 group/btn"
+                    >
                         Shop Now
-                        <ArrowRight size={14} className="group-hover/btn:translate-x-0.5 transition-transform" />
-                    </button>
+                        <motion.span
+                            animate={{ x: [0, 2, 0] }}
+                            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.8 }}
+                        >
+                            <ArrowRight size={14} />
+                        </motion.span>
+                    </motion.button>
                 </Link>
             </div>
 

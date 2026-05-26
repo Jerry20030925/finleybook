@@ -33,6 +33,14 @@ export function generateAffiliateLink(
 
     // 2. Handle Product Specifics
     if (productUrl) {
+        // Validate URL
+        try {
+            new URL(productUrl);
+        } catch (e) {
+            console.warn(`Invalid product URL provided to affiliate engine: ${productUrl}`);
+            return url; // Return base template if product URL is invalid
+        }
+
         // Extract Product ID if needed
         const productId = extractProductId(productUrl, config.name);
         if (productId) {

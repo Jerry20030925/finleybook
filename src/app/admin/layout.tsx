@@ -1,14 +1,16 @@
 'use client'
 
 import { useAuth } from '@/components/AuthProvider'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ShieldAlert, LayoutDashboard, FileText, Settings, LogOut } from 'lucide-react'
+import { ShieldAlert, LayoutDashboard, FileText, Users } from 'lucide-react'
+import clsx from 'clsx'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const { user, loading } = useAuth()
     const router = useRouter()
+    const pathname = usePathname()
     const [isAuthorized, setIsAuthorized] = useState(false)
 
     useEffect(() => {
@@ -56,16 +58,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
 
                 <nav className="flex-1 p-4 space-y-2">
-                    <Link href="/admin" className="flex items-center gap-3 px-4 py-3 bg-slate-800 rounded-lg text-emerald-400 font-medium">
+                    <Link
+                        href="/admin"
+                        className={clsx(
+                            'flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors',
+                            pathname === '/admin'
+                                ? 'bg-slate-800 text-emerald-400'
+                                : 'text-slate-300 hover:bg-slate-800'
+                        )}
+                    >
                         <LayoutDashboard size={20} />
                         Dashboard
                     </Link>
-                    <Link href="/admin/reports" className="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-slate-300 transition-colors">
+                    <Link
+                        href="/admin/reports"
+                        className={clsx(
+                            'flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors',
+                            pathname === '/admin/reports'
+                                ? 'bg-slate-800 text-emerald-400'
+                                : 'text-slate-300 hover:bg-slate-800'
+                        )}
+                    >
                         <FileText size={20} />
-                        Reports (Coming Soon)
+                        Reports
                     </Link>
-                    <Link href="/admin/users" className="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-lg text-slate-300 transition-colors">
-                        <Settings size={20} />
+                    <Link
+                        href="/admin/users"
+                        className={clsx(
+                            'flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors',
+                            pathname === '/admin/users'
+                                ? 'bg-slate-800 text-emerald-400'
+                                : 'text-slate-300 hover:bg-slate-800'
+                        )}
+                    >
+                        <Users size={20} />
                         User Management
                     </Link>
                 </nav>

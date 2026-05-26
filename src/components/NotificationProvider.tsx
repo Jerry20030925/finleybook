@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'error'
@@ -46,48 +46,25 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             }
         } else {
             // Add helpful default notifications if no history exists
-            const isEnglish = typeof window !== 'undefined' && (
-                localStorage.getItem('language') === 'en' ||
-                navigator.language.startsWith('en')
+            addNotification(
+                'Welcome to FinleyBook! 🎉',
+                'Your privacy-first financial dashboard is ready. Start by adding your first transaction.',
+                'success'
             )
-            
-            if (isEnglish) {
+
+            setTimeout(() => {
                 addNotification(
-                    'Welcome to FinleyBook! 🎉',
-                    'Your privacy-first financial dashboard is ready. Start by adding your first transaction.',
-                    'success'
+                    '💡 Pro Tip Available',
+                    'Set up your monthly budget to unlock financial health insights and savings recommendations.',
+                    'info'
                 )
-                
-                setTimeout(() => {
-                    addNotification(
-                        '💡 Pro Tip Available',
-                        'Set up your monthly budget to unlock financial health insights and savings recommendations.',
-                        'info'
-                    )
-                }, 2000)
-            } else {
-                addNotification(
-                    '欢迎使用 FinleyBook！🎉',
-                    '您的隐私优先财务仪表板已就绪。从添加第一笔交易开始吧。',
-                    'success'
-                )
-                
-                setTimeout(() => {
-                    addNotification(
-                        '💡 专业提示',
-                        '设置月度预算以解锁财务健康洞察和省钱建议。',
-                        'info'
-                    )
-                }, 2000)
-            }
+            }, 2000)
         }
     }, [])
 
     // Save to local storage whenever notifications change
     useEffect(() => {
-        if (notifications.length > 0) {
-            localStorage.setItem('finley_notifications', JSON.stringify(notifications))
-        }
+        localStorage.setItem('finley_notifications', JSON.stringify(notifications))
     }, [notifications])
 
     const addNotification = useCallback((title: string, message: string, type: NotificationType = 'info') => {
@@ -121,7 +98,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         localStorage.removeItem('finley_notifications')
     }, [])
 
-    const unreadCount = notifications.filter(n => !n.read).length
+    const unreadCount = useMemo(() => notifications.filter(n => !n.read).length, [notifications])
 
     return (
         <NotificationContext.Provider value={{

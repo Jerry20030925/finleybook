@@ -7,6 +7,7 @@ import { Plus, Target, Trash2, Edit2, CheckCircle2 } from 'lucide-react'
 import { useAuth } from './AuthProvider'
 import { getGoals, addGoal, deleteGoal, updateGoal, Goal } from '@/lib/dataService'
 import toast from 'react-hot-toast'
+import { LIST_STAGGER_VARIANTS, MODAL_VARIANTS, MOTION_SPRING, INTERACTIVE } from '@/lib/motionTokens'
 
 interface GoalsWidgetProps {
   isPro: boolean
@@ -114,128 +115,183 @@ export default function GoalsWidget({ isPro }: GoalsWidgetProps) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="font-bold text-gray-900 text-lg">My Wishlist & Goals</h3>
-        <button
+        <motion.button
           onClick={() => setIsModalOpen(true)}
           className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-black transition-colors"
+          whileHover={INTERACTIVE.buttonHover}
+          whileTap={INTERACTIVE.buttonTap}
         >
           <Plus size={16} /> Add Goal
-        </button>
+        </motion.button>
       </div>
 
       {loading ? (
         <div className="text-center py-10 text-gray-500">Loading goals...</div>
       ) : goals.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-8 text-center bg-white border border-gray-100 rounded-xl border-dashed shadow-sm">
-          <div className="bg-indigo-50 p-3 rounded-full mb-3 shadow-sm">
+        <motion.div
+          className="flex flex-col items-center justify-center py-8 text-center bg-white border border-gray-100 rounded-xl border-dashed shadow-sm"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ ...MOTION_SPRING.panel }}
+        >
+          <motion.div
+            className="bg-indigo-50 p-3 rounded-full mb-3 shadow-sm"
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          >
             <Target className="text-indigo-400" size={24} />
-          </div>
+          </motion.div>
           <h3 className="font-bold text-gray-900 mb-1">No goals yet</h3>
           <p className="text-sm text-gray-500 max-w-[200px] mb-4">Start saving for that special something.</p>
-          <button
+          <motion.button
             onClick={() => setIsModalOpen(true)}
             className="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <Plus size={14} /> Create your first goal
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {goals.map((goal) => {
-            const percentage = Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100))
-            const isFinished = percentage >= 100
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          variants={LIST_STAGGER_VARIANTS.container}
+          initial="hidden"
+          animate="show"
+        >
+          <AnimatePresence mode="popLayout">
+            {goals.map((goal) => {
+              const percentage = Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100))
+              const isFinished = percentage >= 100
 
-            return (
-              <motion.div
-                key={goal.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`bg-white rounded-xl p-5 shadow-sm border ${isFinished ? 'border-green-200 bg-green-50/30' : 'border-gray-100'} relative group overflow-hidden`}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-xl">
-                      {goal.icon || '🎯'}
+              return (
+                <motion.div
+                  key={goal.id}
+                  variants={LIST_STAGGER_VARIANTS.item}
+                  layout
+                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                  className={`bg-white rounded-xl p-5 shadow-sm border ${isFinished ? 'border-green-200 bg-green-50/30' : 'border-gray-100'} relative group overflow-hidden card-lift`}
+                  whileHover={INTERACTIVE.cardHover}
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <motion.div
+                        className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-xl"
+                        whileHover={{ scale: 1.1, rotate: 8 }}
+                        transition={MOTION_SPRING.badge}
+                      >
+                        {goal.icon || '🎯'}
+                      </motion.div>
+                      <div>
+                        <h4 className="font-bold text-gray-900">{goal.title}</h4>
+                        <p className="text-xs text-gray-500 capitalize">{goal.category}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-gray-900">{goal.title}</h4>
-                      <p className="text-xs text-gray-500 capitalize">{goal.category}</p>
-                    </div>
+                    <motion.button
+                      onClick={() => handleDelete(goal.id!)}
+                      className="text-gray-300 hover:text-red-500 transition-colors"
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.85 }}
+                    >
+                      <Trash2 size={16} />
+                    </motion.button>
                   </div>
-                  <button
-                    onClick={() => handleDelete(goal.id!)}
-                    className="text-gray-300 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
 
-                <div className="mb-2 flex justify-between text-sm">
-                  <span className="font-medium text-gray-700">${goal.currentAmount}</span>
-                  <span className="text-gray-400">of ${goal.targetAmount}</span>
-                </div>
+                  <div className="mb-2 flex justify-between text-sm">
+                    <span className="font-medium text-gray-700">${goal.currentAmount}</span>
+                    <span className="text-gray-400">of ${goal.targetAmount}</span>
+                  </div>
 
-                <div className="relative w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-4">
-                  <motion.div
-                    className={`h-full rounded-full ${isFinished ? 'bg-green-500' : 'bg-indigo-600'}`}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${percentage}%` }}
-                    transition={{ duration: 1 }}
-                  />
-                </div>
+                  <div className="relative w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-4">
+                    <motion.div
+                      className={`h-full rounded-full ${isFinished ? 'bg-green-500' : 'bg-indigo-600'}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${percentage}%` }}
+                      transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  </div>
 
-                <div className="flex justify-end">
-                  {isFinished ? (
-                    <span className="text-green-600 text-xs font-bold flex items-center gap-1">
-                      <CheckCircle2 size={14} /> Completed
-                    </span>
-                  ) : (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleProgressUpdate(goal, goal.currentAmount + 10)}
-                        className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded hover:bg-indigo-100 font-medium"
+                  <div className="flex justify-end">
+                    {isFinished ? (
+                      <motion.span
+                        className="text-green-600 text-xs font-bold flex items-center gap-1"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={MOTION_SPRING.badge}
                       >
-                        + $10
-                      </button>
-                      <button
-                        onClick={() => handleProgressUpdate(goal, goal.currentAmount + 100)}
-                        className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded hover:bg-indigo-100 font-medium"
-                      >
-                        + $100
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            )
-          })}
-        </div>
+                        <CheckCircle2 size={14} /> Completed
+                      </motion.span>
+                    ) : (
+                      <div className="flex gap-2">
+                        <motion.button
+                          onClick={() => handleProgressUpdate(goal, goal.currentAmount + 10)}
+                          className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded hover:bg-indigo-100 font-medium"
+                          whileHover={{ scale: 1.06 }}
+                          whileTap={{ scale: 0.92 }}
+                        >
+                          + $10
+                        </motion.button>
+                        <motion.button
+                          onClick={() => handleProgressUpdate(goal, goal.currentAmount + 100)}
+                          className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded hover:bg-indigo-100 font-medium"
+                          whileHover={{ scale: 1.06 }}
+                          whileTap={{ scale: 0.92 }}
+                        >
+                          + $100
+                        </motion.button>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )
+            })}
+          </AnimatePresence>
+        </motion.div>
       )}
 
       {/* Add Goal Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              variants={MODAL_VARIANTS.overlay}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onClick={() => setIsModalOpen(false)}
+            />
+            <motion.div
+              className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl relative z-10"
+              variants={MODAL_VARIANTS.panel}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
             >
               <h3 className="text-xl font-bold mb-4">Add New Goal</h3>
               <form onSubmit={handleAddGoal} className="space-y-4">
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
                   <label className="block text-sm font-medium text-gray-700 mb-1">Goal Title</label>
                   <input
                     type="text"
                     required
                     value={newGoal.title}
                     onChange={e => setNewGoal({ ...newGoal, title: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none transition-shadow"
                     placeholder="e.g., Japan Trip, New Laptop"
                   />
-                </div>
+                </motion.div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <motion.div
+                  className="grid grid-cols-2 gap-4"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                >
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Target Amount ($)</label>
                     <input
@@ -244,7 +300,7 @@ export default function GoalsWidget({ isPro }: GoalsWidgetProps) {
                       min="1"
                       value={newGoal.targetAmount}
                       onChange={e => setNewGoal({ ...newGoal, targetAmount: Number(e.target.value) })}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none"
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none transition-shadow"
                     />
                   </div>
                   <div>
@@ -254,50 +310,67 @@ export default function GoalsWidget({ isPro }: GoalsWidgetProps) {
                       min="0"
                       value={newGoal.currentAmount}
                       onChange={e => setNewGoal({ ...newGoal, currentAmount: Number(e.target.value) })}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none"
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none transition-shadow"
                     />
                   </div>
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                   <select
                     value={newGoal.category}
                     onChange={e => setNewGoal({ ...newGoal, category: e.target.value as any })}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none transition-shadow"
                   >
                     <option value="purchase">Purchase (Gadgets, Clothes)</option>
                     <option value="vacation">Vacation / Travel</option>
                     <option value="savings">General Savings</option>
                     <option value="emergency">Emergency Fund</option>
                   </select>
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                >
                   <label className="block text-sm font-medium text-gray-700 mb-1">Deadline (Optional)</label>
                   <input
                     type="date"
                     value={newGoal.deadline}
                     onChange={e => setNewGoal({ ...newGoal, deadline: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none transition-shadow"
                   />
-                </div>
+                </motion.div>
 
-                <div className="flex gap-3 mt-6">
-                  <button
+                <motion.div
+                  className="flex gap-3 mt-6"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <motion.button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-bold hover:bg-gray-200"
+                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-bold hover:bg-gray-200 transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
                   >
                     Cancel
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-black text-white rounded-lg font-bold hover:bg-gray-800"
+                    className="flex-1 px-4 py-2 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
                   >
                     Save Goal
-                  </button>
-                </div>
+                  </motion.button>
+                </motion.div>
               </form>
             </motion.div>
           </div>

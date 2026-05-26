@@ -3,6 +3,7 @@
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
+import { isMobileApp } from '@/lib/mobileUtils'
 
 interface PullToRefreshProps {
     onRefresh: () => Promise<void>
@@ -11,6 +12,7 @@ interface PullToRefreshProps {
 
 export default function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
     const [isRefreshing, setIsRefreshing] = useState(false)
+    const [enabled, setEnabled] = useState(false)
     const y = useMotionValue(0)
     const pullThreshold = 80
 
@@ -21,7 +23,15 @@ export default function PullToRefresh({ onRefresh, children }: PullToRefreshProp
     const startY = useRef(0)
     const isDragging = useRef(false)
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        // Web browsers should keep native scroll behavior.
+        // Custom pull-to-refresh is enabled only inside native app shells.
+        setEnabled(isMobileApp())
+    }, [])
+
     const handleTouchStart = (e: React.TouchEvent) => {
+        if (!enabled) return
         if (window.scrollY === 0) {
             startY.current = e.touches[0].clientY
             isDragging.current = true
@@ -29,6 +39,7 @@ export default function PullToRefresh({ onRefresh, children }: PullToRefreshProp
     }
 
     const handleTouchMove = (e: React.TouchEvent) => {
+        if (!enabled) return
         if (!isDragging.current) return
 
         const currentY = e.touches[0].clientY
@@ -48,29 +59,41 @@ export default function PullToRefresh({ onRefresh, children }: PullToRefreshProp
     }
 
     const handleTouchEnd = async () => {
+        if (!enabled) return
         if (!isDragging.current) return
         isDragging.current = false
 
         if (y.get() > pullThreshold) {
             setIsRefreshing(true)
-            animate(y, 50, { type: "spring", stiffness: 300, damping: 30 })
+            // Haptic Feedback for threshold
+            try {
+                const { Haptics, ImpactStyle } = await import('@capacitor/haptics')
+                await Haptics.impact({ style: ImpactStyle.Medium })
+            } catch (e) { }
+
+            animate(y, 50, { type: "spring", stiffness: 300, damping: 30, mass: 0.8 })
             try {
                 await onRefresh()
             } finally {
                 setIsRefreshing(false)
-                animate(y, 0, { type: "spring", stiffness: 300, damping: 30 })
+                animate(y, 0, { type: "spring", stiffness: 300, damping: 30, mass: 1 })
             }
         } else {
-            animate(y, 0, { type: "spring", stiffness: 400, damping: 40 })
+            animate(y, 0, { type: "spring", stiffness: 400, damping: 40, mass: 1 })
         }
+    }
+
+    if (!enabled) {
+        return <>{children}</>
     }
 
     return (
         <div
-            className="relative isolate min-h-screen"
+            className="relative isolate min-h-[100dvh]"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
+            style={{ touchAction: 'pan-y' }}
         >
             {/* Loading Indicator */}
             <motion.div
@@ -93,7 +116,7 @@ export default function PullToRefresh({ onRefresh, children }: PullToRefreshProp
             {/* Content Container */}
             <motion.div
                 style={{ y }}
-                className="relative z-10 bg-gray-50 min-h-screen"
+                className="relative z-10 bg-[#F8FAFC] min-h-[100dvh]"
             >
                 {children}
             </motion.div>

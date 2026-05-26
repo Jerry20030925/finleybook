@@ -6,7 +6,7 @@ import { XMarkIcon, EyeIcon, EyeSlashIcon, SparklesIcon, PhoneIcon } from '@hero
 import { useAuth } from './AuthProvider'
 import { useLanguage } from './LanguageProvider'
 import toast from 'react-hot-toast'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 
 interface AuthModalProps {
@@ -63,6 +63,9 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
   }
 
   const router = useRouter() // Add this hook
+  const navigateToDashboard = () => {
+    router.replace('/dashboard')
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -83,7 +86,7 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
         toast.success(t('auth.signUpSuccess'))
       }
       onClose()
-      router.push('/dashboard') // Explicit redirect
+      navigateToDashboard()
     } catch (error: any) {
       console.error('Auth error:', error)
       const errorMessage = error.message || (currentMode === 'signin' ? t('auth.signInError') : t('auth.signUpError'))
@@ -99,6 +102,7 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
       await signInWithGoogle()
       toast.success(t('auth.googleSignInSuccess'))
       onClose()
+      navigateToDashboard()
     } catch (error: any) {
       console.error('Google auth error:', error)
       toast.error(t('auth.googleSignInError'))
@@ -179,7 +183,7 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
       await confirmationResult.confirm(verificationCode)
       toast.success(t('auth.signInSuccess'))
       onClose()
-      router.push('/dashboard')
+      navigateToDashboard()
     } catch (error: any) {
       console.error('Code verification error:', error)
       toast.error('Invalid verification code')
@@ -396,7 +400,7 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
                       )}
                     </motion.div>
                   ) : (
-                    <>
+                    <form onSubmit={handleSubmit} className="space-y-4">
                       {/* Divider */}
                       <motion.div
                         initial={{ scaleX: 0, opacity: 0 }}
@@ -412,75 +416,123 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
                         </div>
                       </motion.div>
 
-                      {/* Form */}
-                      <motion.form
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.6 }}
-                        onSubmit={handleSubmit}
-                        className="space-y-6"
-                      >
-                        {/* Email Field */}
-                        <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                            {t('auth.email')}
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="email"
-                              id="email"
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-violet-500 transition-all duration-200 outline-none bg-white/50 backdrop-blur-sm text-gray-900 placeholder-gray-500 ${errors.email ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-violet-500'
-                                }`}
-                              placeholder={t('auth.emailPlaceholder')}
-                              required
-                              autoComplete="email"
-                            />
-                            {errors.email && (
-                              <motion.p
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="mt-2 text-sm text-red-600 flex items-center"
-                              >
-                                <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                </svg>
-                                {errors.email}
-                              </motion.p>
+                      <div>
+                        <input
+                          type="email"
+                          id="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-violet-500 transition-all duration-200 outline-none bg-white/50 backdrop-blur-sm text-gray-900 placeholder-gray-500 ${errors.email ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-violet-500'
+                            }`}
+                          placeholder={t('auth.emailPlaceholder')}
+                          required
+                          autoComplete="email"
+                        />
+                        {errors.email && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-2 text-sm text-red-600 flex items-center"
+                          >
+                            <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            {errors.email}
+                          </motion.p>
+                        )}
+                      </div>
+
+                      {/* Password Field */}
+                      <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                          {t('auth.password')}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className={`w-full px-4 py-3.5 pr-12 border-2 rounded-xl focus:ring-2 focus:ring-violet-500 transition-all duration-200 outline-none bg-white/50 backdrop-blur-sm text-gray-900 placeholder-gray-500 ${errors.password ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-violet-500'
+                              }`}
+                            placeholder={currentMode === 'signin' ? t('auth.passwordPlaceholder') : t('auth.passwordSignUpPlaceholder')}
+                            required
+                            autoComplete={currentMode === 'signin' ? 'current-password' : 'new-password'}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                          >
+                            {showPassword ? (
+                              <EyeSlashIcon className="w-5 h-5" />
+                            ) : (
+                              <EyeIcon className="w-5 h-5" />
                             )}
-                          </div>
+                          </button>
+                          {errors.password && (
+                            <motion.p
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="mt-2 text-sm text-red-600 flex items-center"
+                            >
+                              <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                              {errors.password}
+                            </motion.p>
+                          )}
                         </div>
 
-                        {/* Password Field */}
-                        <div>
-                          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                            {t('auth.password')}
+                        {/* Forgot Password Link - only for signin mode */}
+                        {currentMode === 'signin' && (
+                          <div className="flex justify-end mt-2">
+                            <button
+                              type="button"
+                              onClick={handleForgotPassword}
+                              disabled={loading}
+                              className="text-sm text-violet-600 hover:text-violet-700 font-medium transition-colors disabled:opacity-50"
+                            >
+                              {t('auth.forgotPassword')}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Confirm Password Field */}
+                      {currentMode === 'signup' && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                        >
+                          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                            {t('auth.confirmPassword')}
                           </label>
                           <div className="relative">
                             <input
-                              type={showPassword ? 'text' : 'password'}
-                              id="password"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              className={`w-full px-4 py-3.5 pr-12 border-2 rounded-xl focus:ring-2 focus:ring-violet-500 transition-all duration-200 outline-none bg-white/50 backdrop-blur-sm text-gray-900 placeholder-gray-500 ${errors.password ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-violet-500'
+                              type={showConfirmPassword ? 'text' : 'password'}
+                              id="confirmPassword"
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              className={`w-full px-4 py-3.5 pr-12 border-2 rounded-xl focus:ring-2 focus:ring-violet-500 transition-all duration-200 outline-none bg-white/50 backdrop-blur-sm text-gray-900 placeholder-gray-500 ${errors.confirmPassword ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-violet-500'
                                 }`}
-                              placeholder={currentMode === 'signin' ? t('auth.passwordPlaceholder') : t('auth.passwordSignUpPlaceholder')}
+                              placeholder={t('auth.confirmPasswordPlaceholder')}
                               required
-                              autoComplete={currentMode === 'signin' ? 'current-password' : 'new-password'}
+                              autoComplete="new-password"
                             />
                             <button
                               type="button"
-                              onClick={() => setShowPassword(!showPassword)}
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                             >
-                              {showPassword ? (
+                              {showConfirmPassword ? (
                                 <EyeSlashIcon className="w-5 h-5" />
                               ) : (
                                 <EyeIcon className="w-5 h-5" />
                               )}
                             </button>
-                            {errors.password && (
+                            {errors.confirmPassword && (
                               <motion.p
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -489,123 +541,64 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
                                 <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                 </svg>
-                                {errors.password}
+                                {errors.confirmPassword}
                               </motion.p>
                             )}
                           </div>
-
-                          {/* Forgot Password Link - only for signin mode */}
-                          {currentMode === 'signin' && (
-                            <div className="flex justify-end mt-2">
-                              <button
-                                type="button"
-                                onClick={handleForgotPassword}
-                                disabled={loading}
-                                className="text-sm text-violet-600 hover:text-violet-700 font-medium transition-colors disabled:opacity-50"
-                              >
-                                {t('auth.forgotPassword')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Confirm Password Field */}
-                        {currentMode === 'signup' && (
-                          <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                              {t('auth.confirmPassword')}
-                            </label>
-                            <div className="relative">
-                              <input
-                                type={showConfirmPassword ? 'text' : 'password'}
-                                id="confirmPassword"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className={`w-full px-4 py-3.5 pr-12 border-2 rounded-xl focus:ring-2 focus:ring-violet-500 transition-all duration-200 outline-none bg-white/50 backdrop-blur-sm text-gray-900 placeholder-gray-500 ${errors.confirmPassword ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-violet-500'
-                                  }`}
-                                placeholder={t('auth.confirmPasswordPlaceholder')}
-                                required
-                                autoComplete="new-password"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                              >
-                                {showConfirmPassword ? (
-                                  <EyeSlashIcon className="w-5 h-5" />
-                                ) : (
-                                  <EyeIcon className="w-5 h-5" />
-                                )}
-                              </button>
-                              {errors.confirmPassword && (
-                                <motion.p
-                                  initial={{ opacity: 0, y: -10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  className="mt-2 text-sm text-red-600 flex items-center"
-                                >
-                                  <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                  </svg>
-                                  {errors.confirmPassword}
-                                </motion.p>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Submit Button */}
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          type="submit"
-                          disabled={loading}
-                          className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold py-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-violet-200 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {loading ? (
-                            <div className="flex items-center justify-center">
-                              <svg className="w-5 h-5 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                              </svg>
-                              {currentMode === 'signin' ? t('auth.signingIn') : t('auth.signingUp')}
-                            </div>
-                          ) : (
-                            currentMode === 'signin' ? t('auth.signIn') : t('auth.signUp')
-                          )}
-                        </motion.button>
-
-                        {/* Mode Switch */}
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.8 }}
-                          className="text-center pt-4"
-                        >
-                          <p className="text-sm text-gray-600">
-                            {currentMode === 'signin' ? t('auth.noAccount') : t('auth.haveAccount')}
-                            {' '}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setCurrentMode(currentMode === 'signin' ? 'signup' : 'signin')
-                                setErrors({})
-                              }}
-                              className="text-violet-600 hover:text-violet-700 font-medium transition-colors"
-                            >
-                              {currentMode === 'signin' ? t('auth.signUp') : t('auth.signIn')}
-                            </button>
-                          </p>
                         </motion.div>
-                      </motion.form>
-                    </>
+                      )}
+
+                      {/* Submit Button */}
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold py-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-violet-200 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading ? (
+                          <div className="flex items-center justify-center">
+                            <svg className="w-5 h-5 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            {currentMode === 'signin' ? t('auth.signingIn') : t('auth.signingUp')}
+                          </div>
+                        ) : (
+                          currentMode === 'signin' ? t('auth.signIn') : t('auth.signUp')
+                        )}
+                      </motion.button>
+
+                      {/* Mode Switch */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.8 }}
+                        className="text-center pt-4"
+                      >
+                        <p className="text-sm text-gray-600">
+                          {currentMode === 'signin' ? t('auth.noAccount') : t('auth.haveAccount')}
+                          {' '}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurrentMode(currentMode === 'signin' ? 'signup' : 'signin')
+                              setErrors({})
+                            }}
+                            className="text-violet-600 hover:text-violet-700 font-medium transition-colors"
+                          >
+                            {currentMode === 'signin' ? t('auth.signUp') : t('auth.signIn')}
+                          </button>
+                        </p>
+                      </motion.div>
+                    </form>
                   )}
                 </motion.div>
               </Dialog.Panel>
             </Transition.Child>
-          </div>
-        </div>
-      </Dialog>
+          </div >
+        </div >
+      </Dialog >
     </Transition >
   )
 }

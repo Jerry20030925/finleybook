@@ -1,73 +1,96 @@
-import { getAdminDb } from '@/lib/firebaseAdmin' // PROJ-SCOPED: Use Admin SDK for server-side privileged access
-import ResendService from '@/lib/resendService'
-import { NextResponse } from 'next/server'
+import { adminDb } from '@/lib/firebase-admin';
+import ResendService from '@/lib/resendService';
+import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 export async function GET(request: Request) {
     try {
-        const authHeader = request.headers.get('authorization')
+        const authHeader = request.headers.get('authorization');
         if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-            return new NextResponse('Unauthorized', { status: 401 })
+            return new NextResponse('Unauthorized', { status: 401 });
         }
 
-        // Define "Today" and "Yesterday" based on Server Time (UTC usually in Vercel)
-        // Ideally we'd use user timezone, but for MVP global UTC cutoffs are acceptable
-        const now = new Date()
-        const todayStart = new Date(now)
-        todayStart.setHours(0, 0, 0, 0)
+        if (!adminDb) {
+            return new NextResponse('Database Error', { status: 500 });
+        }
 
-        const yesterdayStart = new Date(todayStart)
-        yesterdayStart.setDate(todayStart.getDate() - 1)
+        // Define "Today" and "Yesterday" based on Server Time (UTC)
+        const now = new Date();
+        const todayStart = new Date(now);
+        todayStart.setHours(0, 0, 0, 0);
 
-        // Admin SDK Initialization
-        const db = getAdminDb()
+        const yesterdayStart = new Date(todayStart);
+        yesterdayStart.setDate(todayStart.getDate() - 1);
 
-        // Query users who logged in Yesterday (between yesterdayStart and todayStart)
-        // If they logged in AFTER todayStart, they are safe.
-        // If they logged in BEFORE yesterdayStart, their streak is already broken (or inactive).
-        // So we strictly want: YesterdayStart <= lastLogin < TodayStart
-        const snapshot = await db.collection('users')
+        const todayStr = now.toISOString().slice(0, 10); // YYYY-MM-DD for duplicate guard
+
+        // Query users who logged in yesterday but NOT today
+        const snapshot = await adminDb.collection('users')
             .where('lastLogin', '>=', yesterdayStart)
             .where('lastLogin', '<', todayStart)
-            .get()
+            .get();
 
-        let sentCount = 0
-        const processingErrors = []
+        let sentCount = 0;
+        let skipped = 0;
+        const processingErrors: { email: string; error: string }[] = [];
 
-        for (const doc of snapshot.docs) {
-            const user = doc.data()
+        // Process in batches of 10
+        const docs = snapshot.docs;
+        for (let i = 0; i < docs.length; i += 10) {
+            const batch = docs.slice(i, i + 10);
+            const batchResults = await Promise.allSettled(
+                batch.map(async (doc) => {
+                    const user = doc.data();
 
-            // Double check streak is worth saving (> 1 makes more sense, or even > 0 to build habit)
-            // Let's say streak >= 1
-            if (user.streak && user.streak > 0) {
-                try {
-                    // Check if we already sent a reminder today?
-                    // (Optional: add a 'lastStreakReminder' field to user to avoid spam if cron runs multiple times)
-                    // For now, assume cron runs ONCE per day.
+                    // Skip if no streak worth saving
+                    if (!user.streak || user.streak <= 0) return;
+
+                    // Skip if user opted out
+                    if (user.emailPreferences?.streakReminders === false) {
+                        skipped++;
+                        return;
+                    }
+
+                    // Duplicate-send guard: check if already sent today
+                    if (user.lastStreakReminder === todayStr) {
+                        skipped++;
+                        return;
+                    }
 
                     await ResendService.sendStreakReminder(
                         user.email,
                         user.displayName || user.name || 'Friend',
                         user.streak
-                    )
-                    sentCount++
-                } catch (err: any) {
-                    console.error(`Failed to send reminder to ${user.email}:`, err)
-                    processingErrors.push({ email: user.email, error: err.message })
+                    );
+
+                    // Mark reminder sent
+                    await doc.ref.update({
+                        lastStreakReminder: todayStr,
+                    });
+
+                    sentCount++;
+                })
+            );
+
+            batchResults.forEach((r) => {
+                if (r.status === 'rejected') {
+                    console.error('Streak reminder batch error:', r.reason);
+                    processingErrors.push({ email: 'unknown', error: String(r.reason) });
                 }
-            }
+            });
         }
 
         return NextResponse.json({
             success: true,
             processed: snapshot.size,
             sent: sentCount,
-            errors: processingErrors
-        })
-
+            skipped,
+            errors: processingErrors,
+        });
     } catch (error: any) {
-        console.error('Streak Cron Error:', error)
-        return new NextResponse(`Internal Error: ${error.message}`, { status: 500 })
+        console.error('Streak Cron Error:', error);
+        return new NextResponse(`Internal Error: ${error.message}`, { status: 500 });
     }
 }

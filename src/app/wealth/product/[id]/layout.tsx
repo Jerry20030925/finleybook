@@ -1,5 +1,4 @@
 import { Metadata } from 'next'
-import { PRODUCTS } from '@/data/products'
 
 type Props = {
     params: { id: string }
@@ -9,22 +8,15 @@ type Props = {
 export async function generateMetadata(
     { params }: Props
 ): Promise<Metadata> {
-    const product = PRODUCTS.find((p) => p.id === params.id)
-
-    if (!product) {
-        return {
-            title: 'Product Not Found | FinleyBook',
-        }
-    }
-
     return {
-        title: `${product.name} - Best Price & Cashback | FinleyBook`,
-        description: `Get ${product.cashbackRate * 100}% cashback on ${product.name}. Compare specific offers from ${product.offers.length} merchants.`,
-        openGraph: {
-            images: [product.image],
-        },
+        title: 'FinleyBook Reports | Insights Center',
+        description: 'FinleyBook intelligence reports and planning insights.',
         alternates: {
-            canonical: `/wealth/product/${product.id}`,
+            canonical: '/reports',
+        },
+        robots: {
+            index: false,
+            follow: false,
         },
     }
 }

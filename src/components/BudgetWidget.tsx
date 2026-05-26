@@ -5,23 +5,49 @@ import { motion } from 'framer-motion'
 import { useAuth } from './AuthProvider'
 import { useLanguage } from './LanguageProvider'
 import { useCurrency } from './CurrencyProvider'
-import { getUserTransactions } from '@/lib/dataService'
-import { ShoppingBagIcon } from '@heroicons/react/24/outline'
+import { getUserTransactions, getBudgets, type Budget as FirestoreBudget } from '@/lib/dataService'
+import { ShoppingBagIcon, PlusIcon } from '@heroicons/react/24/outline'
+import { useRouter } from 'next/navigation'
 
-interface Budget {
+interface BudgetDisplay {
   name: string
   spent: number
   budget: number
   color: string
 }
 
+// Category to color mapping
+const CATEGORY_COLORS: { [key: string]: string } = {
+  'category.food': 'bg-yellow-500',
+  'category.transport': 'bg-blue-500',
+  'category.shopping': 'bg-purple-500',
+  'category.entertainment': 'bg-green-500',
+  'category.housing': 'bg-orange-500',
+  'category.health': 'bg-red-500',
+  'category.education': 'bg-indigo-500',
+  'category.otherExpense': 'bg-gray-500',
+}
+
+// Mapping from Chinese category names to translation keys
+const CATEGORY_MAPPING: { [key: string]: string } = {
+  '餐饮美食': 'category.food',
+  '交通出行': 'category.transport',
+  '购物消费': 'category.shopping',
+  '居住缴费': 'category.housing',
+  '医疗健康': 'category.health',
+  '文化娱乐': 'category.entertainment',
+  '学习教育': 'category.education',
+  '其他支出': 'category.otherExpense',
+}
+
 export default function BudgetWidget() {
   const [animatedPercentages, setAnimatedPercentages] = useState<{ [key: string]: number }>({})
-  const [budgets, setBudgets] = useState<Budget[]>([])
+  const [budgets, setBudgets] = useState<BudgetDisplay[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const { user } = useAuth()
   const { t } = useLanguage()
   const { formatAmount } = useCurrency()
+  const router = useRouter()
 
   useEffect(() => {
     const loadBudgetData = async () => {
@@ -29,6 +55,17 @@ export default function BudgetWidget() {
 
       try {
         setIsLoading(true)
+
+        // Fetch real budgets from Firestore
+        const firestoreBudgets = await getBudgets(user.uid)
+
+        if (firestoreBudgets.length === 0) {
+          setBudgets([])
+          setIsLoading(false)
+          return
+        }
+
+        // Fetch transactions to calculate spending
         const transactions = await getUserTransactions(user.uid, 1000)
 
         // Calculate spending for current month by category
@@ -49,20 +86,22 @@ export default function BudgetWidget() {
           return acc
         }, {} as { [key: string]: number })
 
-        // Mock Budget Data (In real app, fetch from user settings)
-        const defaultBudgets = [
-          { category: t('category.food'), budget: 1000, color: 'bg-yellow-500' },
-          { category: t('category.transport'), budget: 500, color: 'bg-blue-500' },
-          { category: t('category.shopping'), budget: 800, color: 'bg-purple-500' },
-          { category: t('category.entertainment'), budget: 400, color: 'bg-green-500' }
-        ]
+        // Map Firestore budgets to display format
+        const budgetData: BudgetDisplay[] = firestoreBudgets.map(fb => {
+          const categoryKey = fb.category.startsWith('category.') ? fb.category : (CATEGORY_MAPPING[fb.category] || fb.category)
+          const displayName = categoryKey.startsWith('category.') ? t(categoryKey) : fb.category
+          const color = CATEGORY_COLORS[categoryKey] || 'bg-gray-500'
 
-        const budgetData = defaultBudgets.map(db => ({
-          name: db.category,
-          spent: categorySpending[db.category] || 0,
-          budget: db.budget,
-          color: db.color
-        }))
+          // Calculate spent: match against both the raw category and the translated name
+          const spent = categorySpending[fb.category] || categorySpending[displayName] || 0
+
+          return {
+            name: displayName,
+            spent,
+            budget: fb.amount,
+            color,
+          }
+        })
 
         setBudgets(budgetData)
 
@@ -111,7 +150,7 @@ export default function BudgetWidget() {
             <div className="h-4 bg-gray-300 rounded w-16"></div>
           </div>
           <div className="space-y-4">
-            {[1, 2, 3, 4].map(i => (
+            {[1, 2, 3].map(i => (
               <div key={i} className="space-y-2">
                 <div className="flex justify-between">
                   <div className="h-4 bg-gray-300 rounded w-16"></div>
@@ -121,6 +160,29 @@ export default function BudgetWidget() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Empty state: no budgets set up yet
+  if (budgets.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('budget.title')}</h3>
+        <div className="flex flex-col items-center justify-center py-6 text-center">
+          <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-3">
+            <PlusIcon className="w-6 h-6" />
+          </div>
+          <p className="text-sm text-gray-500 mb-4">{t('budget.emptyDesc') || 'Set monthly spending limits to track your savings goals.'}</p>
+          <motion.button
+            onClick={() => router.push('/budget')}
+            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {t('budget.addBudget')}
+          </motion.button>
         </div>
       </div>
     )
@@ -139,6 +201,7 @@ export default function BudgetWidget() {
           className="text-sm text-primary-600 hover:text-primary-700 transition-colors"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => router.push('/budget')}
         >
           {t('common.edit')}
         </motion.button>

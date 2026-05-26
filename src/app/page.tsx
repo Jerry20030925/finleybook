@@ -3,8 +3,8 @@ import AppEntry from '@/components/AppEntry'
 export const dynamic = 'force-static'
 
 export const metadata = {
-  title: 'FinleyBook - AI Wealth Tracker & Cashback App',
-  description: 'The #1 AI Money App. Track net worth, find 90% off price glitches, and earn double cashback on daily shopping. Join the AI wealth revolution today.',
+  title: 'FinleyBook | Professional AI Wealth Intelligence Platform',
+  description: 'Track net worth, manage budgets, and generate decision-grade financial reports with practical AI guidance in one secure platform.',
   alternates: {
     canonical: 'https://finleybook.com',
   },

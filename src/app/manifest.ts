@@ -2,9 +2,9 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: 'FinleyBook - AI Wealth Tracker',
+        name: 'FinleyBook - Professional AI Wealth Intelligence',
         short_name: 'FinleyBook',
-        description: 'Track net worth, find price glitches, and earn cashback with AI.',
+        description: 'Track net worth, manage budgets, and run professional financial reports with practical AI guidance.',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',

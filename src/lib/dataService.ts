@@ -45,10 +45,40 @@ export interface Account {
   balance: number
 }
 
+const shouldLogDataService = process.env.NODE_ENV !== 'production'
+const dataServiceLog = (...args: unknown[]) => {
+  if (shouldLogDataService) {
+    console.log(...args)
+  }
+}
+
+const normalizeTransaction = (transaction: Transaction): Transaction => {
+  const normalizedAmount = Math.abs(Number(transaction.amount) || 0)
+  return {
+    ...transaction,
+    amount: normalizedAmount
+  }
+}
+
+const normalizeTransactionForWrite = (transaction: Omit<Transaction, 'id' | 'createdAt'>): Omit<Transaction, 'id' | 'createdAt'> => {
+  const rawAmount = Number(transaction.amount) || 0
+  const amount = Math.abs(rawAmount)
+  const normalizedType: Transaction['type'] =
+    transaction.type === 'cashback'
+      ? 'cashback'
+      : transaction.type || (rawAmount < 0 ? 'expense' : 'income')
+
+  return {
+    ...transaction,
+    amount,
+    type: normalizedType
+  }
+}
+
 // Simple data fetching functions
 export const getUserTransactions = async (userId: string, limitCount: number = 10) => {
   try {
-    console.log('[getUserTransactions] Fetching transactions for userId:', userId, 'limit:', limitCount)
+    dataServiceLog('[getUserTransactions] Fetching transactions for userId:', userId, 'limit:', limitCount)
 
     const q = query(
       collection(db, 'transactions'),
@@ -58,21 +88,21 @@ export const getUserTransactions = async (userId: string, limitCount: number = 1
     )
 
     const snapshot = await getDocs(q)
-    console.log('[getUserTransactions] Query executed successfully')
-    console.log('[getUserTransactions] Found', snapshot.docs.length, 'documents')
+    dataServiceLog('[getUserTransactions] Query executed successfully')
+    dataServiceLog('[getUserTransactions] Found', snapshot.docs.length, 'documents')
 
     const transactions = snapshot.docs.map(doc => {
       const data = doc.data()
-      console.log('[getUserTransactions] Processing document:', doc.id, data)
-      return {
+      dataServiceLog('[getUserTransactions] Processing document:', doc.id, data)
+      return normalizeTransaction({
         id: doc.id,
         ...data,
         date: data.date?.toDate() || new Date(),
         createdAt: data.createdAt?.toDate() || new Date()
-      }
+      } as Transaction)
     }) as Transaction[]
 
-    console.log('[getUserTransactions] Returning transactions:', transactions)
+    dataServiceLog('[getUserTransactions] Returning transactions:', transactions)
     return transactions
   } catch (error: any) {
     console.error('[getUserTransactions] Error fetching transactions:', error)
@@ -81,7 +111,7 @@ export const getUserTransactions = async (userId: string, limitCount: number = 1
 
     // If composite index error, try a simpler query
     if (error.code === 'failed-precondition' && error.message.includes('index')) {
-      console.log('[getUserTransactions] Composite index required, trying simpler query...')
+      dataServiceLog('[getUserTransactions] Composite index required, trying simpler query...')
       try {
         const simpleQuery = query(
           collection(db, 'transactions'),
@@ -89,16 +119,16 @@ export const getUserTransactions = async (userId: string, limitCount: number = 1
           limit(limitCount)
         )
         const simpleSnapshot = await getDocs(simpleQuery)
-        console.log('[getUserTransactions] Simple query found', simpleSnapshot.docs.length, 'transactions')
+        dataServiceLog('[getUserTransactions] Simple query found', simpleSnapshot.docs.length, 'transactions')
 
         const simpleTransactions = simpleSnapshot.docs.map(doc => {
           const data = doc.data()
-          return {
+          return normalizeTransaction({
             id: doc.id,
             ...data,
             date: data.date?.toDate() || new Date(),
             createdAt: data.createdAt?.toDate() || new Date()
-          }
+          } as Transaction)
         }) as Transaction[]
 
         // Sort manually
@@ -134,7 +164,7 @@ export const getUserFinancialSummary = async (userId: string) => {
 
     const monthlyExpenses = monthlyTransactions
       .filter(t => t.type === 'expense')
-      .reduce((sum, t) => sum + t.amount, 0)
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0)
 
     // Calculate total assets (simplified - sum of all income minus expenses)
     const totalIncome = transactions
@@ -143,7 +173,7 @@ export const getUserFinancialSummary = async (userId: string) => {
 
     const totalExpenses = transactions
       .filter(t => t.type === 'expense')
-      .reduce((sum, t) => sum + t.amount, 0)
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0)
 
     const totalAssets = totalIncome - totalExpenses
     const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome) * 100 : 0
@@ -186,32 +216,34 @@ export const addTransaction = async (transaction: Omit<Transaction, 'id' | 'crea
       throw new Error('Transaction type is required')
     }
 
-    console.log('Adding transaction:', {
+    const normalizedTransaction = normalizeTransactionForWrite(transaction)
+
+    dataServiceLog('Adding transaction:', {
       userId: transaction.userId,
-      amount: transaction.amount,
-      category: transaction.category,
-      type: transaction.type,
-      description: transaction.description,
-      date: transaction.date
+      amount: normalizedTransaction.amount,
+      category: normalizedTransaction.category,
+      type: normalizedTransaction.type,
+      description: normalizedTransaction.description,
+      date: normalizedTransaction.date
     })
 
     const transactionData = {
-      ...transaction,
-      date: Timestamp.fromDate(new Date(transaction.date)),
+      ...normalizedTransaction,
+      date: Timestamp.fromDate(new Date(normalizedTransaction.date)),
       createdAt: Timestamp.now()
     }
 
-    console.log('Prepared transaction data for Firestore:', transactionData)
+    dataServiceLog('Prepared transaction data for Firestore:', transactionData)
 
     const docRef = await addDoc(collection(db, 'transactions'), transactionData)
 
-    console.log('Transaction added successfully with ID:', docRef.id)
+    dataServiceLog('Transaction added successfully with ID:', docRef.id)
 
     // Verify the transaction was actually saved
     setTimeout(async () => {
       try {
         const verifyTransactions = await getUserTransactions(transaction.userId, 5)
-        console.log('Verification: Found', verifyTransactions.length, 'transactions after add')
+        dataServiceLog('Verification: Found', verifyTransactions.length, 'transactions after add')
       } catch (error) {
         console.error('Verification failed:', error)
       }
@@ -230,6 +262,162 @@ export const addTransaction = async (transaction: Omit<Transaction, 'id' | 'crea
     } else {
       throw new Error(`保存失败：${error.message || '未知错误'}`)
     }
+  }
+}
+
+export const updateTransaction = async (transactionId: string, updates: Partial<Transaction>) => {
+  try {
+    const docRef = doc(db, 'transactions', transactionId)
+
+    const payload: Record<string, unknown> = { ...updates }
+    delete payload.id
+    delete payload.createdAt
+
+    if (payload.date instanceof Date) {
+      payload.date = Timestamp.fromDate(payload.date)
+    }
+
+    if (typeof payload.amount !== 'undefined') {
+      payload.amount = Math.abs(Number(payload.amount) || 0)
+    }
+
+    if (
+      payload.type !== 'income'
+      && payload.type !== 'expense'
+      && payload.type !== 'cashback'
+      && typeof payload.type !== 'undefined'
+    ) {
+      delete payload.type
+    }
+
+    await updateDoc(docRef, payload)
+  } catch (error) {
+    console.error('Error updating transaction:', error)
+    throw error
+  }
+}
+
+export const deleteTransaction = async (transactionId: string) => {
+  try {
+    await deleteDoc(doc(db, 'transactions', transactionId))
+  } catch (error) {
+    console.error('Error deleting transaction:', error)
+    throw error
+  }
+}
+
+export const updateTransactionsCategoryBatch = async (
+  transactionIds: string[],
+  category: string
+) => {
+  if (!transactionIds.length) return
+
+  try {
+    const batch = writeBatch(db)
+    transactionIds.forEach((id) => {
+      const docRef = doc(db, 'transactions', id)
+      batch.update(docRef, { category: category.trim() })
+    })
+    await batch.commit()
+  } catch (error) {
+    console.error('Error batch updating transaction categories:', error)
+    throw error
+  }
+}
+
+export const updateTransactionsBatch = async (
+  transactionIds: string[],
+  updates: Partial<Transaction>
+) => {
+  if (!transactionIds.length) return
+
+  try {
+    const payload: Record<string, unknown> = { ...updates }
+    delete payload.id
+    delete payload.createdAt
+    delete payload.userId
+
+    if (payload.date instanceof Date) {
+      payload.date = Timestamp.fromDate(payload.date)
+    }
+
+    if (typeof payload.amount !== 'undefined') {
+      payload.amount = Math.abs(Number(payload.amount) || 0)
+    }
+
+    if (
+      payload.type !== 'income'
+      && payload.type !== 'expense'
+      && payload.type !== 'cashback'
+      && typeof payload.type !== 'undefined'
+    ) {
+      delete payload.type
+    }
+
+    const batch = writeBatch(db)
+    transactionIds.forEach((id) => {
+      batch.update(doc(db, 'transactions', id), payload)
+    })
+    await batch.commit()
+  } catch (error) {
+    console.error('Error batch updating transactions:', error)
+    throw error
+  }
+}
+
+export const updateTransactionsByIdBatch = async (
+  items: Array<{ transactionId: string; updates: Partial<Transaction> }>
+) => {
+  if (!items.length) return
+
+  try {
+    const batch = writeBatch(db)
+
+    items.forEach(({ transactionId, updates }) => {
+      const payload: Record<string, unknown> = { ...updates }
+      delete payload.id
+      delete payload.createdAt
+      delete payload.userId
+
+      if (payload.date instanceof Date) {
+        payload.date = Timestamp.fromDate(payload.date)
+      }
+
+      if (typeof payload.amount !== 'undefined') {
+        payload.amount = Math.abs(Number(payload.amount) || 0)
+      }
+
+      if (
+        payload.type !== 'income'
+        && payload.type !== 'expense'
+        && payload.type !== 'cashback'
+        && typeof payload.type !== 'undefined'
+      ) {
+        delete payload.type
+      }
+
+      batch.update(doc(db, 'transactions', transactionId), payload)
+    })
+
+    await batch.commit()
+  } catch (error) {
+    console.error('Error batch updating transactions by id:', error)
+    throw error
+  }
+}
+
+export const deleteTransactionsBatch = async (transactionIds: string[]) => {
+  if (!transactionIds.length) return
+
+  try {
+    const batch = writeBatch(db)
+    transactionIds.forEach((id) => {
+      batch.delete(doc(db, 'transactions', id))
+    })
+    await batch.commit()
+  } catch (error) {
+    console.error('Error batch deleting transactions:', error)
+    throw error
   }
 }
 
@@ -411,17 +599,18 @@ export const addTransactionsBatch = async (transactions: Omit<Transaction, 'id' 
     const addedIds: string[] = []
 
     transactions.forEach(transaction => {
+      const normalizedTransaction = normalizeTransactionForWrite(transaction)
       const docRef = doc(collectionRef)
       batch.set(docRef, {
-        ...transaction,
-        date: Timestamp.fromDate(new Date(transaction.date)),
+        ...normalizedTransaction,
+        date: Timestamp.fromDate(new Date(normalizedTransaction.date)),
         createdAt: Timestamp.now()
       })
       addedIds.push(docRef.id)
     })
 
     await batch.commit()
-    console.log(`Successfully batch added ${transactions.length} transactions`)
+    dataServiceLog(`Successfully batch added ${transactions.length} transactions`)
     return addedIds
   } catch (error) {
     console.error('Error batch adding transactions:', error)
@@ -520,8 +709,33 @@ export const getBudgets = async (userId: string) => {
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate() || new Date()
     })) as Budget[]
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching budgets:', error)
+
+    // If composite index is missing, fallback to simple query
+    if (error.code === 'failed-precondition' && error.message?.includes('index')) {
+      console.warn('[getBudgets] Composite index missing, falling back to simple query...')
+      try {
+        const simpleQuery = query(
+          collection(db, 'budgets'),
+          where('userId', '==', userId)
+        )
+        const simpleSnapshot = await getDocs(simpleQuery)
+        const budgets = simpleSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date()
+        })) as Budget[]
+
+        // Sort manually by createdAt desc
+        budgets.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        return budgets
+      } catch (simpleError) {
+        console.error('[getBudgets] Simple query also failed:', simpleError)
+        return []
+      }
+    }
+
     return []
   }
 }

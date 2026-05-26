@@ -92,7 +92,7 @@ export default function SafeRing({ dailyBudget, currentSpent, currency = '$' }: 
                 )}
             >
                 <span className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">
-                    今日可花
+                    Safe to Spend
                 </span>
                 <div className="flex items-baseline">
                     <span className={clsx("text-4xl font-bold transition-colors duration-300", getColor().split(' ')[0])}>
@@ -108,7 +108,7 @@ export default function SafeRing({ dailyBudget, currentSpent, currency = '$' }: 
                     </motion.span>
                 </div>
                 <span className="text-xs text-gray-400 mt-2">
-                    预算: {currency}{dailyBudget}
+                    Budget: {currency}{dailyBudget}
                 </span>
             </motion.div>
         </div>

@@ -1,5 +1,6 @@
 'use client'
 
+import { toast } from 'react-hot-toast'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { StarIcon, ArrowUpIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
@@ -10,7 +11,7 @@ import { SUBSCRIPTION_PLANS } from '@/lib/stripe'
 import SubscriptionPage from './SubscriptionPage'
 
 export default function SubscriptionStatus() {
-  const { subscription, isProMember } = useSubscription()
+  const { subscription, isProMember, usage, getRemainingUsage, currentPlanName } = useSubscription()
   const { user } = useAuth()
   const { t } = useLanguage()
   const [showUpgrade, setShowUpgrade] = useState(false)
@@ -18,11 +19,16 @@ export default function SubscriptionStatus() {
   if (!subscription) return null
 
   const currentPlan = SUBSCRIPTION_PLANS[subscription.planKey]
+  const usageItems: Array<{ key: 'transactions' | 'budgets' | 'exports', label: string }> = [
+    { key: 'transactions', label: 'Transactions' },
+    { key: 'budgets', label: 'Budget Categories' },
+    { key: 'exports', label: 'Exports' }
+  ]
 
   if (isProMember) {
     return (
       <motion.div
-        className="card bg-gradient-to-br from-blue-500 to-purple-600 text-white relative overflow-hidden"
+        className="card bg-gradient-to-br from-blue-500 to-indigo-700 text-white relative overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -36,7 +42,7 @@ export default function SubscriptionStatus() {
           transition={{
             duration: 20,
             repeat: Infinity,
-            ease: "linear"
+            ease: 'linear'
           }}
         />
 
@@ -46,23 +52,27 @@ export default function SubscriptionStatus() {
               <StarIcon className="w-6 h-6 text-yellow-300" />
               <h3 className="text-lg font-semibold">{t('subscription.status.pro')}</h3>
             </div>
-            <div className="flex items-center space-x-1">
-              {[...Array(5)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.1, duration: 0.3 }}
-                >
-                  <StarIcon className="w-4 h-4 text-yellow-300 fill-current" />
-                </motion.div>
-              ))}
-            </div>
+            <div className="text-xs font-bold px-2 py-1 rounded-full bg-white/20">{currentPlanName}</div>
           </div>
 
           <p className="text-blue-100 mb-4">
-            {currentPlan.name} - {t('subscription.status.pro.desc')}
+            {t('subscription.status.pro.desc')}
           </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
+            <div className="rounded-lg bg-white/10 p-3">
+              <p className="text-xs text-blue-100">This Month</p>
+              <p className="text-base font-bold">{usage.transactions} transactions</p>
+            </div>
+            <div className="rounded-lg bg-white/10 p-3">
+              <p className="text-xs text-blue-100">Budgets</p>
+              <p className="text-base font-bold">{usage.budgets} categories</p>
+            </div>
+            <div className="rounded-lg bg-white/10 p-3">
+              <p className="text-xs text-blue-100">Exports</p>
+              <p className="text-base font-bold">{usage.exports} files</p>
+            </div>
+          </div>
 
           {subscription.currentPeriodEnd && (
             <div className="text-sm text-blue-100 mb-4">
@@ -70,20 +80,20 @@ export default function SubscriptionStatus() {
             </div>
           )}
 
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-white border-opacity-20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 pt-4 border-t border-white/20">
             <div className="flex items-center text-sm text-blue-100">
               <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
               {t('subscription.features.pro.unlimited')}
             </div>
-            <div className="flex items-center text-sm text-blue-100 mt-1">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
-              Mobile Smart Alerts & Haptics 📱
-            </div>
             <button
               onClick={async () => {
+                const loadingToast = toast.loading(t('common.loading'))
                 try {
-                  const token = await user?.getIdToken();
-                  if (!token) return;
+                  const token = await user?.getIdToken()
+                  if (!token) {
+                    toast.dismiss(loadingToast)
+                    return
+                  }
 
                   const res = await fetch('/api/stripe/create-portal-session', {
                     method: 'POST',
@@ -94,20 +104,22 @@ export default function SubscriptionStatus() {
                     body: JSON.stringify({
                       returnUrl: window.location.href
                     })
-                  });
+                  })
 
-                  const data = await res.json();
+                  const data = await res.json()
+                  toast.dismiss(loadingToast)
                   if (data.url) {
-                    window.location.href = data.url;
+                    window.location.href = data.url
                   } else {
-                    alert('Could not open subscription portal');
+                    toast.error('Could not open subscription portal')
                   }
                 } catch (e) {
-                  console.error(e);
-                  alert('Error opening portal');
+                  console.error(e)
+                  toast.dismiss(loadingToast)
+                  toast.error('Error opening portal')
                 }
               }}
-              className="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-xs font-semibold text-white transition-all flex items-center gap-2"
+              className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-semibold text-white transition-all flex items-center justify-center gap-2"
             >
               Manage Subscription <ArrowTopRightOnSquareIcon className="w-3 h-3" />
             </button>
@@ -134,7 +146,7 @@ export default function SubscriptionStatus() {
           transition={{
             duration: 3,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: 'easeInOut'
           }}
         />
 
@@ -143,14 +155,8 @@ export default function SubscriptionStatus() {
             <h3 className="text-lg font-semibold text-gray-900">{t('subscription.status.free')}</h3>
             <motion.div
               className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
-              animate={{
-                scale: [1, 1.05, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             >
               {t('subscription.status.current')}
             </motion.div>
@@ -160,24 +166,34 @@ export default function SubscriptionStatus() {
             {t('subscription.status.free.desc')}
           </p>
 
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center text-sm text-gray-700">
-              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2" />
-              {t('subscription.features.free.limit')}
-            </div>
-            <div className="flex items-center text-sm text-gray-700">
-              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2" />
-              {t('subscription.features.free.categories')}
-            </div>
-            <div className="flex items-center text-sm text-gray-700">
-              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2" />
-              {t('subscription.features.free.export')}
-            </div>
+          <div className="space-y-3 mb-4">
+            {usageItems.map((item) => {
+              const limit = currentPlan.limits[item.key]
+              const current = usage[item.key]
+              const progress = limit > 0 ? Math.min((current / limit) * 100, 100) : 0
+              const remaining = getRemainingUsage(item.key)
+
+              return (
+                <div key={item.key}>
+                  <div className="flex items-center justify-between text-xs text-gray-700 mb-1">
+                    <span>{item.label}</span>
+                    <span>{current}/{limit}</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${progress >= 85 ? 'bg-amber-500' : 'bg-blue-500'}`}
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-500 mt-1">{remaining} remaining</p>
+                </div>
+              )
+            })}
           </div>
 
           <motion.button
             onClick={() => setShowUpgrade(true)}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
           >

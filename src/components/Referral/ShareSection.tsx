@@ -32,8 +32,8 @@ export default function ShareSection() {
 
     const handleShare = async () => {
         const shareData = {
-            title: '拯救好友的钱包',
-            text: '兄弟，我刚用这个查了一下，发现我有三个订阅完全忘了取消，白扣了半年钱... 你也快查一下，反正试用不要钱：',
+            title: 'Save your friends some money',
+            text: `Hey, I just used this app and found 3 forgotten subscriptions draining my account for months... You should check yours too, the trial is free:`,
             url: shareUrl,
         }
 
@@ -52,9 +52,9 @@ export default function ShareSection() {
 
     return (
         <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-6 rounded-xl text-white shadow-lg">
-            <h3 className="text-xl font-bold mb-2">送朋友 1 个月免费试用</h3>
+            <h3 className="text-xl font-bold mb-2">Give a Friend 1 Month Free</h3>
             <p className="text-indigo-100 mb-6 text-sm">
-                每邀请一位朋友注册，你也能获得 1 个月免费会员（价值 $9.99）。
+                For each friend you invite, you also get 1 month free membership (worth $9.99).
             </p>
 
             <div className="bg-white/10 backdrop-blur-sm p-1 rounded-lg flex items-center border border-white/20 mb-4">
@@ -69,7 +69,7 @@ export default function ShareSection() {
                     className="bg-white text-indigo-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-50 transition-colors flex items-center gap-2"
                 >
                     {copied ? <Check size={16} /> : <Copy size={16} />}
-                    {copied ? '已复制' : '复制'}
+                    {copied ? 'Copied' : 'Copy'}
                 </button>
             </div>
 
@@ -78,7 +78,7 @@ export default function ShareSection() {
                 className="w-full bg-white/20 hover:bg-white/30 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
                 <Share2 size={18} />
-                立即分享给好友
+                Share with Friends
             </button>
         </div>
     )

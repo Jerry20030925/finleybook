@@ -3,6 +3,8 @@ import { db } from '@/lib/firebase'
 import { collection, writeBatch, doc } from 'firebase/firestore'
 import { AffiliateMerchant } from '@/lib/dataService'
 
+export const dynamic = 'force-dynamic'
+
 // Merchant Sync API
 // GET /api/skimlinks/merchants
 // This endpoint fetches the latest merchant data from Skimlinks and updates the Firestore `affiliate_merchants` collection.

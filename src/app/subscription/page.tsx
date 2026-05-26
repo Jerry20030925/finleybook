@@ -2,8 +2,8 @@ import SubscriptionPage from '@/components/SubscriptionPage'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Pricing - FinleyBook | Invest in Your Financial Future',
-  description: 'Pro features for serious wealth building. automated net worth tracking, AI investment analysis, and premium cashback rewards.',
+  title: 'Pricing - FinleyBook | Professional Wealth Intelligence',
+  description: 'Upgrade to FinleyBook Pro for advanced AI analytics, professional financial reports, and unlimited exports.',
 }
 
 export default function Subscription() {

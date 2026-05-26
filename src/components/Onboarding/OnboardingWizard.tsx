@@ -54,6 +54,9 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
     const { signIn, signUp, signInWithGoogle, signInWithPhone, sendPasswordReset, auth } = useAuth()
     const { t } = useLanguage()
     const router = useRouter()
+    const navigateToDashboard = () => {
+        router.replace('/dashboard')
+    }
 
     useEffect(() => {
         let interval: NodeJS.Timeout
@@ -92,6 +95,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
             if (userCred?.user) {
                 await saveUserGoal(userCred.user.uid)
             }
+            navigateToDashboard()
         } catch (error) {
             console.error('Signup failed', error)
             toast.error(t('auth.googleSignInError'))
@@ -165,7 +169,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
             if (userCred?.user) {
                 await saveUserGoal(userCred.user.uid)
             }
-            router.push('/dashboard')
+            navigateToDashboard()
         } catch (error: any) {
             console.error('Verification failed', error)
             setAuthError(error.message)
@@ -183,7 +187,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
             setAuthError(null)
             try {
                 await signIn(email, password)
-                router.push('/dashboard')
+                navigateToDashboard()
             } catch (error: any) {
                 console.error("Auth failed", error)
                 setAuthError(error.message)
@@ -288,7 +292,7 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
                 await saveUserGoal(result.user.uid)
             }
             toast.success(t('auth.signInSuccess'))
-            router.push('/dashboard')
+            navigateToDashboard()
         } catch (error: any) {
             console.error('Code verification error:', error)
             setAuthError('Invalid verification code')
@@ -695,4 +699,3 @@ export default function OnboardingWizard({ initialStep = 0 }: OnboardingWizardPr
         </div>
     )
 }
-

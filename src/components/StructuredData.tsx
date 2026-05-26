@@ -1,7 +1,7 @@
-'use client'
+// StructuredData component for SEO
 
 interface StructuredDataProps {
-  type: 'website' | 'organization' | 'software' | 'article' | 'product' | 'faq' | 'blog' | 'breadcrumbs'
+  type: 'website' | 'organization' | 'software' | 'article' | 'product' | 'faq' | 'blog' | 'breadcrumbs' | 'service'
   data?: any
 }
 
@@ -16,13 +16,13 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           '@id': `${baseUrl}/#website`,
           url: baseUrl,
           name: 'FinleyBook',
-          description: 'FinleyBook is an intelligent personal finance platform providing AI-driven budget planning, investment tracking, wealth analysis, and tax management services.',
+          description: 'FinleyBook is a professional personal finance platform delivering AI-guided bookkeeping, wealth analysis, and decision-grade reporting.',
           inLanguage: 'en-AU',
           potentialAction: {
             '@type': 'SearchAction',
             target: {
               '@type': 'EntryPoint',
-              urlTemplate: `${baseUrl}/search?q={search_term_string}`
+              urlTemplate: `${baseUrl}/shop?q={search_term_string}`
             },
             'query-input': 'required name=search_term_string'
           },
@@ -47,14 +47,19 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             'https://www.instagram.com/finleybook',
             'https://x.com/finleybook1'
           ],
-          description: 'FinleyBook is a premier AI-powered personal finance platform helping users build wealth through automated tracking and smart rewards.',
+          description: 'FinleyBook provides professional AI wealth intelligence for households and independent professionals who need clear financial decisions.',
           contactPoint: {
             '@type': 'ContactPoint',
             contactType: 'customer service',
-            areaServed: ['AU', 'US'],
-            availableLanguage: ['en', 'zh']
+            email: 'support@finleybook.com',
+            areaServed: ['AU', 'US', 'NZ', 'GB'],
+            availableLanguage: ['English', 'Chinese']
           },
-          foundingDate: '2024'
+          foundingDate: '2024',
+          funder: {
+            '@type': 'Organization',
+            name: 'FinleyBook AI'
+          }
         }
         return organizationData
 
@@ -75,7 +80,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         const softwareData = {
           '@type': 'SoftwareApplication',
           name: 'FinleyBook',
-          description: 'The Intelligent AI Wealth Platform. Automated net worth tracking, smart expense analytics, and premium cashback optimization.',
+          description: 'A professional AI wealth platform with automated net worth tracking, smart expense analytics, and decision-grade reporting.',
           url: baseUrl,
           applicationCategory: 'FinanceApplication',
           applicationSubCategory: 'PersonalFinanceApplication',
@@ -85,7 +90,41 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             '@type': 'Offer',
             price: '0',
             priceCurrency: 'USD',
-            availability: 'https://schema.org/InStock'
+            priceValidUntil: '2026-12-31',
+            availability: 'https://schema.org/InStock',
+            shippingDetails: {
+              '@type': 'OfferShippingDetails',
+              shippingRate: {
+                '@type': 'MonetaryAmount',
+                value: '0',
+                currency: 'USD'
+              },
+              shippingDestination: {
+                '@type': 'DefinedRegion',
+                addressCountry: ['AU', 'US', 'NZ', 'GB']
+              },
+              deliveryTime: {
+                '@type': 'ShippingDeliveryTime',
+                handlingTime: {
+                  '@type': 'QuantitativeValue',
+                  minValue: 0,
+                  maxValue: 0,
+                  unitCode: 'DAY'
+                },
+                transitTime: {
+                  '@type': 'QuantitativeValue',
+                  minValue: 0,
+                  maxValue: 0,
+                  unitCode: 'DAY'
+                }
+              }
+            },
+            hasMerchantReturnPolicy: {
+              '@type': 'MerchantReturnPolicy',
+              applicableCountry: ['AU', 'US', 'NZ', 'GB'],
+              returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+              merchantReturnDays: 0
+            }
           },
           aggregateRating: {
             '@type': 'AggregateRating',
@@ -98,7 +137,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             'AI Wealth Management',
             'Net Worth Tracking',
             'Smart Expense Analytics',
-            'Premium Cashback Rewards',
+            'Professional Financial Reporting',
             'Financial Goal Planning'
           ]
         }
@@ -111,7 +150,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           url: `${baseUrl}/blog`,
           name: 'FinleyBook 财务知识库',
           description: '获取最新的财务管理技巧、投资策略和理财知识',
-          inLanguage: 'zh-CN',
+          inLanguage: 'en-AU',
           isPartOf: {
             '@type': 'WebSite',
             '@id': `${baseUrl}/#website`
@@ -145,7 +184,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           articleSection: data.category,
           keywords: data.tags?.join(', '),
           wordCount: data.wordCount,
-          inLanguage: 'zh-CN'
+          inLanguage: 'en-AU'
         }
         return articleData
 
@@ -180,8 +219,44 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             url: `${baseUrl}/wealth/product/${data.id}`,
             priceCurrency: 'USD',
             price: data.price,
+            priceValidUntil: '2026-12-31',
             availability: 'https://schema.org/InStock',
-            itemCondition: 'https://schema.org/NewCondition'
+            itemCondition: 'https://schema.org/NewCondition',
+            shippingDetails: {
+              '@type': 'OfferShippingDetails',
+              shippingRate: {
+                '@type': 'MonetaryAmount',
+                value: '0',
+                currency: 'USD'
+              },
+              shippingDestination: {
+                '@type': 'DefinedRegion',
+                addressCountry: ['AU', 'US', 'NZ', 'GB']
+              },
+              deliveryTime: {
+                '@type': 'ShippingDeliveryTime',
+                handlingTime: {
+                  '@type': 'QuantitativeValue',
+                  minValue: 0,
+                  maxValue: 1,
+                  unitCode: 'DAY'
+                },
+                transitTime: {
+                  '@type': 'QuantitativeValue',
+                  minValue: 1,
+                  maxValue: 7,
+                  unitCode: 'DAY'
+                }
+              }
+            },
+            hasMerchantReturnPolicy: {
+              '@type': 'MerchantReturnPolicy',
+              applicableCountry: ['AU', 'US', 'NZ', 'GB'],
+              returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+              merchantReturnDays: 30,
+              returnMethod: 'https://schema.org/ReturnByMail',
+              returnFees: 'https://schema.org/FreeReturn'
+            }
           },
           aggregateRating: {
             '@type': 'AggregateRating',
@@ -191,6 +266,30 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         }
         return productData
 
+
+      case 'service':
+        if (!data) return null
+        const serviceData = {
+          '@type': 'Service',
+          name: data.name,
+          serviceType: data.type,
+          provider: {
+            '@type': 'Organization',
+            '@id': `${baseUrl}/#organization`
+          },
+          description: data.description,
+          areaServed: {
+            '@type': 'Country',
+            name: 'Australia'
+          },
+          offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+            priceValidUntil: '2026-12-31'
+          }
+        }
+        return serviceData
 
       default:
         return null

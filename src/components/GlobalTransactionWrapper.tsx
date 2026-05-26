@@ -2,16 +2,15 @@
 
 import { useGlobalModal } from './GlobalModalProvider'
 import TransactionModal from './TransactionModal'
-import { useRouter } from 'next/navigation'
 
 export default function GlobalTransactionWrapper() {
     const { isAddTransactionOpen, closeAddTransaction } = useGlobalModal()
-    const router = useRouter()
 
     const handleSuccess = () => {
         closeAddTransaction()
-        // Optionally refresh data or show toast
-        router.refresh()
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('finley:transaction-added'))
+        }
     }
 
     return (

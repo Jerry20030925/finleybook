@@ -35,12 +35,11 @@ export default function HeroSection({ onStart }: HeroSectionProps) {
   }, [mouseX, mouseY])
 
   return (
-    <section ref={containerRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white selection:bg-indigo-100">
-      {/* Logo - Top Left */}
-      <div className="absolute top-6 left-6 z-50">
-        <Logo size="lg" />
-      </div>
-
+    <section
+      ref={containerRef}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white selection:bg-indigo-100"
+      aria-label="Hero Section"
+    >
       {/* Fluid Background Animation */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -73,7 +72,10 @@ export default function HeroSection({ onStart }: HeroSectionProps) {
         />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center pt-20 lg:pt-0">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center pt-10 sm:pt-20 lg:pt-0">
+        <div className="lg:col-span-2 mb-8 lg:mb-0">
+          <Logo size="lg" className="scale-75 sm:scale-100 origin-left" />
+        </div>
         {/* Left Column - Content */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
@@ -91,7 +93,7 @@ export default function HeroSection({ onStart }: HeroSectionProps) {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md border border-indigo-100 text-indigo-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm"
+            className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md border border-indigo-100 text-indigo-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm relative z-20"
           >
             <Zap size={14} className="fill-indigo-600" />
             {t('landing.badge')}
@@ -178,7 +180,7 @@ export default function HeroSection({ onStart }: HeroSectionProps) {
               <div className="flex -space-x-2">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center overflow-hidden">
-                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`} alt="User" className="w-full h-full" />
+                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`} alt={`FinleyBook Happy User ${i + 1}`} className="w-full h-full" />
                   </div>
                 ))}
                 <div className="w-8 h-8 rounded-full border-2 border-white bg-indigo-50 flex items-center justify-center text-xs font-bold text-indigo-600">

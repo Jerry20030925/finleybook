@@ -85,13 +85,32 @@ export default function ReferralGiftCard({ code, forceShow = false, onExpire }: 
         setTimeout(() => setCopied(false), 2000)
     }
 
-    const handleShare = (platform: 'wechat' | 'whatsapp' | 'copy') => {
+    const handleShare = async (platform: 'wechat' | 'whatsapp' | 'copy' | 'native') => {
         switch (platform) {
+            case 'native':
+                if (typeof navigator.share === 'function') {
+                    try {
+                        await navigator.share({
+                            title: 'FinleyBook Pro Gift',
+                            text: messages.generic,
+                            url: referralLink,
+                        })
+                        toast.success('Shared successfully!')
+                    } catch (err: unknown) {
+                        if (err instanceof Error && err.name !== 'AbortError') {
+                            handleCopy() // Fallback
+                        }
+                    }
+                } else {
+                    handleCopy()
+                }
+                break
             case 'wechat':
                 handleCopy() // WeChat usually requires manual paste
+                toast('Open WeChat and paste to a friend', { icon: '💬' })
                 break
             case 'whatsapp':
-                window.location.href = `whatsapp://send?text=${encodeURIComponent(messages.whatsapp)}`
+                window.open(`https://wa.me/?text=${encodeURIComponent(messages.whatsapp)}`, '_blank')
                 break
             case 'copy':
                 handleCopy()
@@ -260,11 +279,11 @@ export default function ReferralGiftCard({ code, forceShow = false, onExpire }: 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    onClick={() => handleShare('copy')}
+                    onClick={() => handleShare('native')}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl active:scale-95"
                 >
-                    {copied ? <Check size={20} /> : <Copy size={20} />}
-                    {copied ? 'Copied!' : 'Copy Gift Link'}
+                    <Share2 size={20} />
+                    Share Gift Link
                 </motion.button>
 
                 <div className="grid grid-cols-2 gap-3">

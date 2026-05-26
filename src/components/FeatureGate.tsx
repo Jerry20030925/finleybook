@@ -73,7 +73,7 @@ export default function FeatureGate({
         >
           <div className="flex items-center justify-center">
             <SparklesIcon className="w-5 h-5 mr-2" />
-            升级到 Pro 版
+            Upgrade to Pro
           </div>
         </motion.button>
 
@@ -83,7 +83,7 @@ export default function FeatureGate({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          解锁全部高级功能，提升您的财务管理体验
+          Unlock all premium features and enhance your financial management experience
         </motion.p>
       </div>
     </motion.div>
@@ -173,7 +173,7 @@ export function UsageLimit({ limitType, title, current, limit }: UsageLimitProps
 
       <div className="flex items-center justify-between text-xs">
         <span className="text-gray-500">
-          剩余 {remaining} 次使用
+          {remaining} uses remaining
         </span>
         {isNearLimit && (
           <motion.span
@@ -181,7 +181,7 @@ export function UsageLimit({ limitType, title, current, limit }: UsageLimitProps
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            升级获得无限使用
+            Upgrade for unlimited
           </motion.span>
         )}
       </div>

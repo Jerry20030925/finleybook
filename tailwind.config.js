@@ -68,6 +68,7 @@ module.exports = {
       },
       boxShadow: {
         'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02)',
+        'soft-hover': '0 8px 30px rgb(0,0,0,0.08)',
         'medium': '0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.01)',
         'glow': '0 0 15px rgba(16, 185, 129, 0.3)',
       },

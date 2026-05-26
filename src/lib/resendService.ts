@@ -29,6 +29,7 @@ interface EmailOptions {
   html?: string;
   text?: string;
   from?: string;
+  headers?: Record<string, string>;
 }
 
 export class ResendService {
@@ -49,6 +50,10 @@ export class ResendService {
         subject: options.subject,
         html: options.html,
         text: options.text,
+        headers: {
+          ...options.headers,
+          'List-Unsubscribe': `<${this.generateUnsubscribeUrl(Array.isArray(options.to) ? options.to[0] : options.to)}>`,
+        },
       };
 
       console.log(`[EmailService] Sending "${options.subject}" to ${Array.isArray(options.to) ? options.to.join(', ') : options.to}`);
@@ -398,9 +403,7 @@ export class ResendService {
     });
   }
 
-  private static generateUnsubscribeUrl(email: string): string {
-    // In a real app, this would generate a signed token
-    // For now, we'll point to a generic unsubscribe page with the email query param
+  static generateUnsubscribeUrl(email: string): string {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://finleybook.com';
     return `${baseUrl}/unsubscribe?email=${encodeURIComponent(email)}`;
   }

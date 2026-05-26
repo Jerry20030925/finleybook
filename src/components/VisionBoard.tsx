@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion'
 import { getGoals, Goal, updateGoal } from '@/lib/dataService'
 import { useAuth } from './AuthProvider'
 import { useCurrency } from './CurrencyProvider'
@@ -23,6 +23,27 @@ export default function VisionBoard({ primaryGoal, compact = false }: VisionBoar
     const [isEditingBg, setIsEditingBg] = useState(false)
     const [bgInput, setBgInput] = useState('')
     const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+
+    // Perspective Hover Effect
+    const mouseX = useMotionValue(0)
+    const mouseY = useMotionValue(0)
+
+    const springConfig = { damping: 20, stiffness: 150 }
+    const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), springConfig)
+    const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), springConfig)
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect()
+        const x = (e.clientX - rect.left) / rect.width - 0.5
+        const y = (e.clientY - rect.top) / rect.height - 0.5
+        mouseX.set(x)
+        mouseY.set(y)
+    }
+
+    const handleMouseLeave = () => {
+        mouseX.set(0)
+        mouseY.set(0)
+    }
 
     // Moved up hooks
     const percentage = primaryGoal ? Math.min(100, Math.round((primaryGoal.currentAmount / primaryGoal.targetAmount) * 100)) : 0
@@ -166,13 +187,27 @@ export default function VisionBoard({ primaryGoal, compact = false }: VisionBoar
 
     return (
         <motion.div
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            style={{ rotateX, rotateY, perspective: 1000 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden bg-gray-900 text-white rounded-3xl shadow-xl min-h-[14rem] h-auto group flex flex-col"
+            className="relative overflow-hidden bg-gray-900 text-white rounded-3xl shadow-xl min-h-[14rem] h-auto group flex flex-col transform-gpu"
         >
             {/* Dynamic Background Image */}
-            <div
-                className="absolute inset-0 z-0 transition-all duration-1000 ease-out bg-cover bg-center"
+            <motion.div
+                className="absolute inset-0 z-0 bg-cover bg-center"
+                initial={{ scale: 1.1 }}
+                animate={{
+                    scale: [1.1, 1.15, 1.1],
+                    x: [0, 10, 0],
+                    y: [0, 5, 0]
+                }}
+                transition={{
+                    duration: 30,
+                    repeat: Infinity,
+                    ease: "linear"
+                }}
                 style={{
                     backgroundImage: `url(${bgImage})`,
                     filter: `blur(${blurAmount}px) grayscale(${grayscaleAmount}%) contrast(1.1) brightness(0.6)`

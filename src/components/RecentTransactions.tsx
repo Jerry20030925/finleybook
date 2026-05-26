@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   PlusIcon,
@@ -21,105 +21,69 @@ import {
 import { useAuth } from './AuthProvider'
 import { useLanguage } from './LanguageProvider'
 import { useCurrency } from './CurrencyProvider'
-import { getUserTransactions, Transaction } from '@/lib/dataService'
+import { Transaction } from '@/lib/dataService'
 import TransactionModal from './TransactionModal'
-import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+
+const CATEGORY_ICONS: { [key: string]: any } = {
+  'Food': ShoppingBagIcon,
+  'Transport': TruckIcon,
+  'Shopping': TagIcon,
+  'Housing': HomeIcon,
+  'Health': HeartIcon,
+  'Entertainment': TicketIcon,
+  'Education': AcademicCapIcon,
+  'Salary': BanknotesIcon,
+  'Investment': CurrencyDollarIcon,
+  '餐饮美食': ShoppingBagIcon,
+  '交通出行': TruckIcon,
+  '购物消费': TagIcon,
+  '居住缴费': HomeIcon,
+  '医疗健康': HeartIcon,
+  '文化娱乐': TicketIcon,
+  '学习教育': AcademicCapIcon,
+  '工资收入': BanknotesIcon,
+  '投资收益': CurrencyDollarIcon,
+  '兼职收入': BriefcaseIcon,
+  '其他收入': BanknotesIcon,
+  '其他支出': CreditCardIcon,
+}
 
 const getCategoryIcon = (category: string) => {
-  const icons: { [key: string]: any } = {
-    'Food': ShoppingBagIcon,
-    'Transport': TruckIcon,
-    'Shopping': TagIcon,
-    'Housing': HomeIcon,
-    'Health': HeartIcon,
-    'Entertainment': TicketIcon,
-    'Education': AcademicCapIcon,
-    'Salary': BanknotesIcon,
-    'Investment': CurrencyDollarIcon,
-    '餐饮美食': ShoppingBagIcon,
-    '交通出行': TruckIcon,
-    '购物消费': TagIcon,
-    '居住缴费': HomeIcon,
-    '医疗健康': HeartIcon,
-    '文化娱乐': TicketIcon,
-    '学习教育': AcademicCapIcon,
-    '工资收入': BanknotesIcon,
-    '投资收益': CurrencyDollarIcon,
-    '兼职收入': BriefcaseIcon,
-    '其他收入': BanknotesIcon,
-    '其他支出': CreditCardIcon,
-  }
-  const IconComponent = icons[category] || CreditCardIcon;
+  const IconComponent = CATEGORY_ICONS[category] || CreditCardIcon;
   return <IconComponent className="w-5 h-5 text-slate-600 group-hover:text-primary-600 transition-colors" />;
 }
 
-export default function RecentTransactions() {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+interface RecentTransactionsProps {
+  transactions?: Transaction[]
+  onTransactionUpdate?: () => void
+}
+
+const RecentTransactions = memo(function RecentTransactions({ transactions = [], onTransactionUpdate }: RecentTransactionsProps) {
+  // transactions prop is now the source of truth
   const [showAll, setShowAll] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const { user } = useAuth()
   const { t } = useLanguage()
   const { formatAmount } = useCurrency()
 
-  const loadTransactions = useCallback(async () => {
-    if (!user?.uid) return
-
-    try {
-      setIsLoading(true)
-      const data = await getUserTransactions(user.uid, showAll ? 50 : 10)
-      setTransactions(data)
-    } catch (error) {
-      console.error('[RecentTransactions] Error loading transactions:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [user?.uid, showAll])
-
-  useEffect(() => {
-    loadTransactions()
-  }, [loadTransactions])
-
-  useEffect(() => {
-    if (!user?.uid) return
-
-    const q = query(
-      collection(db, 'transactions'),
-      where('userId', '==', user.uid),
-      orderBy('date', 'desc'),
-      limit(showAll ? 50 : 10)
-    )
-
-    const unsubscribe = onSnapshot(q,
-      (snapshot) => {
-        const transactions = snapshot.docs.map(doc => {
-          const data = doc.data()
-          return {
-            id: doc.id,
-            ...data,
-            date: data.date?.toDate() || new Date(),
-            createdAt: data.createdAt?.toDate() || new Date()
-          }
-        }) as Transaction[]
-        setTransactions(transactions)
-        setIsLoading(false)
-      },
-      (error) => {
-        console.error('[RecentTransactions] Real-time listener error:', error)
-        loadTransactions()
-      }
-    )
-
-    return () => unsubscribe()
-  }, [user?.uid, showAll, loadTransactions])
+  // Derive display transactions from props
+  // If showAll is false, show 10. If true, show 50 (or max passed)
+  const displayLimit = showAll ? 50 : 10
+  const displayTransactions = transactions.slice(0, displayLimit)
 
   const handleTransactionAdded = async () => {
     setShowAddModal(false)
-    setTimeout(async () => {
-      await loadTransactions()
-    }, 500)
+    // Trigger parent refresh
+    if (onTransactionUpdate) {
+      onTransactionUpdate()
+    }
   }
+
+  // Loading state is now controlled by parent passing empty array? 
+  // Or we can say if transactions is empty array but we expect data..
+  // For now, let's assume parent handles 'loading' spinner for the whole page.
+  // But if we want a local empty state, we check transactions.length.
+  const isLoading = false // Parent Dashboard handles initial loading
 
   return (
     <>
@@ -147,25 +111,22 @@ export default function RecentTransactions() {
       ) : (
         <motion.div
           className="bg-white rounded-2xl p-6 shadow-soft border border-slate-100 overflow-hidden relative"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
         >
           {/* Decorative background blur */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full blur-3xl -z-10 opacity-50 transform translate-x-1/2 -translate-y-1/2"></div>
 
           <div className="flex justify-between items-center mb-6">
-            <motion.h3
+            <h3
               className="text-lg font-bold text-slate-900"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
             >
               {t('transactions.recent')}
-            </motion.h3>
+            </h3>
             <div className="flex items-center gap-2">
               <motion.button
-                onClick={loadTransactions}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+                onClick={() => onTransactionUpdate?.()}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 title="Refresh"
@@ -174,7 +135,7 @@ export default function RecentTransactions() {
               </motion.button>
               <motion.button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center px-4 py-2 text-sm font-bold text-white bg-slate-900 rounded-xl hover:bg-black shadow-lg hover:shadow-xl transition-all"
+                className="min-h-[44px] flex items-center px-4 py-2 text-sm font-bold text-white bg-slate-900 rounded-xl hover:bg-black shadow-lg hover:shadow-xl transition-all"
                 whileHover={{ scale: 1.02, y: -1 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -187,14 +148,18 @@ export default function RecentTransactions() {
           <div className="relative">
             {transactions.length === 0 ? (
               <motion.div
-                className="text-center py-16 px-4 border-2 border-dashed border-slate-100 rounded-2xl"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                className="text-center py-16 px-4 border-2 border-dashed border-slate-200 rounded-2xl bg-gradient-to-br from-slate-50/80 to-indigo-50/40"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
               >
-                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <motion.div
+                  className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm border border-indigo-100"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                >
                   📝
-                </div>
+                </motion.div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{t('transactions.noRecords')}</h3>
                 <p className="text-slate-500 mb-6 max-w-sm mx-auto">{t('transactions.startAdding')}</p>
                 <motion.button
@@ -208,38 +173,25 @@ export default function RecentTransactions() {
                 </motion.button>
               </motion.div>
             ) : (
-              <motion.div
+              <div
                 className="space-y-3"
-                variants={{
-                  hidden: { opacity: 0 },
-                  show: {
-                    opacity: 1,
-                    transition: {
-                      staggerChildren: 0.1
-                    }
-                  }
-                }}
-                initial="hidden"
-                animate="show"
               >
                 <AnimatePresence mode='popLayout'>
-                  {transactions.map((transaction, index) => {
+                  {displayTransactions.map((transaction, index) => {
                     const isGroceries = transaction.category === 'Groceries' || transaction.category === '购物消费';
                     const isSubscription = transaction.category === 'Entertainment' || transaction.category === '文化娱乐';
 
                     return (
                       <motion.div
                         key={transaction.id}
-                        layout
-                        variants={{
-                          hidden: { opacity: 0, y: 20, scale: 0.95 },
-                          show: { opacity: 1, y: 0, scale: 1 }
-                        }}
+                        layout="position"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.4) }}
                         exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                        whileHover={{ scale: 1.01, y: -2 }}
-                        whileTap={{ scale: 0.99 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="group relative overflow-hidden bg-white border border-slate-100 rounded-2xl p-4 hover:border-primary-200 hover:shadow-md transition-all duration-300 cursor-pointer"
+                        whileHover={{ scale: 1.01, zIndex: 1 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="group relative overflow-hidden bg-white border border-slate-100 rounded-2xl p-4 hover:border-primary-200 hover:shadow-lg transition-all duration-300 cursor-pointer"
                       >
                         {/* Hover gradient background - More subtle and smooth */}
                         <div className="absolute inset-0 bg-gradient-to-r from-slate-50/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -316,15 +268,17 @@ export default function RecentTransactions() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.6 }}
                   >
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.96 }}
                       onClick={() => setShowAll(!showAll)}
-                      className="inline-flex items-center px-6 py-2 border border-slate-200 text-sm font-bold rounded-xl text-slate-600 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
+                      className="min-h-[44px] inline-flex items-center justify-center px-6 py-2 border border-slate-200 text-sm font-bold rounded-xl text-slate-600 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
                     >
                       {showAll ? t('transactions.showLess') : t('transactions.showMore')}
-                    </button>
+                    </motion.button>
                   </motion.div>
                 )}
-              </motion.div>
+              </div>
             )}
           </div>
         </motion.div>
@@ -337,4 +291,6 @@ export default function RecentTransactions() {
       />
     </>
   )
-}
+})
+
+export default RecentTransactions

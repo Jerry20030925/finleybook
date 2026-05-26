@@ -14,12 +14,14 @@ export const stripe = process.env.STRIPE_SECRET_KEY
   })
   : null
 
-// Subscription Plans
+// Subscription Plans — prices in AUD cents
+// NOTE: Update NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY and NEXT_PUBLIC_STRIPE_PRICE_ID_YEARLY
+// in .env when you create AUD-denominated prices in the Stripe Dashboard.
 export const SUBSCRIPTION_PLANS = {
   FREE: {
     name: '免费版',
     price: 0,
-    currency: 'usd',
+    currency: 'aud',
     interval: 'month',
     features: [
       '基础记账功能',
@@ -36,8 +38,8 @@ export const SUBSCRIPTION_PLANS = {
   },
   PRO_MONTHLY: {
     name: 'Pro 月付',
-    price: 999, // $9.99 in cents
-    currency: 'usd',
+    price: 499, // $4.99 AUD in cents
+    currency: 'aud',
     interval: 'month',
     stripePriceId: 'price_1SWsXIDBM183XrjL5aFQQeiJ',
     features: [
@@ -58,8 +60,8 @@ export const SUBSCRIPTION_PLANS = {
   },
   PRO_YEARLY: {
     name: 'Pro 年付',
-    price: 7999, // $79.99 in cents (33% discount)
-    currency: 'usd',
+    price: 3900, // $39.00 AUD in cents (35% discount vs monthly)
+    currency: 'aud',
     interval: 'year',
     stripePriceId: 'price_1SWsy2DBM183XrjL9RJ4F95Z',
     features: [
@@ -79,7 +81,7 @@ export const SUBSCRIPTION_PLANS = {
       budgets: -1,
       exports: -1
     },
-    discount: '节省 33%'
+    discount: '节省 35%'
   }
 } as const
 

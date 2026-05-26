@@ -86,7 +86,7 @@ export default function ProUpgradeModal({ isOpen, onClose, featureName = 'This f
                                 </div>
 
                                 <motion.button
-                                    onClick={() => router.push('/wallet')}
+                                    onClick={() => router.push('/subscribe')}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-all group shadow-lg shadow-indigo-500/20"

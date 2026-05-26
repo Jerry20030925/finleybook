@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
-import PageLoader from '@/components/PageLoader'
 import OnboardingWizard from '@/components/Onboarding/OnboardingWizard'
 import LandingPage from '@/components/LandingPage'
 
@@ -16,7 +15,7 @@ export default function HomePage() {
     // Redirect logged-in users to dashboard
     useEffect(() => {
         if (!loading && user) {
-            router.push('/dashboard')
+            router.replace('/dashboard')
         }
     }, [user, loading, router])
 

@@ -9,12 +9,28 @@ interface MerchantCardProps {
     merchant: Merchant;
     isPro: boolean;
     onShopClick: (merchant: Merchant) => void;
+    searchQuery?: string;
 }
 
-export default function MerchantCard({ merchant, isPro, onShopClick }: MerchantCardProps) {
+export default function MerchantCard({ merchant, isPro, onShopClick, searchQuery }: MerchantCardProps) {
     const proRate = (merchant.base_commission_rate * 100).toFixed(1);
     // Free users get ~1/3 of the Pro rate (e.g. 15% vs 50%)
     const freeRate = (merchant.base_commission_rate * 0.33 * 100).toFixed(1);
+
+    const Highlight = ({ text, highlight }: { text: string, highlight?: string }) => {
+        if (!highlight || !highlight.trim()) return <span>{text}</span>
+        const terms = highlight.toLowerCase().split(' ').filter(t => t.length > 0)
+        if (terms.length === 0) return <span>{text}</span>
+        const regex = new RegExp(`(${terms.join('|')})`, 'gi')
+        const parts = text.split(regex)
+        return (
+            <span>
+                {parts.map((part, i) => (
+                    regex.test(part) ? <mark key={i} className="bg-yellow-200 text-gray-900 rounded-sm px-0.5">{part}</mark> : <span key={i}>{part}</span>
+                ))}
+            </span>
+        )
+    }
 
     return (
         <motion.div
@@ -40,7 +56,9 @@ export default function MerchantCard({ merchant, isPro, onShopClick }: MerchantC
 
             <div className="p-5 flex-1 flex flex-col">
                 <div className="mb-4">
-                    <h3 className="font-bold text-lg text-gray-900">{merchant.name}</h3>
+                    <h3 className="font-bold text-lg text-gray-900">
+                        <Highlight text={merchant.name} highlight={searchQuery} />
+                    </h3>
                     <p className="text-sm text-gray-500">{merchant.category}</p>
                 </div>
 

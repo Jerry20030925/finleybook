@@ -2,7 +2,7 @@
 
 import { LightBulbIcon, ExclamationTriangleIcon, ArrowTrendingUpIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import { AIInsight } from '@/types'
-
+import { useLanguage } from './LanguageProvider'
 import { AnimatePresence, motion } from 'framer-motion'
 
 interface InsightsWidgetProps {
@@ -10,6 +10,7 @@ interface InsightsWidgetProps {
 }
 
 export default function InsightsWidget({ insights }: InsightsWidgetProps) {
+  const { t } = useLanguage()
   const displayInsights = insights
 
   const getInsightIcon = (type: string, priority: string) => {
@@ -38,12 +39,21 @@ export default function InsightsWidget({ insights }: InsightsWidgetProps) {
     }
   }
 
+  const getPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case 'high': return t('insights.highPriority')
+      case 'medium': return t('insights.mediumPriority')
+      case 'low': return t('insights.lowPriority')
+      default: return priority
+    }
+  }
+
   return (
     <div className="card">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-medium text-gray-900">AI 智能洞察</h2>
+        <h2 className="text-lg font-medium text-gray-900">{t('insights.title')}</h2>
         <button className="text-sm text-primary-600 hover:text-primary-700 transition-colors">
-          查看全部
+          {t('insights.viewAll')}
         </button>
       </div>
 
@@ -76,15 +86,14 @@ export default function InsightsWidget({ insights }: InsightsWidgetProps) {
                         insight.priority === 'medium' ? 'bg-warning-100 text-warning-800' :
                           'bg-success-100 text-success-800'
                         }`}>
-                        {insight.priority === 'high' ? '高优先级' :
-                          insight.priority === 'medium' ? '中优先级' : '低优先级'}
+                        {getPriorityLabel(insight.priority)}
                       </span>
                     </div>
                     <p className="mt-1 text-sm text-gray-600">{insight.description}</p>
                     {insight.actionable && (
                       <div className="mt-2">
                         <button className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1 group">
-                          查看建议 <ArrowTrendingUpIcon className="w-3 h-3 transition-transform group-hover:translate-x-1" />
+                          {t('insights.viewAdvice')} <ArrowTrendingUpIcon className="w-3 h-3 transition-transform group-hover:translate-x-1" />
                         </button>
                       </div>
                     )}
@@ -106,9 +115,9 @@ export default function InsightsWidget({ insights }: InsightsWidgetProps) {
           className="text-center py-8"
         >
           <LightBulbIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">暂无新洞察</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">{t('insights.noInsights')}</h3>
           <p className="mt-1 text-sm text-gray-500">
-            AI 正在分析您的财务数据，稍后将为您提供个性化建议
+            {t('insights.analyzing')}
           </p>
         </motion.div>
       )}

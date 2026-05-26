@@ -7,7 +7,6 @@ import {
     XMarkIcon,
     ArrowRightIcon,
     PlusCircleIcon,
-    BanknotesIcon,
     UserCircleIcon,
     ChartBarIcon,
     TrophyIcon,
@@ -22,7 +21,7 @@ import { toast } from 'react-hot-toast'
 interface GettingStartedGuideProps {
     hasTransactions: boolean
     hasBudget: boolean
-    hasCashback: boolean
+    hasReportReady: boolean
     hasProfile: boolean
     onAddTransaction: () => void
     onImportCsv: () => void
@@ -32,7 +31,7 @@ interface GettingStartedGuideProps {
 export default function GettingStartedGuide({
     hasTransactions,
     hasBudget,
-    hasCashback,
+    hasReportReady,
     hasProfile,
     onAddTransaction,
     onImportCsv,
@@ -94,14 +93,14 @@ export default function GettingStartedGuide({
             cta: 'Set Budget'
         },
         {
-            id: 'cashback',
-            title: 'Earn Cashback',
-            desc: 'Shop at partner stores to get rebates.',
-            icon: BanknotesIcon,
+            id: 'report',
+            title: 'Generate First Report',
+            desc: 'Open your FinleyBook intelligence report and review monthly performance.',
+            icon: ChartBarIcon,
             color: 'text-green-600 bg-green-100',
-            action: () => router.push('/wealth'),
-            isCompleted: hasCashback,
-            cta: 'Visit Vault'
+            action: () => router.push('/reports'),
+            isCompleted: hasReportReady,
+            cta: 'Open Reports'
         },
         {
             id: 'profile',

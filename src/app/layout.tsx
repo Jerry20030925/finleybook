@@ -3,43 +3,43 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
-import { AuthProvider } from '@/components/AuthProvider'
-import { NotificationProvider } from '@/components/NotificationProvider'
-import { SubscriptionProvider } from '@/components/SubscriptionProvider'
-import ErrorBoundary from '@/components/ErrorBoundary'
+import { AppProviders } from '@/components/AppProviders'
 import StructuredData from '@/components/StructuredData'
-import { Toaster } from 'react-hot-toast'
-import { LanguageProvider } from '@/components/LanguageProvider'
-import { CurrencyProvider } from '@/components/CurrencyProvider'
-import { GlobalModalProvider } from '@/components/GlobalModalProvider'
-import GlobalTransactionWrapper from '@/components/GlobalTransactionWrapper'
-import SmartNotificationManager from '@/components/SmartNotificationManager'
-import AIChatInput from '@/components/AIChatInput'
-import NoSSR from '@/components/NoSSR'
-import Navigation from '@/components/Navigation'
-import BottomNavigation from '@/components/BottomNavigation'
+import AppChrome from '@/components/AppChrome'
+import PageTransitionWrapper from '@/components/PageTransitionWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
-    default: 'FinleyBook | AI Wealth Management & Cashback Rewards',
-    template: '%s | FinleyBook - Smart Finance',
+    default: 'FinleyBook | Professional AI Wealth Intelligence',
+    template: '%s | FinleyBook',
   },
-  description: 'Maximize your wealth with FinleyBook. The #1 AI-powered personal finance tracker offering automated expense insights, net worth tracking, and exclusive cashback rewards in Australia and globally.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'FinleyBook',
+  },
+  description: 'FinleyBook is a professional AI wealth intelligence platform combining automated net worth tracking, smart expense analytics, proactive budgeting, and decision-grade monthly reporting for households and professionals in Australia.',
   keywords: [
-    'Wealth Management',
-    'AI Finance',
-    'Cashback Australia',
-    'Best Expense Tracker',
-    'Net Worth Calculator',
-    'Financial Independence',
-    'Money Management App',
+    'Wealth Management Australia',
+    'AI Finance Assistant Sydney',
+    'Best Expense Tracker App Australia',
+    'Net Worth Tracker ASX',
+    'Financial Independence App Australia',
+    'Money Management Tool',
     'Personal Finance Dashboard',
+    'Family Budget Planner',
+    'Passive Income Ideas Australia',
+    'Automated Net Worth Tracker Australia',
+    'AI Expense Manager Sydney',
+    'Wealth Building Tools for Australians',
     '财富管理',
     '澳洲理财',
     '智能记账',
-    'Passive Income'
+    'Sydney Finance AI',
+    'ASX Stock Portfolio Tracker'
   ],
   authors: [{ name: 'FinleyBook Team' }],
   creator: 'FinleyBook',
@@ -53,16 +53,20 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://finleybook.com'),
   alternates: {
     canonical: '/',
+    languages: {
+      'en-AU': 'https://finleybook.com',
+      'zh-CN': 'https://finleybook.com',
+    },
   },
   verification: {
-    google: 'verification_token', // TODO: User to provide Google Site Verification Token from Search Console
+    google: 'verification_token', // TODO: Replace with real token from Google Search Console → Settings → Ownership Verification
   },
   openGraph: {
     type: 'website',
     locale: 'en_AU',
     url: 'https://finleybook.com',
-    title: 'FinleyBook | Intelligent Wealth Management & Cashback Rewards',
-    description: 'Elevate your financial game. FinleyBook combines advanced AI analytics with automated wealth tracking and premium rewards discovery. Smart finance for the modern era.',
+    title: 'FinleyBook | Professional AI Wealth Intelligence',
+    description: 'Track wealth, improve budgeting decisions, and run professional reporting workflows with AI support.',
     siteName: 'FinleyBook',
     images: [
       {
@@ -75,14 +79,20 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FinleyBook - AI Wealth & Premium Rewards',
-    description: 'Track Net Worth. Optimize Spending. Maximize Rewards. The intelligent finance platform for wealth builders.',
-    images: ['https://finleybook.com/og-image.png'],
+    site: '@finleybook',
     creator: '@finleybook',
+    title: 'FinleyBook | Professional AI Wealth Intelligence',
+    description: 'Track net worth, manage spending with confidence, and generate professional financial reports.',
+    images: ['https://finleybook.com/og-image.png'],
   },
   icons: {
-    icon: '/icon.png',
-    apple: '/icon.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icon.png', type: 'image/png' },
+    ],
   },
   robots: {
     index: true,
@@ -112,37 +122,19 @@ export default function RootLayout({
         <StructuredData type="organization" />
         <StructuredData type="software" />
       </head>
-      <body className={inter.className}>
-        <LanguageProvider>
-          <ErrorBoundary>
-            <AuthProvider>
-              <NotificationProvider>
-                <CurrencyProvider>
-                  <SubscriptionProvider>
-                    <GlobalModalProvider>
-                      <SmartNotificationManager />
-                      <GlobalTransactionWrapper />
-                      <NoSSR>
-                        <Navigation />
-                        <div className="pb-24 md:pb-0"> {/* Increased padding to 6rem (96px) for safe bottom nav */}
-                          {children}
-                        </div>
-                        <BottomNavigation />
-                        <Toaster position="top-right" />
-                      </NoSSR>
-                    </GlobalModalProvider>
-                  </SubscriptionProvider>
-                </CurrencyProvider>
-              </NotificationProvider>
-            </AuthProvider>
-          </ErrorBoundary>
-        </LanguageProvider>
+      <body className={inter.className} suppressHydrationWarning>
+        <AppProviders>
+          <AppChrome />
+          <PageTransitionWrapper>
+            {children}
+          </PageTransitionWrapper>
+        </AppProviders>
         <Script
           id="skimlinks-script"
           strategy="lazyOnload"
           src="https://s.skimresources.com/js/295600X1782999.skimlinks.js"
         />
       </body>
-    </html>
+    </html >
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion'
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { Check, X, ShoppingBag, Tag, AlertCircle } from 'lucide-react'
 
 interface Opportunity {
@@ -45,7 +45,7 @@ const MOCK_OPPORTUNITIES: Opportunity[] = [
     }
 ]
 
-export default function OpportunityRadar({ onAccept, onReject }: OpportunityRadarProps) {
+const OpportunityRadar = memo(function OpportunityRadar({ onAccept, onReject }: OpportunityRadarProps) {
     const [cards, setCards] = useState(MOCK_OPPORTUNITIES)
 
     const removeCard = (id: string) => {
@@ -73,7 +73,9 @@ export default function OpportunityRadar({ onAccept, onReject }: OpportunityRada
             )}
         </div>
     )
-}
+})
+
+export default OpportunityRadar
 
 function Card({ card, active, onSwipe }: { card: Opportunity, active: boolean, onSwipe: (dir: 'left' | 'right') => void }) {
     const x = useMotionValue(0)
@@ -105,8 +107,8 @@ function Card({ card, active, onSwipe }: { card: Opportunity, active: boolean, o
         >
             <div className="flex items-center gap-3 mb-4">
                 <div className={`p-3 rounded-full ${card.type === 'dupe' ? 'bg-purple-100 text-purple-600' :
-                        card.type === 'sub' ? 'bg-red-100 text-red-600' :
-                            'bg-amber-100 text-amber-600'
+                    card.type === 'sub' ? 'bg-red-100 text-red-600' :
+                        'bg-amber-100 text-amber-600'
                     }`}>
                     {card.type === 'dupe' && <ShoppingBag size={20} />}
                     {card.type === 'sub' && <AlertCircle size={20} />}

@@ -73,7 +73,7 @@ export const EmailLayout = ({ children, preview, unsubscribeUrl }: EmailLayoutPr
 
                         {/* Copyright */}
                         <Text style={copyrightStyle}>
-                            © 2025 FinleyBook. All rights reserved.
+                            © 2026 FinleyBook. All rights reserved.
                         </Text>
                     </Section>
                 </Container>

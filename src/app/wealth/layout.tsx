@@ -1,10 +1,14 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Wealth Vault | Earn Cashback & Find Glitch Deals',
-    description: 'Shop at over 50+ merchants and earn up to 50% cashback. Find active price glitches, bank bounties, and exclusive tech deals.',
+    title: 'FinleyBook Reports Hub',
+    description: 'Professional financial reporting and AI wealth intelligence by FinleyBook.',
     alternates: {
-        canonical: '/wealth',
+        canonical: '/reports',
+    },
+    robots: {
+        index: false,
+        follow: false,
     },
 }
 

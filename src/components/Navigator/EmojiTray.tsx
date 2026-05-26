@@ -12,11 +12,11 @@ interface EmojiItem {
 }
 
 const DEFAULT_EMOJIS: EmojiItem[] = [
-    { id: 'food', emoji: '🍔', label: '午餐', defaultAmount: 15, category: '餐饮' },
-    { id: 'drink', emoji: '☕', label: '咖啡', defaultAmount: 6, category: '餐饮' },
-    { id: 'transport', emoji: '🚗', label: '交通', defaultAmount: 10, category: '交通' },
-    { id: 'shopping', emoji: '🛍️', label: '购物', defaultAmount: 50, category: '购物' },
-    { id: 'game', emoji: '🎮', label: '娱乐', defaultAmount: 30, category: '娱乐' },
+    { id: 'food', emoji: '🍔', label: 'Lunch', defaultAmount: 15, category: 'Food' },
+    { id: 'drink', emoji: '☕', label: 'Coffee', defaultAmount: 6, category: 'Food' },
+    { id: 'transport', emoji: '🚗', label: 'Transport', defaultAmount: 10, category: 'Transport' },
+    { id: 'shopping', emoji: '🛍️', label: 'Shopping', defaultAmount: 50, category: 'Shopping' },
+    { id: 'game', emoji: '🎮', label: 'Games', defaultAmount: 30, category: 'Entertainment' },
 ]
 
 interface EmojiTrayProps {
@@ -32,7 +32,7 @@ export default function EmojiTray({ onDrop }: EmojiTrayProps) {
                 ))}
             </div>
             <p className="text-center text-xs text-gray-400 mt-2">
-                拖拽图标到圆环记账
+                Drag icons to the ring to log
             </p>
         </div>
     )

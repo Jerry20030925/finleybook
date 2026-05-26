@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { CheckCircle2, Circle, Trophy, TrendingUp, Wallet, ArrowRight } from 'lucide-react'
+import { MOTION_SPRING, INTERACTIVE } from '@/lib/motionTokens'
 import { useCurrency } from '@/components/CurrencyProvider'
 import { Goal, Transaction } from '@/lib/dataService'
 import { useState, useEffect } from 'react'
@@ -40,9 +41,11 @@ export default function DailyMissionCard({ dailyTarget, todayTransactions, month
     return (
         <>
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 24, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ ...MOTION_SPRING.panel }}
                 className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+                whileHover={INTERACTIVE.cardHover}
             >
                 {/* Header */}
                 <div className="flex justify-between items-start mb-6">
@@ -78,7 +81,7 @@ export default function DailyMissionCard({ dailyTarget, todayTransactions, month
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${progress}%` }}
-                            transition={{ duration: 1, ease: 'easeOut' }}
+                            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
                             className={`h-full relative ${isComplete
                                 ? 'bg-gradient-to-r from-emerald-400 to-green-500'
                                 : 'bg-gradient-to-r from-indigo-500 to-purple-500'
@@ -87,8 +90,9 @@ export default function DailyMissionCard({ dailyTarget, todayTransactions, month
                             {isComplete && (
                                 <motion.div
                                     initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="absolute inset-0 bg-white/20 animate-pulse"
+                                    animate={{ opacity: [0.15, 0.35, 0.15] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                                    className="absolute inset-0 bg-white/30 animate-shimmer"
                                 />
                             )}
                         </motion.div>
@@ -131,7 +135,9 @@ export default function DailyMissionCard({ dailyTarget, todayTransactions, month
                         initial={{ opacity: 0, y: 5 }}
                         animate={{ opacity: 1, y: 0 }}
                         onClick={() => setShowShareModal(true)}
-                        className="w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:scale-[1.02] transition-all"
+                        className="w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30"
+                        whileHover={{ scale: 1.02, boxShadow: '0 20px 40px -8px rgba(16, 185, 129, 0.4)' }}
+                        whileTap={{ scale: 0.98 }}
                     >
                         <motion.div
                             animate={{ rotate: [0, 10, -10, 0] }}
@@ -142,10 +148,20 @@ export default function DailyMissionCard({ dailyTarget, todayTransactions, month
                         Claim Victory & Share
                     </motion.button>
                 ) : (
-                    <button className="w-full py-3 bg-gray-900 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-black transition-colors group">
+                    <motion.button
+                        className="w-full py-3 bg-gray-900 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 group"
+                        whileHover={{ scale: 1.02, backgroundColor: '#000' }}
+                        whileTap={{ scale: 0.98 }}
+                    >
                         Find Ways to Earn
-                        <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                    </button>
+                        <motion.div
+                            className="inline-flex"
+                            animate={{ x: [0, 4, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                            <ArrowRight size={16} />
+                        </motion.div>
+                    </motion.button>
                 )}
             </motion.div>
 

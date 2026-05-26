@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { initializeFirebase } from '@/lib/firebase'
 import PageLoader from './PageLoader'
-import { useSearchParams } from 'next/navigation'
 
 interface AuthContextType {
   user: any | null
@@ -66,6 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               clearTimeout(timeoutId)
 
               if (firebaseUser) {
+                setLoading(true)
                 // Subscribe to user document for real-time updates (subscription status, etc.)
                 import('firebase/firestore').then(({ doc, onSnapshot, setDoc, serverTimestamp }) => {
                   const userRef = doc(firebase.db, 'users', firebaseUser.uid)
@@ -93,11 +93,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                     setUser(mergedUser)
                     setLoading(false)
+                  }, (error) => {
+                    console.error("Firestore Error in AuthProvider:", error);
+                    // Even if profile sync fails, we still have the basic auth user
+                    // So we should allow the app to proceed, potentially with limited profile data
+                    setUser(firebaseUser)
+                    setLoading(false)
                   })
 
                   // Store unsubscribe function to clean up later if needed
                   // Note: We can't easily clean this up inside this callback, 
                   // but it will be cleaned up when the component unmounts via the main unsubscribe
+                }).catch((profileSyncError) => {
+                  console.error('Failed to initialize profile sync:', profileSyncError)
+                  setUser(firebaseUser)
+                  setLoading(false)
                 })
               } else {
                 setUser(null)
@@ -186,11 +196,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setError(null)
+      setLoading(true)
       const { signInWithEmailAndPassword } = await import('firebase/auth')
       return await signInWithEmailAndPassword(auth, email, password)
     } catch (error: any) {
       console.error('Sign in error:', error)
       setError(error.message)
+      setLoading(false)
       throw error
     }
   }
@@ -203,6 +215,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setError(null)
+      setLoading(true)
       const { createUserWithEmailAndPassword } = await import('firebase/auth')
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       await trackReferral(userCredential.user.uid)
@@ -219,6 +232,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error('Sign up error:', error)
       setError(error.message)
+      setLoading(false)
       throw error
     }
   }
@@ -231,6 +245,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setError(null)
+      setLoading(true)
       const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = await import('firebase/auth')
       const provider = new GoogleAuthProvider()
 
@@ -278,6 +293,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error('Google sign in error:', error)
       setError(error.message)
+      setLoading(false)
       throw error
     }
   }
@@ -289,6 +305,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setError(null)
+      setLoading(true)
       const { OAuthProvider, signInWithPopup, signInWithRedirect } = await import('firebase/auth')
       const provider = new OAuthProvider('apple.com')
 
@@ -314,6 +331,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error('Apple sign in error:', error)
       setError(error.message)
+      setLoading(false)
       throw error
     }
   }
@@ -326,12 +344,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setError(null)
+      setLoading(true)
       const { signInWithPhoneNumber } = await import('firebase/auth')
       const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier)
       return confirmationResult
     } catch (error: any) {
       console.error('Phone sign in error:', error)
       setError(error.message)
+      setLoading(false)
       throw error
     }
   }
@@ -344,12 +364,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setError(null)
+      setLoading(true)
       const { signInAnonymously } = await import('firebase/auth')
       const result = await signInAnonymously(auth)
       return result
     } catch (error: any) {
       console.error('Guest login error:', error)
       setError(error.message)
+      setLoading(false)
       throw error
     }
   }
@@ -362,11 +384,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setError(null)
+      setLoading(true)
       const { signOut } = await import('firebase/auth')
       await signOut(auth)
     } catch (error: any) {
       console.error('Logout error:', error)
       setError(error.message)
+      setLoading(false)
       throw error
     }
   }

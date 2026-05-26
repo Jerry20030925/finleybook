@@ -159,7 +159,20 @@ export default function TransactionModal({ isOpen, onClose, onSuccess }: Transac
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-t-2xl sm:rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all w-full sm:my-8 sm:w-full sm:max-w-lg sm:p-6 h-[85vh] sm:h-auto overflow-y-scroll sm:overflow-visible">
+              <Dialog.Panel
+                as={motion.div}
+                drag="y"
+                dragConstraints={{ top: 0, bottom: 0 }}
+                dragElastic={{ top: 0, bottom: 0.5 }}
+                onDragEnd={(e, info) => {
+                  if (info.offset.y > 100 || info.velocity.y > 500) {
+                    onClose()
+                  }
+                }}
+                className="relative transform overflow-hidden rounded-t-2xl sm:rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl w-full sm:my-8 sm:w-full sm:max-w-lg sm:p-6 max-h-[90vh] sm:h-auto overflow-y-auto sm:overflow-visible flex flex-col"
+              >
+                {/* Drag handle pill for mobile */}
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-gray-300 rounded-full sm:hidden" />
                 <div className="absolute right-4 top-4 block z-10">
                   <button
                     type="button"
@@ -257,6 +270,7 @@ export default function TransactionModal({ isOpen, onClose, onSuccess }: Transac
                               <motion.input
                                 type="number"
                                 id="amount"
+                                inputMode="decimal"
                                 step="0.01"
                                 min="0"
                                 required
@@ -364,8 +378,8 @@ export default function TransactionModal({ isOpen, onClose, onSuccess }: Transac
                                   key={tag}
                                   type="button"
                                   onClick={() => setFormData(prev => ({ ...prev, emotionalTag: tag as any }))}
-                                  className={`p-2 rounded-lg text-2xl flex flex-col items-center gap-1 transition-all ${formData.emotionalTag === tag
-                                    ? 'bg-indigo-100 border-2 border-indigo-500 scale-110'
+                                  className={`p-4 rounded-xl text-3xl flex flex-col items-center gap-1 transition-all touch-manipulation ${formData.emotionalTag === tag
+                                    ? 'bg-indigo-100 border-2 border-indigo-500 scale-110 shadow-sm'
                                     : 'bg-gray-50 border border-gray-200 hover:bg-gray-100 opacity-70 hover:opacity-100'
                                     }`}
                                   title={tag}

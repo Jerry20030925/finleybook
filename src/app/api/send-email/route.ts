@@ -5,20 +5,21 @@ import { render } from '@react-email/render';
 
 export async function POST(request: Request) {
   try {
-    // 假设这是从数据库取出的用户数据
-    // In a real application, you would parse the request body or fetch data from DB
-    const userData = {
-      userName: "Alex",
-      email: "alex@example.com", // This should be dynamic
-      savedAmount: "85.50",
-      topCategory: "Gaming",
-      nextBillName: "Spotify",
-      nextBillAmount: "11.99"
-    };
+    const body = await request.json();
 
-    // Allow overriding email for testing
-    const body = await request.json().catch(() => ({}));
-    const recipientEmail = body.email || userData.email;
+    // Validate required fields
+    if (!body.email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    }
+
+    const userData = {
+      userName: body.userName || "User",
+      email: body.email,
+      savedAmount: body.savedAmount || "0.00",
+      topCategory: body.topCategory || "General",
+      nextBillName: body.nextBillName || "None",
+      nextBillAmount: body.nextBillAmount || "0.00"
+    };
 
     const html = await render(WeeklyReportEmail({
       userName: userData.userName,
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
 
     const data = await ResendService.sendEmail({
       from: ResendService.SENDERS.default,
-      to: recipientEmail,
+      to: userData.email,
       subject: `Weekly Report: You saved $${userData.savedAmount}!`,
       html: html
     });

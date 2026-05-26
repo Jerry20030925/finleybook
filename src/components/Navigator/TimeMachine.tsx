@@ -26,14 +26,14 @@ export default function TimeMachine({ currentSavings, monthlySavings }: TimeMach
     return (
         <div className={clsx("p-6 rounded-2xl transition-colors duration-1000", getBackgroundClass())}>
             <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-gray-900">时光机 ⏳</h3>
+                <h3 className="text-lg font-bold text-gray-900">Time Machine ⏳</h3>
                 <span className="text-xs font-mono bg-white/50 px-2 py-1 rounded">
-                    {months === 0 ? '现在' : `${months} 个月后`}
+                    {months === 0 ? 'Now' : `In ${months} months`}
                 </span>
             </div>
 
             <div className="text-center mb-8">
-                <p className="text-sm text-gray-500 mb-1">预计资产</p>
+                <p className="text-sm text-gray-500 mb-1">Projected Assets</p>
                 <motion.div
                     key={projectedAmount}
                     initial={{ scale: 0.8, opacity: 0.5 }}
@@ -71,8 +71,8 @@ export default function TimeMachine({ currentSavings, monthlySavings }: TimeMach
             <p className="text-center text-xs text-gray-500 mt-4 h-4">
                 {months > 0 && (
                     isPositive
-                        ? "坚持现在的习惯，你可以买辆车了！🚗"
-                        : "警告：照这样下去，你会破产的。📉"
+                        ? "Keep up these habits and you could buy a car! 🚗"
+                        : "Warning: at this rate, you'll go broke. 📉"
                 )}
             </p>
         </div>
