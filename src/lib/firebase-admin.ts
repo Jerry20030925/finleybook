@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 
 let adminDb: FirebaseFirestore.Firestore | null = null;
 let adminAuth: admin.auth.Auth | null = null;
+let adminMessaging: admin.messaging.Messaging | null = null;
 
 // Only initialize Firebase Admin if all required environment variables are present
 const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
@@ -31,6 +32,7 @@ if (!admin.apps.length && hasRequiredCredentials) {
 if (admin.apps.length > 0) {
     adminDb = admin.firestore();
     adminAuth = admin.auth();
+    adminMessaging = admin.messaging();
 }
 
-export { adminDb, adminAuth };
+export { adminDb, adminAuth, adminMessaging };

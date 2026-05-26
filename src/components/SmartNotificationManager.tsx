@@ -8,6 +8,7 @@ import { db, initializeFirebase } from '@/lib/firebase'
 import { Transaction } from '@/lib/dataService'
 import { isMobileApp } from '@/lib/mobileUtils'
 import { createClientNotification } from '@/lib/clientNotificationService'
+import { requestPushPermission } from '@/lib/pushNotifications'
 
 const LARGE_EXPENSE_THRESHOLD = 500
 const INACTIVITY_DAYS = 7
@@ -37,6 +38,37 @@ export default function SmartNotificationManager() {
     const processedTransactionIds = useRef<Set<string>>(new Set())
     const sentNotificationKeys = useRef<Set<string>>(new Set())
     const isInitialLoad = useRef(true)
+
+    // Register FCM token once per session after the user logs in
+    useEffect(() => {
+        if (!user?.uid) return
+        const registered = sessionStorage.getItem(`fcm_registered_${user.uid}`)
+        if (registered) return
+
+        const registerToken = async () => {
+            try {
+                const token = await requestPushPermission()
+                if (!token) return
+
+                const { getAuth } = await import('firebase/auth')
+                const { getApps } = await import('firebase/app')
+                if (!getApps().length) return
+                const idToken = await getAuth().currentUser?.getIdToken()
+                if (!idToken) return
+
+                await fetch('/api/notifications/register-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, idToken }),
+                })
+                sessionStorage.setItem(`fcm_registered_${user.uid}`, '1')
+            } catch (err) {
+                console.warn('[Push] Token registration failed:', err)
+            }
+        }
+
+        void registerToken()
+    }, [user?.uid])
 
     useEffect(() => {
         processedTransactionIds.current = new Set()

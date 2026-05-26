@@ -1,4 +1,4 @@
-import { adminDb } from '@/lib/firebase-admin';
+import { adminDb, adminMessaging } from '@/lib/firebase-admin';
 import { ResendService } from '@/lib/resendService';
 import { Timestamp } from 'firebase-admin/firestore';
 
@@ -38,22 +38,41 @@ export async function notifyUser(userId: string, data: {
 
         console.log(`[Notification] In-app notification sent to ${userId}`);
 
-        // 2. Send Email if High Priority
+        // 2. Send Email + Push if High Priority
         if (priority === 'high') {
             const userSnap = await adminDb.collection('users').doc(userId).get();
             const userData = userSnap.data();
             const email = userData?.email;
-            const name = userData?.displayName || 'there';
+            const fcmTokens: string[] = userData?.fcmTokens ?? [];
 
             if (email) {
                 await ResendService.sendNotificationEmail(email, {
                     title: data.title,
                     message: data.body,
-                    type: data.type === 'promo' ? 'info' : data.type, // Map promo to info for email template
+                    type: data.type === 'promo' ? 'info' : data.type,
                 });
                 console.log(`[Notification] Email sent to ${email}`);
-            } else {
-                console.warn(`[Notification] No email found for user ${userId}`);
+            }
+
+            if (fcmTokens.length > 0 && adminMessaging) {
+                const result = await adminMessaging.sendEachForMulticast({
+                    tokens: fcmTokens,
+                    notification: { title: data.title, body: data.body },
+                    webpush: {
+                        fcmOptions: { link: data.link ?? '/dashboard' },
+                        notification: { icon: '/icon.png', badge: '/icon.png' },
+                    },
+                    data: data.link ? { url: data.link } : undefined,
+                });
+                // Remove tokens that are no longer valid
+                const staleTokens = fcmTokens.filter((_, i) => result.responses[i]?.error)
+                if (staleTokens.length > 0) {
+                    const { FieldValue } = await import('firebase-admin/firestore');
+                    await adminDb.collection('users').doc(userId).update({
+                        fcmTokens: FieldValue.arrayRemove(...staleTokens),
+                    });
+                }
+                console.log(`[Notification] Push sent to ${result.successCount}/${fcmTokens.length} tokens`);
             }
         }
     } catch (error) {
