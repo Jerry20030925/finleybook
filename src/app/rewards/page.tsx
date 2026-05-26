@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
     Sparkles, ArrowRight, TrendingUp, Wallet, ShoppingBag,
@@ -9,6 +9,9 @@ import {
 import { useCurrency } from '@/components/CurrencyProvider'
 import Link from 'next/link'
 import CountUp from '@/components/CountUp'
+import { useAuth } from '@/components/AuthProvider'
+import { useSubscription } from '@/components/SubscriptionProvider'
+import { getCashbackTransactions, CashbackTransaction } from '@/lib/dataService'
 
 interface MerchantDeal {
     id: string
@@ -110,15 +113,33 @@ const STEPS = [
 
 export default function RewardsPage() {
     const { country } = useCurrency()
+    const { user } = useAuth()
+    const { isProMember } = useSubscription()
     const [activeTab, setActiveTab] = useState<'deals' | 'activity'>('deals')
+    const [cashbackTxs, setCashbackTxs] = useState<CashbackTransaction[]>([])
+    const [loadingWallet, setLoadingWallet] = useState(true)
 
-    // Demo wallet values — will be pulled from Firestore once backend is live
-    const pendingBalance = 12.00
-    const availableBalance = 48.50
-    const lifetimeEarned = 145.50
+    useEffect(() => {
+        if (!user) { setLoadingWallet(false); return }
+        getCashbackTransactions(user.uid).then(txs => {
+            setCashbackTxs(txs)
+            setLoadingWallet(false)
+        })
+    }, [user])
 
-    // Simulate pro status — replace with real subscription check
-    const isPro = false
+    const pendingBalance = cashbackTxs
+        .filter(t => t.status === 'pending')
+        .reduce((sum, t) => sum + t.userCashbackAmount, 0)
+
+    const availableBalance = cashbackTxs
+        .filter(t => t.status === 'confirmed')
+        .reduce((sum, t) => sum + t.userCashbackAmount, 0)
+
+    const lifetimeEarned = cashbackTxs
+        .filter(t => t.status !== 'declined')
+        .reduce((sum, t) => sum + t.userCashbackAmount, 0)
+
+    const isPro = isProMember
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 pb-24">
@@ -272,22 +293,60 @@ export default function RewardsPage() {
                 )}
 
                 {activeTab === 'activity' && (
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
-                        <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-3">
-                            <TrendingUp size={22} className="text-gray-600" />
+                    loadingWallet ? (
+                        <div className="space-y-3">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="rounded-2xl border border-white/10 bg-white/5 p-4 h-16 animate-pulse" />
+                            ))}
                         </div>
-                        <p className="text-sm font-bold text-gray-400">No activity yet</p>
-                        <p className="text-xs text-gray-600 mt-1 max-w-[220px] mx-auto leading-relaxed">
-                            Your cashback transactions will appear here once you shop through Finleybook.
-                        </p>
-                        <button
-                            onClick={() => setActiveTab('deals')}
-                            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-xs font-bold text-white transition-colors"
-                        >
-                            <ShoppingBag size={13} />
-                            Browse Deals
-                        </button>
-                    </div>
+                    ) : cashbackTxs.length === 0 ? (
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
+                            <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-3">
+                                <TrendingUp size={22} className="text-gray-600" />
+                            </div>
+                            <p className="text-sm font-bold text-gray-400">No activity yet</p>
+                            <p className="text-xs text-gray-600 mt-1 max-w-[220px] mx-auto leading-relaxed">
+                                Your cashback transactions will appear here once you shop through Finleybook.
+                            </p>
+                            <button
+                                onClick={() => setActiveTab('deals')}
+                                className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-xs font-bold text-white transition-colors"
+                            >
+                                <ShoppingBag size={13} />
+                                Browse Deals
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {cashbackTxs.map((tx, i) => (
+                                <motion.div
+                                    key={tx.id ?? tx.skimlinksTransactionId}
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.04 }}
+                                    className="rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center gap-3"
+                                >
+                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                                        <ShoppingBag size={16} className="text-indigo-400" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-bold text-white truncate">{tx.merchantName}</p>
+                                        <p className="text-xs text-gray-500 mt-0.5">
+                                            {tx.transactionDate ? new Date(tx.transactionDate).toLocaleDateString() : '—'}
+                                        </p>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                        <p className={`text-sm font-black ${tx.status === 'confirmed' || tx.status === 'paid' ? 'text-emerald-400' : tx.status === 'declined' ? 'text-red-400' : 'text-amber-400'}`}>
+                                            +{country.symbol}{tx.userCashbackAmount.toFixed(2)}
+                                        </p>
+                                        <span className={`text-[10px] font-bold capitalize ${tx.status === 'confirmed' || tx.status === 'paid' ? 'text-emerald-500' : tx.status === 'declined' ? 'text-red-500' : 'text-amber-500'}`}>
+                                            {tx.status}
+                                        </span>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )
                 )}
 
                 {/* How it works */}

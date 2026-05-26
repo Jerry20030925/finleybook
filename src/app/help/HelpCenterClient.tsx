@@ -14,7 +14,15 @@ interface Props {
 }
 
 export default function HelpCenterClient({ faqs }: Props) {
-    const [openIndex, setOpenIndex] = useState<number | null>(0)
+    const [openIndex, setOpenIndex] = useState<number | null>(null)
+    const [query, setQuery] = useState('')
+
+    const filtered = query.trim()
+        ? faqs.filter(f =>
+            f.question.toLowerCase().includes(query.toLowerCase()) ||
+            f.answer.toLowerCase().includes(query.toLowerCase())
+          )
+        : faqs
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -26,6 +34,8 @@ export default function HelpCenterClient({ faqs }: Props) {
                         <MagnifyingGlassIcon className="absolute left-4 top-3.5 h-6 w-6 text-gray-400" />
                         <input
                             type="text"
+                            value={query}
+                            onChange={e => { setQuery(e.target.value); setOpenIndex(null) }}
                             placeholder="Search for answers..."
                             className="w-full pl-12 pr-4 py-3 rounded-xl text-gray-900 border-none shadow-lg focus:ring-2 focus:ring-indigo-300 outline-none"
                         />
@@ -36,9 +46,12 @@ export default function HelpCenterClient({ faqs }: Props) {
             {/* FAQ Content */}
             <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Frequently Asked Questions</h2>
+                {filtered.length === 0 && (
+                    <p className="text-center text-gray-500 py-8">No results for &ldquo;{query}&rdquo;. Try a different keyword.</p>
+                )}
                 <div className="space-y-4">
-                    {faqs.map((faq, index) => (
-                        <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    {filtered.map((faq, index) => (
+                        <div key={faq.question} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                             <button
                                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                                 className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
